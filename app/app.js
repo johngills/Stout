@@ -1,6 +1,6 @@
 var express = require('./node_modules/express');
 				
-var static = require('/usr/local/lib/node_modules/node-static');
+var static = require('./node_modules/node-static');
 var jade = require('jade');
 var OAuth = require('oauth').OAuth;
 var url = require('url');
@@ -21,9 +21,9 @@ parser.parse('.class { width: 1 + 1 }', function (e, tree) {
 
 // DATABASE INFO -----------------------------------------
 var mysql = require('mysql'),
-	database = 'beer',
+	database = 'mysql.mynameissterling.com',
 	user_table = 'users',
-	client = mysql.createClient({ user: 'root', password: '' });
+	client = mysql.createClient({ user: 'sterlingrules', password: '@y&7~s45' });
 	client.query('USE ' + database);
 
 // OAUTH SETUP --------------------------------------------
