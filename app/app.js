@@ -21,10 +21,17 @@ parser.parse('.class { width: 1 + 1 }', function (e, tree) {
 
 // DATABASE INFO -----------------------------------------
 var mysql = require('mysql'),
-	database = 'mysql.mynameissterling.com',
+	database = 'stout',
 	user_table = 'users',
 	client = mysql.createClient({ user: 'sterlingrules', password: '@y&7~s45' });
 	client.query('USE ' + database);
+	client.host = 'mysql.mynameissterling.com';
+
+// var mysql = require('mysql'),
+// 	database = 'beer',
+// 	user_table = 'users',
+// 	client = mysql.createClient({ user: 'root', password: '' });
+// 	client.query('USE ' + database);
 
 // OAUTH SETUP --------------------------------------------
 var oa = new OAuth(
