@@ -21,7 +21,6 @@ function loadTab(limit) {
 	
 	$.ajax({
 		cache: false,
-		time: 5000,
 		url: '/get-feed',
 		data: { limit: limit },
 		success: function(results) {
