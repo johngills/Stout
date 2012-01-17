@@ -617,6 +617,7 @@ table.stats td {
 			width: 50px;
 			margin-top: 5px;
 			background: url('/img/backbutton.hd.png') 0 -120px;
+			background-size: 75px 180px;
 		}
 		
 		#backButton {

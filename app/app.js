@@ -20,17 +20,17 @@ parser.parse('.class { width: 1 + 1 }', function (e, tree) {
 });
 
 // DATABASE INFO -----------------------------------------
-var mysql = require('mysql'),
-	database = 'stout',
-	user_table = 'users',
-	client = mysql.createClient({ user: 'sterlingrules', password: '@y&7~s45', host: 'mysql.mynameissterling.com', port: 3306 });
-	client.query('USE ' + database);
-
 // var mysql = require('mysql'),
-// 	database = 'beer',
+// 	database = 'stout',
 // 	user_table = 'users',
-// 	client = mysql.createClient({ user: 'root', password: '' });
+// 	client = mysql.createClient({ user: 'sterlingrules', password: '@y&7~s45', host: 'mysql.mynameissterling.com', port: 3306 });
 // 	client.query('USE ' + database);
+
+var mysql = require('mysql'),
+	database = 'beer',
+	user_table = 'users',
+	client = mysql.createClient({ user: 'root', password: '' });
+	client.query('USE ' + database);
 
 // OAUTH SETUP --------------------------------------------
 var oa = new OAuth(
@@ -39,8 +39,8 @@ var oa = new OAuth(
 	"6nvxG75CDfoNWTiZ8jRQ",
 	"19cnrCnCH8C7bn7xxvXl1N4jVWPtIvTZjJ8zbBthSS0",
 	"1.0",
-	// "http://localhost:1337/auth/twitter/callback",
-	"http://ps79519.dreamhostps.com:1337/auth/twitter/callback",
+	"http://localhost:1337/auth/twitter/callback",
+	// "http://ps79519.dreamhostps.com:1337/auth/twitter/callback",
 	"HMAC-SHA1"
 );
 // var timestamp = Math.round((new Date()).getTime() / 1000);
@@ -199,7 +199,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 app.get('/find-friend', checkAuth, function(req, res) {
 	console.log('search term: ' + req.query.user_name);
 	client.query(
-		'SELECT DISTINCT users.user_name, users.user_id, users.avatar, beers.name AS beer_name, beers.id FROM users, beers, feed WHERE (beers.id = feed.beer_id) AND (users.user_id = feed.user_id) AND users.user_name LIKE "%' + req.query.user_name + '%" ORDER BY users.created_date DESC LIMIT 0,10;',
+		'SELECT users.user_name, users.user_id, users.avatar, beers.name AS beer_name, beers.id FROM users, beers, feed A RIGHT JOIN (SELECT DISTINCT users.user_name FROM users) AS user_names ON (beers.id = feed.beer_id) AND (users.user_id = feed.user_id) AND users.user_name LIKE "%' + req.query.user_name + '%" ORDER BY users.created_date DESC LIMIT 0,10;',
 		function(err, sql_results, fields) {
 			if (err) throw err;
 			if (sql_results != undefined) {
