@@ -1,0 +1,26 @@
+include head
+body
+	input(type="hidden", id="user_id", value="#{user_id}")
+	section.toolbar
+		if user_name != ''
+			a#addFriend.right(href="#find_friend", onclick="loadFindFriend();")
+		h1#pageTitle
+		a#backButton.button(href="javascript:void(0);") back
+
+	section#footer
+		if user_name != ''
+			ul
+				li.the_tab.active(onclick="loadTab(0);")
+					a(href="#index")
+						span
+						| Tab
+				li.find_beer(onclick="loadFindBeer();")
+					a(href="#find_beer")
+						span
+						| Add
+				li.profile
+					a(href='#profile', onclick='loadProfile(#{user_id});')
+						span
+						| Profile
+
+	!= body

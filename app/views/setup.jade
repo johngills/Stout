@@ -1,0 +1,16 @@
+a(href='/logout', title='Logout') Logout
+h1
+  Welcome
+form
+  input#user_id(type='hidden', value=id)
+  fieldset
+    label First name:
+    input(type='text', value=first_name, name='first_name', placeholder='First name')
+  fieldset
+    label Last name:
+    input(type='text', value=last_name, name='last_name', placeholder='Last name')
+  fieldset
+    label Location name:
+    input(type='text', value='', name='location', placeholder='Begin typing the name of your location')
+    
+ul#likes
