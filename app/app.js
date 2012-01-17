@@ -39,7 +39,8 @@ var oa = new OAuth(
 	"6nvxG75CDfoNWTiZ8jRQ",
 	"19cnrCnCH8C7bn7xxvXl1N4jVWPtIvTZjJ8zbBthSS0",
 	"1.0",
-	"http://localhost:1337/auth/twitter/callback",
+	// "http://localhost:1337/auth/twitter/callback",
+	"http://ps79519.dreamhostps.com:1337/auth/twitter/callback",
 	"HMAC-SHA1"
 );
 // var timestamp = Math.round((new Date()).getTime() / 1000);
