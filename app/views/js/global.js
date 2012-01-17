@@ -363,14 +363,14 @@ function findFriend() {
 								 									+ '</a></li>');
 							}
 							if (results.length > 5) {
-								$('ul#find_beer span.results').append('<li style="height:40px;"></li>');
+								$('ul#find_friend span.results').append('<li style="height:40px;"></li>');
 							}
 						} else {
-							$('ul#find_beer span.results').empty().append('<li class="loader"><p class="meta">No one by that name, try searching for another drinking buddy</p></li>');
+							$('ul#find_friend span.results').empty().append('<li class="loader"><p class="meta">No one by that name, try searching for another drinking buddy</p></li>');
 						}
 					},
 			error: function(results) {
-						$('#find_beer span.results').empty().append('<li>There was a problem loading your tab!</li>');
+						$('#find_friend span.results').empty().append('<li>There was a problem loading your tab!</li>');
 						return false;
 					}
 		});
@@ -378,6 +378,7 @@ function findFriend() {
 }
 
 $(document).ready(function() {
+	$('html, body').animate({scrollTop: '0px'}, 0);
 	$(function() {
 		if ($('#index[title="The Tab"]').is(':visible') && $('#user_id').val() != '') {
 			loadTab(0);

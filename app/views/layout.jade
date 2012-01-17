@@ -1,14 +1,15 @@
 include head
-body
+body(ontouchmove="BlockMove(event);")
 	input(type="hidden", id="user_id", value="#{user_id}")
-	section.toolbar
-		if user_name != ''
-			a#addFriend.right(href="#find_friend", onclick="loadFindFriend();")
-		h1#pageTitle
-		a#backButton.button(href="javascript:void(0);") back
 
-	section#footer
-		if user_name != ''
+	if user_name != ''
+		section.toolbar
+			a#addFriend.right(href="#find_friend", onclick="loadFindFriend();")
+			h1#pageTitle
+			a#backButton.button(href="javascript:void(0);") back
+	
+	if user_name != ''
+		section#footer
 			ul
 				li.the_tab.active(onclick="loadTab(0);")
 					a(href="#index")

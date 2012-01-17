@@ -20,17 +20,17 @@ parser.parse('.class { width: 1 + 1 }', function (e, tree) {
 });
 
 // DATABASE INFO -----------------------------------------
-var mysql = require('mysql'),
-	database = 'stout',
-	user_table = 'users',
-	client = mysql.createClient({ user: 'sterlingrules', password: '@y&7~s45', host: 'mysql.mynameissterling.com', port: 3306 });
-	client.query('USE ' + database);
-
 // var mysql = require('mysql'),
-// 	database = 'beer',
+// 	database = 'stout',
 // 	user_table = 'users',
-// 	client = mysql.createClient({ user: 'root', password: '' });
+// 	client = mysql.createClient({ user: 'sterlingrules', password: '@y&7~s45', host: 'mysql.mynameissterling.com', port: 3306 });
 // 	client.query('USE ' + database);
+
+var mysql = require('mysql'),
+	database = 'beer',
+	user_table = 'users',
+	client = mysql.createClient({ user: 'root', password: '' });
+	client.query('USE ' + database);
 
 // OAUTH SETUP --------------------------------------------
 var oa = new OAuth(
@@ -39,8 +39,8 @@ var oa = new OAuth(
 	"6nvxG75CDfoNWTiZ8jRQ",
 	"19cnrCnCH8C7bn7xxvXl1N4jVWPtIvTZjJ8zbBthSS0",
 	"1.0",
-	// "http://localhost:1337/auth/twitter/callback",
-	"http://ps79519.dreamhostps.com:1337/auth/twitter/callback",
+	"http://localhost:1337/auth/twitter/callback",
+	// "http://ps79519.dreamhostps.com:1337/auth/twitter/callback",
 	"HMAC-SHA1"
 );
 // var timestamp = Math.round((new Date()).getTime() / 1000);
@@ -86,8 +86,21 @@ function checkAuth(req, res, next) {
 }
 
 app.get('/', function(req, res) {
-	res.render('index', { user_name: '', user_id: '', title: 'Stout' });
+	console.log(req.cookies);
+	if (req.cookies.user_name != undefined && req.cookies.user_id != undefined) {
+		req.session.user_name = req.cookies.user_name;
+		req.session.user_id = req.cookies.user_id;
+		res.redirect('/dashboard');
+	} else {
+		res.render('index', { user_name: '', user_id: '', title: 'Stout' });
+	}
 });
+
+// app.get('/', function(req, res) {
+// 	console.log(req.cookies.user_name);
+// 	console.log(req.cookies.user_id);
+// 	res.render('index', { user_name: '', user_id: '', title: 'Stout' });
+// });
 
 app.get('/dashboard', checkAuth, function(req, res) {
 	console.log(req.session.user_name);
@@ -186,7 +199,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 app.get('/find-friend', checkAuth, function(req, res) {
 	console.log('search term: ' + req.query.user_name);
 	client.query(
-		'SELECT users.user_name, users.user_id, users.avatar, beers.name AS beer_name, beers.id FROM users, beers, feed WHERE (beers.id = feed.beer_id) AND (users.user_id = feed.user_id) AND users.user_name LIKE "%' + req.query.user_name + '%" ORDER BY users.created_date DESC LIMIT 0,10;',
+		'SELECT DISTINCT users.user_name, users.user_id, users.avatar, beers.name AS beer_name, beers.id FROM users, beers, feed WHERE (beers.id = feed.beer_id) AND (users.user_id = feed.user_id) AND users.user_name LIKE "%' + req.query.user_name + '%" ORDER BY users.created_date DESC LIMIT 0,10;',
 		function(err, sql_results, fields) {
 			if (err) throw err;
 			if (sql_results != undefined) {
@@ -306,6 +319,10 @@ app.get('/auth/twitter/callback', function(req, res, next) {
 				req.session.oauth.access_token = oauth_access_token;
 				req.session.oauth.access_token_secret = oauth_access_token_secret;
 				
+				// sets cookies upon initial login
+				res.cookie('user_name', results.screen_name, { maxAge: 900000, httpOnly: true });
+				res.cookie('user_id', results.user_id, { maxAge: 900000, httpOnly: true });
+				
 				// Check database for user
 				client.query(
 					'SELECT user_name FROM ' + user_table + ' WHERE user_name = "' + results.screen_name + '";',
@@ -359,6 +376,9 @@ app.get('/auth/twitter/callback', function(req, res, next) {
 
 app.get('/logout', function(req, res) {
 	delete req.session.user_name;
+	delete req.session.user_id;
+	res.clearCookie('user_name');
+	res.clearCookie('user_id');
 	res.redirect('/');
 });
 

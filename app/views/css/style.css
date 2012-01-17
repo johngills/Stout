@@ -389,7 +389,7 @@ li p.rate_count {
 	background: url('/img/backbutton.png') 0 -120px;
 }
 #addFriend:active {
-	background: url('/img/backbutton.png') 0 -150px;
+	background-position: 0 -150px;
 }
 
 .btn {
@@ -610,6 +610,13 @@ table.stats td {
 			margin-right: 10px;
 			background: url('/img/sprite.hd.png') 0 0 no-repeat;
 			background-size: 80px 160px;
+		}
+		
+		#addFriend {
+			height: 30px;
+			width: 50px;
+			margin-top: 5px;
+			background: url('/img/backbutton.hd.png') 0 -120px;
 		}
 		
 		#backButton {
