@@ -6,7 +6,7 @@ var OAuth = require('oauth').OAuth;
 var url = require('url');
 var fs = require('fs');
 var http = require('http');
-var base64 = require('base64');
+// var base64 = require('base64');
 
 // CSS ---------------------------------------------------
 var less = require('less');
@@ -296,7 +296,7 @@ app.get('/auth/twitter/callback', function(req, res, next) {
 		var time = new Date();
 		var now = dateToString(time);
 		
-		console.log('decode: ' + base64.encode(now)); // creates nonce;
+		// console.log('decode: ' + base64.encode(now)); // creates nonce;
 		
 		oa.getOAuthAccessToken(oauth.token,oauth.token_secret,oauth.verifier, 
 		function(error, oauth_access_token, oauth_access_token_secret, results) {
