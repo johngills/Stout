@@ -390,18 +390,18 @@ $(document).ready(function() {
 	});
 	
 	// infinite scroll
-	$(window).scroll(function(){
-		var w = $(document).height() - $(window).height();
-		// var ww = w-300;
-		// Used to check the values:
-		// $('body').append('<div style="position:fixed; bottom: 250px; left: 5px; z-index:9999;;">'
-		//					  + '<input type="text" value="Window-50: ' + ww + '" />'
-		//					  + '<input type="text" value="Window Scroll: ' + $(window).scrollTop() + '" />');
-		if ($(window).scrollTop() >= w){
-			loadTab(limit);
-			limit += 10;
-		}
-	});
+	// $(window).scroll(function(){
+	// 	var w = $(document).height() - $(window).height();
+	// 	// var ww = w-300;
+	// 	// Used to check the values:
+	// 	// $('body').append('<div style="position:fixed; bottom: 250px; left: 5px; z-index:9999;;">'
+	// 	//					  + '<input type="text" value="Window-50: ' + ww + '" />'
+	// 	//					  + '<input type="text" value="Window Scroll: ' + $(window).scrollTop() + '" />');
+	// 	if ($(window).scrollTop() >= w){
+	// 		loadTab(limit);
+	// 		limit += 10;
+	// 	}
+	// });
 	
 	$('input#beer_name').live('keyup', function() {
 		findBeer();
