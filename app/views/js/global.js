@@ -380,7 +380,7 @@ function findFriend() {
 
 $(document).ready(function() {
 	$(function() {
-		if ($('#index[title="The Tab"]').is(':visible')) {
+		if ($('#index[title="The Tab"]').is(':visible') && $('#user_id').val() != '') {
 			loadTab(0);
 		}
 	});
