@@ -8,17 +8,17 @@ var fs = require('fs');
 var http = require('http');
 // var base64 = require('base64');
 
-var forever = require('forever');
-
-var child = new (forever.Monitor)('app.js', {
-	max: 3,
-	silent: true,
-	options: []
-});
-
-forever.startServer(child);
-child.on('exit', this.callback);
-child.start();
+// var forever = require('forever');
+// 
+// var child = new (forever.Monitor)('app.js', {
+// 	max: 3,
+// 	silent: true,
+// 	options: []
+// });
+// 
+// forever.startServer(child);
+// child.on('exit', this.callback);
+// child.start();
 
 // CSS ---------------------------------------------------
 var less = require('less');
