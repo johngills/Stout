@@ -148,7 +148,6 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 			if (err) throw err;
 			if (sql_results != undefined) {
 				console.log(sql_results);
-				res.send('{"status":"success"}');
 				var rate = '';
 				var time = new Date();
 				var now = dateToString(time);
