@@ -23,9 +23,8 @@ parser.parse('.class { width: 1 + 1 }', function (e, tree) {
 var mysql = require('mysql'),
 	database = 'stout',
 	user_table = 'users',
-	client = mysql.createClient({ user: 'sterlingrules', password: '@y&7~s45' });
+	client = mysql.createClient({ user: 'sterlingrules', password: '@y&7~s45', host: 'mysql.mynameissterling.com', port: 3306 });
 	client.query('USE ' + database);
-	client.host = 'mysql.mynameissterling.com';
 
 // var mysql = require('mysql'),
 // 	database = 'beer',
