@@ -1,6 +1,6 @@
 var express = require('./node_modules/express');
 				
-var static = require('./node_modules/node-static');
+var static = require('node-static');
 var jade = require('jade');
 var OAuth = require('oauth').OAuth;
 var url = require('url');
