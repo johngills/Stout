@@ -79,6 +79,7 @@ app.set('view engine', 'jade');
 
 function checkAuth(req, res, next) {
 	if (!req.session.user_name) {
+		console.log('attempted to redirect to index...');
 		res.redirect('/');
 	} else {
 		next();
@@ -86,10 +87,12 @@ function checkAuth(req, res, next) {
 }
 
 app.get('/', function(req, res) {
-	console.log(req.cookies);
-	if (req.cookies.user_name != undefined && req.cookies.user_id != undefined) {
+	console.log('cookies: ' + req.cookies);
+	console.log('cookies user_name: ' + req.cookies.user_name);
+	console.log('cookies user_id: ' + req.cookies.user_id);
+	if (req.cookies.user_name != undefined) {
 		req.session.user_name = req.cookies.user_name;
-		req.session.user_id = req.cookies.user_id;
+		// req.session.user_id = req.cookies.user_id;
 		res.redirect('/dashboard');
 	} else {
 		res.render('index', { user_name: '', user_id: '', title: 'Stout' });
@@ -199,7 +202,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 app.get('/find-friend', checkAuth, function(req, res) {
 	console.log('search term: ' + req.query.user_name);
 	client.query(
-		'SELECT users.user_name, users.user_id, users.avatar, beers.name AS beer_name, beers.id FROM users, beers, feed A RIGHT JOIN (SELECT DISTINCT users.user_name FROM users) AS user_names ON (beers.id = feed.beer_id) AND (users.user_id = feed.user_id) AND users.user_name LIKE "%' + req.query.user_name + '%" ORDER BY users.created_date DESC LIMIT 0,10;',
+		'SELECT DISTINCT users.user_name, users.user_id, users.avatar, beers.name AS beer_name, beers.id FROM users, feed, beers WHERE (beers.id = feed.beer_id) AND (users.user_id = feed.user_id) AND users.user_name LIKE "%' + req.query.user_name + '%" ORDER BY users.created_date DESC LIMIT 0,10;',
 		function(err, sql_results, fields) {
 			if (err) throw err;
 			if (sql_results != undefined) {
@@ -321,7 +324,7 @@ app.get('/auth/twitter/callback', function(req, res, next) {
 				
 				// sets cookies upon initial login
 				res.cookie('user_name', results.screen_name, { maxAge: 900000, httpOnly: true });
-				res.cookie('user_id', results.user_id, { maxAge: 900000, httpOnly: true });
+				// res.cookie('user_id', results.user_id, { maxAge: 900000, httpOnly: true });
 				
 				// Check database for user
 				client.query(
