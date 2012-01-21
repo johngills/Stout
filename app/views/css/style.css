@@ -41,6 +41,7 @@ a {
 ------------------------------------- */
 
 .ac { text-align: center; }
+.ar { text-align: right; }
 .left { float: left; }
 .right { float: right; }
 
@@ -282,6 +283,9 @@ li {
 	background: linear-gradient(top,  rgba(245,245,245,1) 0%,rgba(239,239,239,1) 100%); /* W3C */
 	border-top: 1px solid #ffffff;
 	border-bottom: 1px solid #cccccc;
+}
+li:last-child {
+	margin-bottom: 60px;
 }
 li.heading {
 	padding: 2px 10px;
@@ -568,6 +572,7 @@ ul.rate_controls li:last-child {
 
 table.stats {
 	width: 90%;
+	max-width: 90%;
 	color: #888888;
 	margin: 0 auto;
 }
@@ -580,6 +585,11 @@ table.stats td {
 	font-weight: 500;
 	padding: 5px;
 	text-align: right;
+}
+
+table.stats td p {
+	margin: 0;
+	padding: 0;
 	display: block;
     text-overflow: ellipsis;
     -o-text-overflow: ellipsis;

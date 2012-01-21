@@ -1,9 +1,15 @@
 include head
 body
+	input(type="hidden", id="user_name", value="#{user_name}")
 	input(type="hidden", id="user_id", value="#{user_id}")
 
 	if user_name != ''
 		section.toolbar
+			a#addFriend.right(href="#find_friend", onclick="loadFindFriend();")
+			h1#pageTitle
+			a#backButton.button(href="javascript:void(0);") back
+	else
+		section.toolbar(style="display:none;")
 			a#addFriend.right(href="#find_friend", onclick="loadFindFriend();")
 			h1#pageTitle
 			a#backButton.button(href="javascript:void(0);") back

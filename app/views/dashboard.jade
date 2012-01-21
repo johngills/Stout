@@ -1,22 +1,25 @@
-ul#index(title="The Tab", selected="true")
-	li
-		p Welcome 
-			a(href='/profile')= user_name
+body(onclick="store();")
+	ul#index(title="The Tab", selected="true")
+		li
+			p Welcome 
+				a(href='/profile')= user_name
 
-ul#find_beer(title="Find Beer")
-	li.input-text
-		form(id="beer_search", role="search", action="javascript:void(0);")
-			input#beer_name.search(type="text", title="search", placeholder="Search here for the booze")
-	span.results
+	ul#find_beer(title="Find Beer")
+		li.input-text
+			form(id="beer_search", role="search", action="javascript:void(0);")
+				input#beer_name.search(type="text", title="search", placeholder="Search here for the booze")
+		span.results
+			li
+				a(href="javascript:void(0);", onclick="store();") click
 
-ul#beer_detail(title="Beer")
+	ul#beer_detail(title="Beer")
 
-ul#find_beer(title="Find Beer")
+	ul#find_beer(title="Find Beer")
 
-ul#profile(title="Profile")
+	ul#profile(title="Profile")
 
-ul#find_friend(title="Find Friends")
-	li.input-text
-		form(id="friend_search", role="search", action="javascript:void(0);")
-			input#user_name.search(type="text", title="search", placeholder="Find friends by twitter handle")
-	span.results
+	ul#find_friend(title="Find Friends")
+		li.input-text
+			form(id="friend_search", role="search", action="javascript:void(0);")
+				input#user_name.search(type="text", title="search", placeholder="Find friends by twitter handle")
+		span.results

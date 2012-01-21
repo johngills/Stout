@@ -1,4 +1,32 @@
 var limit = 0;
+function store() {
+	localStorage['user_id'] = $('input#user_id').val();
+	localStorage['user_name'] = $('input#user_name').val();
+}
+
+function storeCheck() {
+	if (localStorage['user_id'] != null) {
+		var user_name = localStorage['user_name'];
+		var user_id = localStorage['user_id'];
+		$.ajax({
+			cache: false,
+			url: '/logged',
+			data: { user_name: user_name, user_id: user_id },
+			success: function(results) {
+						if (results != '') {
+							window.location='/dashboard';
+						}
+					},
+			error: function(results) {
+						return false;
+					}
+		});
+	}
+}
+
+function logout() {
+	localStorage.clear();
+}
 
 function message(message) {
 	$('body').append('<section id="overlay" onclick="$(\'#modal\').fadeOut();" style="width:100%; text-align:center; position:absolute; top:0; left:0; display:block; padding-top:75px; background:rgba(0,0,0,0.5);"><section style="background:#ffffff; color:#000000; display:block; width:150px; height:75px; margin:0 auto;">just testing</section><section style="clear:both;"></section></section>');
@@ -41,7 +69,7 @@ function loadTab(limit) {
 										action = 'likes';
 										break;
 									case 3:
-										action = 'is whatever about';
+										action = 'is meh for';
 										break;
 									case 4:
 										action = 'dislikes';
@@ -77,9 +105,7 @@ function loadTab(limit) {
 						
 						if (feed.length > 5 && results.length >= 10) {
 							limit += 10;
-							$('#index').append('<li class="load_more" onclick="loadTab(' + limit + ');">View More</li><li class="load_more"></li>');
-						} else if (feed.length > 5) {
-							$('#index').append('<li class="load_more"></li>');
+							$('#index').append('<li class="load_more" onclick="loadTab(' + limit + ');">View More</li>');
 						}
 					} else {
 						$('#index').empty().append('<li class="loader">Your tab is empty, start by adding a beer and following others!</li>');
@@ -217,8 +243,8 @@ function beerDetail(id) {
 					if (results != '') {
 						var beer_name = escape(results[0].name);
 						var abv = (results[0].abv > 0) ? '<tr><th>ABV:</th><td>' + results[0].abv + '%</td></tr>' : '';
-						var category = (results[0].cat_name != '') ? '<tr><th>Category:</th><td>' + results[0].cat_name + '</td></tr>' : '';
-						var style = (results[0].style_name != '') ? '<tr><th>Style:</th><td>' + results[0].style_name + '</td></tr>' : '';
+						var category = (results[0].cat_name != '') ? '<tr><th>Category:</th><td><p>' + results[0].cat_name + '</p></td></tr>' : '';
+						var style = (results[0].style_name != '') ? '<tr><th>Style:</th><td><p>' + results[0].style_name + '</p></td></tr>' : '';
 						
 						var love = (results[0].love > 0) ? results[0].love : '';
 						var like = (results[0].like > 0) ? results[0].like : '';
