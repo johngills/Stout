@@ -5,7 +5,8 @@ ul#index(title="The Tab", selected="true")
 
 ul#find_beer(title="Find Beer")
 	li.input-text
-		input#beer_name.search(type="search", placeholder="Search here for the booze")
+		form(id="beer_search", role="search", action="javascript:void(0);")
+			input#beer_name.search(type="text", title="search", placeholder="Search here for the booze")
 	span.results
 
 ul#beer_detail(title="Beer")
@@ -16,5 +17,6 @@ ul#profile(title="Profile")
 
 ul#find_friend(title="Find Friends")
 	li.input-text
-		input#user_name.search(type="search", placeholder="Find friends by twitter handle")
+		form(id="friend_search", role="search", action="javascript:void(0);")
+			input#user_name.search(type="text", title="search", placeholder="Find friends by twitter handle")
 	span.results

@@ -5,18 +5,19 @@ function message(message) {
 }
 
 function tabSelect(name) {
-	$('html, body').animate({scrollTop: '0px'}, 0);
 	$('#footer ul li').removeClass('active');
 	if (name != '') {
 		$('#footer ul li.' + name).addClass('active');
-	} else if ($('ul#index').is(':visible')) { // not working
-		$('#footer ul li.the_tab').addClass('active');
-		loadTab(0);
 	}
 }
 
-function loadTab(limit) {
-	$('#index').empty().append('<li class="loader">Loading your tab...</li>');
+function loadTab(limit) {	
+	if (limit == 0) {
+		$('html, body').animate({scrollTop: '0px'}, 0);
+		$('#index').empty();
+	}
+	$('.load_more').remove();
+	$('#index').append('<li class="loader">Loading your tab...</li>');
 	tabSelect('the_tab');
 	
 	$.ajax({
@@ -28,6 +29,7 @@ function loadTab(limit) {
 						if (limit == 0) {
 							$('#index').empty();
 						}
+						$('li.loader').remove();
 						for (var i = 0; i < results.length; i++) {
 							var action = '';
 							if (results[i].rating != '') {
@@ -46,18 +48,38 @@ function loadTab(limit) {
 										break;
 								}
 							}
+							var time = '';
+							if (results[i].time == 0) {
+								time = '<time class="right">just now</time>'; // seconds ago
+							} else if (results[i].time > 0 && results[i].time < 60) {
+								time = '<time class="right">' + results[i].time + 'm</time>'; // minutes ago
+							} else if (results[i].time > 59 && results[i].time < 1440) {
+								time = '<time class="right">' + Math.round(results[i].time/60) + 'h</time>'; // hours ago
+							} else if (results[i].time > 1439 && results[i].time < 10080) {
+								time = '<time class="right">' + Math.round(results[i].time/1440) + 'd</time>'; // days ago
+							} else if (results[i].time > 10079 && results[i].time < 30240) {
+								time = '<time class="right">' + Math.round(results[i].time/10080) + 'w</time>'; // weeks ago
+							}
 							var avatar = '<img src="' + results[i].avatar + '" width="32px" class="left avatar" />'
 							var item_heading = '<p class="meta">' + results[i].user_name + ' ' + action + '</p>';
 							var beer_name = '<h3>' + results[i].beer_name + '</h3>';
 							$('#index').append('<li><a href="#profile" onclick="loadProfile(' + results[i].user_id + ')">'
 												+ '<section class="icon arrow right"></section>'
+												+ time
 												+ avatar
 												+ item_heading
 												+ beer_name
 												+ '</a></li>');
 						}
-						if (results.length > 5) {
-							$('#index').append('<li style="height:40px;"></li>');
+						
+						var obj = $('#index li');
+						var feed = $.makeArray(obj);
+						
+						if (feed.length > 5 && results.length >= 10) {
+							limit += 10;
+							$('#index').append('<li class="load_more" onclick="loadTab(' + limit + ');">View More</li><li class="load_more"></li>');
+						} else if (feed.length > 5) {
+							$('#index').append('<li class="load_more"></li>');
 						}
 					} else {
 						$('#index').empty().append('<li class="loader">Your tab is empty, start by adding a beer and following others!</li>');
@@ -82,6 +104,7 @@ function loadFindFriend() {
 }
 
 function loadProfile(id) {
+	$('html, body').animate({scrollTop: '0px'}, 0);
 	$.ajax({
 		cache: false,
 		url: '/get-profile',
@@ -389,6 +412,16 @@ $(document).ready(function() {
 		tabSelect('');
 	});
 	
+	$('#beer_search').submit(function() {
+		findBeer();
+		$('#beer_name').blur();
+	});
+	
+	$('#friend_search').submit(function() {
+		findFriend();
+		$('#user_name').blur();
+	});
+	
 	// infinite scroll
 	// $(window).scroll(function(){
 	// 	var w = $(document).height() - $(window).height();
@@ -403,10 +436,10 @@ $(document).ready(function() {
 	// 	}
 	// });
 	
-	$('input#beer_name').live('keyup', function() {
-		findBeer();
-	});
-	$('input#user_name').live('keyup', function() {
-		findFriend();
-	});
+	// $('input#beer_name').live('keyup', function() {
+	// 		findBeer();
+	// 	});
+	// 	$('input#user_name').live('keyup', function() {
+	// 		findFriend();
+	// 	});
 });

@@ -25,24 +25,30 @@ var mysql = require('mysql'),
 	user_table = 'users',
 	client = mysql.createClient({ user: 'sterlingrules', password: '@y&7~s45', host: 'mysql.mynameissterling.com', port: 3306 });
 	client.query('USE ' + database);
+	client.database = 'stout';
 
 // var mysql = require('mysql'),
 // 	database = 'beer',
 // 	user_table = 'users',
 // 	client = mysql.createClient({ user: 'root', password: '' });
 // 	client.query('USE ' + database);
+// 	client.database = 'beer';
+	// client._connection.on('connect', function() { client.query('use db'); });
 
 // OAUTH SETUP --------------------------------------------
 var oa = new OAuth(
 	"https://api.twitter.com/oauth/request_token",
 	"https://api.twitter.com/oauth/access_token",
-	"6nvxG75CDfoNWTiZ8jRQ",
-	"19cnrCnCH8C7bn7xxvXl1N4jVWPtIvTZjJ8zbBthSS0",
+	"Nmqm7UthsfdjaDQ4HcxPw",
+	"PIFvIPSXlTIbqnnnjBIqoWs0VIxpQivNrIJuWxtkLI",
 	"1.0",
 	// "http://localhost:1337/auth/twitter/callback",
 	"http://ps79519.dreamhostps.com:1337/auth/twitter/callback",
 	"HMAC-SHA1"
 );
+
+// Twitter stuff
+//
 // var timestamp = Math.round((new Date()).getTime() / 1000);
 // var consumer_secret = '19cnrCnCH8C7bn7xxvXl1N4jVWPtIvTZjJ8zbBthSS0';
 // var oauth_token_secret = req.session.oauth.token_secret;
@@ -58,6 +64,16 @@ var app = express.createServer(
 				express.cookieParser(),
 				express.session({secret: 'FlurbleGurgleBurgle',
 				                store: new express.session.MemoryStore({ reapInterval: -1 }) }));
+// SOCKET.IO
+//
+// var io = require('socket.io').listen(app);
+// 
+// io.sockets.on('connection', function (socket) {
+//   socket.emit('news', { hello: 'world' });
+//   socket.on('my other event', function (data) {
+//     console.log(data);
+//   });
+// });
 
 function dateToString(date){ 
 	//check that date is a date object 
@@ -111,8 +127,10 @@ app.get('/dashboard', checkAuth, function(req, res) {
 });
 
 app.get('/get-feed', checkAuth, function(req, res) {
+	var time = new Date();
+	var now = dateToString(time);
 	client.query(
-		'SELECT DISTINCT feed.user_name, feed.user_id, users.avatar, feed.beer_id, feed.rating, feed.created_date, beers.name AS beer_name '
+		'SELECT DISTINCT feed.user_name, feed.user_id, users.avatar, feed.beer_id, feed.rating, ROUND(TIMESTAMPDIFF(SECOND,feed.created_date,"' + now + '")/60) AS time, beers.name AS beer_name '
 		+ 'FROM feed, beers, users, followers '
 		+ 'WHERE ((feed.user_id = users.user_id) AND (feed.beer_id = beers.id)) AND (((followers.owner_id = feed.user_id) AND (followers.follower_id = ' + req.session.user_id + ')) '
 		+ 'OR ((feed.user_id = ' + req.session.user_id + '))) '
@@ -323,8 +341,8 @@ app.get('/auth/twitter/callback', function(req, res, next) {
 				req.session.oauth.access_token_secret = oauth_access_token_secret;
 				
 				// sets cookies upon initial login
-				res.cookie('user_name', results.screen_name, { maxAge: 900000, httpOnly: true });
-				// res.cookie('user_id', results.user_id, { maxAge: 900000, httpOnly: true });
+				res.cookie('user_name', results.screen_name, { expires: new Date(Date.now() + 900000), httpOnly: true });
+				res.cookie('user_id', results.user_id, { expires: new Date(Date.now() + 900000), httpOnly: true });
 				
 				// Check database for user
 				client.query(

@@ -320,6 +320,14 @@ li.load-message {
 	padding: 10px;
 	font: normal 0.75em "Helvetica Neue", "Helvetica", sans-serif;
 }
+li.load_more {
+	display: block;
+	height: 40px;
+	line-height: 40px;
+	color: #888888;
+	text-align: center;
+	font-weight: bold;
+}
 li.share {
 	height: 40px;
 }
@@ -346,7 +354,7 @@ li h3 {
     overflow: hidden;
     white-space: nowrap;
 }
-li p.meta {
+li p.meta, time {
 	font: 500 0.875em "Helvetica Neue", "Helvetica", sans-serif;
 	margin: 5px 0;
 	color: #888888;
