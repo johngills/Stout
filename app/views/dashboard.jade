@@ -12,12 +12,10 @@ body(onclick="store();")
 
 	ul#beer_detail(title="Beer")
 
-	ul#find_beer(title="Find Beer")
-
 	ul#profile(title="Profile")
 
 	ul#find_friend(title="Find Friends")
 		li.input-text
 			form(id="friend_search", role="search", action="javascript:void(0);", autocorrect="off")
-				input#user_name.search(type="text", title="search", placeholder="Find friends by twitter handle")
+				input#search_user.search(type="text", title="search", placeholder="Find friends by twitter handle")
 		span.results

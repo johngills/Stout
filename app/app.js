@@ -92,7 +92,7 @@ var oa = new OAuth(
 	"Nmqm7UthsfdjaDQ4HcxPw",
 	"PIFvIPSXlTIbqnnnjBIqoWs0VIxpQivNrIJuWxtkLI",
 	"1.0",
-	// "http://localhost:1337/auth/twitter/callback",
+	//"http://localhost:1337/auth/twitter/callback",
 	"http://ps79519.dreamhostps.com:1337/auth/twitter/callback",
 	"HMAC-SHA1"
 );
@@ -224,7 +224,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 app.get('/find-friend', checkAuth, function(req, res) {
 	console.log('search term: ' + req.query.user_name);
 	client.query(
-		'SELECT DISTINCT users.user_name, users.user_id, users.avatar, beers.name AS beer_name, beers.id FROM users, feed, beers WHERE (beers.id = feed.beer_id) AND (users.user_id = feed.user_id) AND users.user_name LIKE "%' + req.query.user_name + '%" ORDER BY users.created_date DESC LIMIT 0,10;',
+		'SELECT DISTINCT users.user_name, users.first_name, users.last_name, users.user_id, users.avatar, beers.name AS beer_name, beers.id FROM users, feed, beers WHERE (beers.id = feed.beer_id) AND (users.user_id = feed.user_id) AND users.user_name LIKE "%' + req.query.user_name + '%" OR users.first_name LIKE "%' + req.query.user_name + '%" OR users.last_name LIKE "%' + req.query.user_name + '%" ORDER BY users.created_date DESC LIMIT 0,10;',
 		function(err, sql_results, fields) {
 			if (err) throw err;
 			if (sql_results != undefined) {

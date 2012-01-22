@@ -412,7 +412,7 @@ function findBeer() {
 
 function findFriend() {
 	
-	var name = $.trim($('input#user_name').val());
+	var name = $.trim($('input#search_user').val());
 	$('#find_friend span.results').empty().append('<li class="loader"><p class="meta">Brewing your search...</p></li>');
 	
 	if (name != '' && name.length > 1) {
@@ -425,7 +425,8 @@ function findFriend() {
 						if (results != '') {
 							$('ul#find_friend span.results').empty();
 							for(var i = 0; i < results.length; i++) {
-								var user_name = results[i].user_name;
+								var first_name = results[i].first_name;
+								var last_name = results[i].last_name;
 								var user_id = results[i].user_id;
 								var beer_name = '<h3>' + results[i].beer_name + '</h3>';
 								var avatar = '<p class="meta">' + results[i].avatar + '</p>';
@@ -433,7 +434,7 @@ function findFriend() {
 																	+ '<a href="#profile" id="' + user_id + '" onclick="javascript:loadProfile(' + user_id + ');">'
 																	+ '<section class="icon arrow right"></section>'
 								 									+ '<img src="' + results[0].avatar + '" width="32px" class="avatar left" />'
-																	+ '<h3>' + user_name + '</h3>'
+																	+ '<h3>' + first_name + ' ' + last_name + '</h3>'
 																	+ '<p class="meta">Last seen drinking a <b>' + results[0].beer_name + '</b></p>'
 								 									+ '</a></li>');
 							}
