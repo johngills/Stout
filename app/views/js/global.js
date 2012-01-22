@@ -24,8 +24,32 @@ function storeCheck() {
 	}
 }
 
+function test() {
+	$.ajax({
+		cache: false,
+		url: 'https://api.twitter.com/1/users/show.json',
+		data: { screen_name: 'marloyearight', user_id: '25537168' },
+		dataType: 'jsonp',
+		success: function(results) {
+					console.log(results);
+				}
+	});
+}
+
 function logout() {
-	localStorage.clear();
+	$.ajax({
+		cache: false,
+		url: '/logout',
+		success: function(results) {
+					if (results != '') {
+						localStorage.clear();
+						window.location='/';
+					}
+				},
+		error: function(results) {
+					return false;
+				}
+	});
 }
 
 function message(message) {
@@ -89,7 +113,7 @@ function loadTab(limit) {
 								time = '<time class="right">' + Math.round(results[i].time/10080) + 'w</time>'; // weeks ago
 							}
 							var avatar = '<img src="' + results[i].avatar + '" width="32px" class="left avatar" />'
-							var item_heading = '<p class="meta">' + results[i].user_name + ' ' + action + '</p>';
+							var item_heading = '<p class="meta">' + results[i].first_name + ' ' + action + '</p>';
 							var beer_name = '<h3>' + results[i].beer_name + '</h3>';
 							$('#index').append('<li><a href="#profile" onclick="loadProfile(' + results[i].user_id + ')">'
 												+ '<section class="icon arrow right"></section>'
@@ -105,7 +129,9 @@ function loadTab(limit) {
 						
 						if (feed.length > 5 && results.length >= 10) {
 							limit += 10;
-							$('#index').append('<li class="load_more" onclick="loadTab(' + limit + ');">View More</li>');
+							$('#index').append('<li class="load_more" onclick="loadTab(' + limit + ');">Tap to View More</li>');
+						} else {
+							$('#index').append('<li class="load_more">end of the line</li>');
 						}
 					} else {
 						$('#index').empty().append('<li class="loader">Your tab is empty, start by adding a beer and following others!</li>');
@@ -138,14 +164,14 @@ function loadProfile(id) {
 		success: function(results) {
 					if (results != '') {
 						// Profile heading
-						var user_name = results[0].user_name;
+						var user_name = results[0].first_name + ' ' + results[0].last_name;
 						if (results[0].user_id != $('#user_id').val()) {
 							var follow  = (results[0].created_date == null) ? '<li><a href="javascript:void(0);" onclick="follow(' + id + ');" class="btn orange ' + id + '">Follow</a></li>' : '<li><a href="javascript:void(0);" onclick="unfollow(' + id + ');" class="btn light ' + id + '">Unfollow</a></li>';
 							var profile_settings = '';
 						} else { // My profile
 							tabSelect('profile');
 							var follow = '';
-							var profile_settings = '<li><a href="mailto:me@mynameissterling.com" class="btn orange">Feedback</a><a href="/logout" class="btn orange">Logout</a><p class="meta ac">Made with love by MyNIS Labs</p><br /><br /><br /></li>'
+							var profile_settings = '<li><a href="mailto:me@mynameissterling.com" class="btn orange">Feedback</a><a href="javascript:void(0);" onclick="logout();" class="btn orange">Logout</a><p class="meta ac">Made with love by MyNIS Labs</p><br /><br /><br /></li>'
 						}
 						$('ul#profile').attr('title',user_name).empty();
 						$('ul#profile').append('<li style="height:80px;">'
@@ -176,7 +202,7 @@ function loadProfile(id) {
 											break;
 									}
 								}
-								var item_heading = '<p class="meta">' + results[i].user_name + ' ' + action + '</p>';
+								var item_heading = '<p class="meta">' + results[i].first_name + ' ' + action + '</p>';
 								var beer_name = '<h3>' + results[i].beer_name + '</h3>';
 								$('#profile').append('<li>'
 													+ '<a href="#beer_detail" onclick="beerDetail(\'' + results[i].beer_id + '\')">'

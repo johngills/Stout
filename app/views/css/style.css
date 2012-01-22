@@ -622,6 +622,15 @@ table.stats td p {
 			background-size: 120px 120px;
 		}
 		
+		li.input-text input.search {
+			background: #efefef url('/img/sprite.hd.png') -40px -45px no-repeat;
+			background-size: 80px 160px;
+		}
+		li.input-text input.search:focus {
+			background: #ffffff url('/img/sprite.hd.png') -40px -45px no-repeat;
+			background-size: 80px 160px;
+		}
+		
 		.icon {
 			display: block;
 			height: 40px;

@@ -6,11 +6,9 @@ body(onclick="store();")
 
 	ul#find_beer(title="Find Beer")
 		li.input-text
-			form(id="beer_search", role="search", action="javascript:void(0);")
+			form(id="beer_search", role="search", action="javascript:void(0);", autocorrect="off")
 				input#beer_name.search(type="text", title="search", placeholder="Search here for the booze")
 		span.results
-			li
-				a(href="javascript:void(0);", onclick="store();") click
 
 	ul#beer_detail(title="Beer")
 
@@ -20,6 +18,6 @@ body(onclick="store();")
 
 	ul#find_friend(title="Find Friends")
 		li.input-text
-			form(id="friend_search", role="search", action="javascript:void(0);")
+			form(id="friend_search", role="search", action="javascript:void(0);", autocorrect="off")
 				input#user_name.search(type="text", title="search", placeholder="Find friends by twitter handle")
 		span.results

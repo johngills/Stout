@@ -6,6 +6,8 @@ var OAuth = require('oauth').OAuth;
 var url = require('url');
 var fs = require('fs');
 var http = require('http');
+var $ = require('jquery');
+// var io = require('socket.io').listen(app);
 // var base64 = require('base64');
 
 // CSS ---------------------------------------------------
@@ -61,6 +63,7 @@ app.use(express.compiler({ src: __dirname + '/views', enable: ['less'] }));
 app.use('/css', express.static(__dirname + '/views'));
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
+app.enable('jsonp callback');
 
 function checkAuth(req, res, next) {
 	if (!req.session.user_name) {
@@ -72,19 +75,19 @@ function checkAuth(req, res, next) {
 }
 
 // DATABASE INFO -----------------------------------------
-var mysql = require('mysql'),
-	database = 'stout',
-	user_table = 'users',
-	client = mysql.createClient({ user: 'sterlingrules', password: '@y&7~s45', host: 'mysql.mynameissterling.com', port: 3306 });
-	client.query('USE ' + database);
-	client.database = 'stout';
-
 // var mysql = require('mysql'),
-// 	database = 'beer',
+// 	database = 'stout',
 // 	user_table = 'users',
-// 	client = mysql.createClient({ user: 'root', password: '' });
+// 	client = mysql.createClient({ user: 'sterlingrules', password: '@y&7~s45', host: 'mysql.mynameissterling.com', port: 3306 });
 // 	client.query('USE ' + database);
-// 	client.database = 'beer';
+// 	client.database = 'stout';
+
+var mysql = require('mysql'),
+	database = 'beer',
+	user_table = 'users',
+	client = mysql.createClient({ user: 'root', password: '' });
+	client.query('USE ' + database);
+	client.database = 'beer';
 
 var oa = new OAuth(
 	"https://api.twitter.com/oauth/request_token",
@@ -92,14 +95,14 @@ var oa = new OAuth(
 	"Nmqm7UthsfdjaDQ4HcxPw",
 	"PIFvIPSXlTIbqnnnjBIqoWs0VIxpQivNrIJuWxtkLI",
 	"1.0",
-	"http://ps79519.dreamhostps.com:1337/auth/twitter/callback",
-	// "http://localhost:1337/auth/twitter/callback",
+	//"http://ps79519.dreamhostps.com:1337/auth/twitter/callback",
+	"http://localhost:1337/auth/twitter/callback",
 	"HMAC-SHA1"
 );
 
 // SOCKET.IO
 //
-// var io = require('socket.io').listen(app);
+// 
 // 
 // io.sockets.on('connection', function (socket) {
 //   socket.emit('news', { hello: 'world' });
@@ -117,7 +120,7 @@ function dateToString(date){
 }
 
 app.get('/', function(req, res) {
-	console.log('cookies: ' + req.cookies);
+	// console.log('cookies: ' + req.cookies);
 	if (req.session.user_name != undefined) {
 		res.redirect('/dashboard');
 	} else {
@@ -129,7 +132,7 @@ app.get('/logged', function(req, res) {
 	if (req.query.user_name != undefined) {
 		req.session.user_name = req.query.user_name;
 		req.session.user_id = req.query.user_id;
-		res.send('{"status":"success"}');
+		res.json(['success']);
 		// res.redirect('/dashboard');
 	} else {
 		return false;
@@ -145,7 +148,7 @@ app.get('/get-feed', checkAuth, function(req, res) {
 	var time = new Date();
 	var now = dateToString(time);
 	client.query(
-		'SELECT DISTINCT feed.user_name, feed.user_id, users.avatar, feed.beer_id, feed.rating, ROUND(TIMESTAMPDIFF(SECOND,feed.created_date,"' + now + '")/60) AS time, beers.name AS beer_name '
+		'SELECT DISTINCT feed.user_name, feed.user_id, users.first_name, users.last_name, users.avatar, feed.beer_id, feed.rating, ROUND(TIMESTAMPDIFF(SECOND,feed.created_date,"' + now + '")/60) AS time, beers.name AS beer_name '
 		+ 'FROM feed, beers, users, followers '
 		+ 'WHERE ((feed.user_id = users.user_id) AND (feed.beer_id = beers.id)) AND (((followers.owner_id = feed.user_id) AND (followers.follower_id = ' + req.session.user_id + ')) '
 		+ 'OR ((feed.user_id = ' + req.session.user_id + '))) '
@@ -252,7 +255,7 @@ app.get('/get-profile', checkAuth, function(req, res) {
 	}
 	console.log('profile for user id: ' + user_id);
 	client.query(
-		'SELECT users.user_name, users.avatar, users.user_id, feed.beer_id, feed.rating, beers.name AS beer_name, followers.created_date FROM users, feed, beers LEFT OUTER JOIN followers ON (follower_id = ' + req.session.user_id + ') AND (owner_id = ' + req.query.user_id + ') WHERE (users.user_id = ' + user_id + ') AND (feed.user_id = ' + user_id + ') AND (feed.beer_id = beers.id) ORDER BY feed.created_date DESC LIMIT 0,5;',
+		'SELECT users.user_name, users.first_name, users.last_name, users.avatar, users.user_id, feed.beer_id, feed.rating, beers.name AS beer_name, followers.created_date FROM users, feed, beers LEFT OUTER JOIN followers ON (follower_id = ' + req.session.user_id + ') AND (owner_id = ' + req.query.user_id + ') WHERE (users.user_id = ' + user_id + ') AND (feed.user_id = ' + user_id + ') AND (feed.beer_id = beers.id) ORDER BY feed.created_date DESC LIMIT 0,5;',
 		function(err, sql_results, fields) {
 			if (err) throw err;
 			if (sql_results != undefined && sql_results != '') {
@@ -376,7 +379,6 @@ app.get('/auth/twitter/callback', function(req, res, next) {
 						// Get user creation datetime
 						var time = new Date();
 						var now = dateToString(time);
-						var avatar = '';
 						// Checks if user is already in database
 						if (has_user) {
 							req.session.user_name = results.screen_name;
@@ -388,21 +390,23 @@ app.get('/auth/twitter/callback', function(req, res, next) {
 							user_name = results.screen_name;
 							req.session.user_name = user_name;
 							req.session.user_id = results.user_id;
-							http.get({
-								host: 'api.twitter.com',
-								port: 80,
-								path: '/1/users/profile_image/' + results.screen_name + '.json' },
-								function(res) {
-									avatar = res.header('Location');
-									console.log(res.header('Location'));
-									client.query(
-										'INSERT INTO ' + user_table + ' ' +
-										'SET user_id = ?, user_name = ?, avatar = ?, access_token = ?, access_token_secret = ?, created_date = ?',
-										[results.user_id, results.screen_name, avatar, oauth_access_token, oauth_access_token_secret, now]
-									);
-								}
-							);
-							res.redirect('/dashboard');
+							$.ajax({
+								cache: false,
+								url: 'https://api.twitter.com/1/users/show.json',
+								data: { screen_name: results.screen_name, user_id: results.user_id },
+								dataType: 'jsonp',
+								success: function(data) {
+											var avatar = data.profile_image_url;
+											var full_name = data.name;
+											var name = full_name.split(' ');
+											client.query(
+												'INSERT INTO ' + user_table + ' ' +
+												'SET user_id = ?, user_name = ?, first_name = ?, last_name = ?, avatar = ?, access_token = ?, access_token_secret = ?, created_date = ?',
+												[results.user_id, results.screen_name, name[0], name[1], avatar, oauth_access_token, oauth_access_token_secret, now]
+											);
+											res.redirect('/dashboard');
+										}
+							});
 						}
 					});
 			}
@@ -417,7 +421,8 @@ app.get('/logout', function(req, res) {
 	delete req.session.user_id;
 	// res.clearCookie('user_name');
 	// res.clearCookie('user_id');
-	res.redirect('/');
+	res.send('{"status":"success"}');
+	// res.redirect('/');
 });
 
 app.listen(1337);
