@@ -1,7 +1,12 @@
 var limit = 0;
 function store() {
-	localStorage['user_id'] = $('input#user_id').val();
-	localStorage['user_name'] = $('input#user_name').val();
+	var user_id = $('input#user_id').val();
+	var user_name = $('input#user_name').val();
+	if ((user_id != undefined && user_name != undefined) || (user_id != '' && user_name != '')) {
+		localStorage.clear();
+		localStorage['user_id'] = user_id;
+		localStorage['user_name'] = user_name;
+	}
 }
 
 function storeCheck() {
@@ -13,16 +18,19 @@ function storeCheck() {
 			url: '/logged',
 			data: { user_name: user_name, user_id: user_id },
 			success: function(results) {
-						if (results != '') {
+						console.log(results);
+						if (results.status == 'success') {
 							window.location='/dashboard';
-						} else {
-							window.location='/';
 						}
 					},
 			error: function(results) {
+						console.log(results);
 						return false;
 					}
 		});
+	} else {
+		localStorage.clear();
+		return false;
 	}
 }
 
@@ -43,7 +51,7 @@ function logout() {
 		cache: false,
 		url: '/logout',
 		success: function(results) {
-					if (results != '') {
+					if (results.status == 'success') {
 						localStorage.clear();
 						window.location='/';
 					}
@@ -439,9 +447,6 @@ function findFriend() {
 																	+ '<h3>' + first_name + ' ' + last_name + '</h3>'
 																	+ '<p class="meta">Last seen drinking a <b>' + results[0].beer_name + '</b></p>'
 								 									+ '</a></li>');
-							}
-							if (results.length > 5) {
-								$('ul#find_friend span.results').append('<li style="height:40px;"></li>');
 							}
 						} else {
 							$('ul#find_friend span.results').empty().append('<li class="loader"><p class="meta">No one by that name, try searching for another drinking buddy</p></li>');

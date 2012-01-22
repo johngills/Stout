@@ -318,20 +318,20 @@ li > a[selected], li > a:active {
 	background: -ms-linear-gradient(top,  rgba(254,252,234,1) 0%,rgba(255,255,204,1) 100%); /* IE10+ */
 	background: linear-gradient(top,  rgba(254,252,234,1) 0%,rgba(255,255,204,1) 100%); /* W3C */
 }
-li.load-message, li.loader {
+li.load-message {
 	padding-left: 60px;
 	display: block;
 	height: 40px;
 	line-height: 40px;
 	color: #aaaaaa;
-	font: bold 1.25em "Helvetica Neue", "Helvetica", sans-serif;
+	font: bold 1em "Helvetica Neue", "Helvetica", sans-serif;
 }
 li.loader:after {
 	content: '';
 	display: block;
 	height: 30px;
 	width: 30px;
-	margin: -31px 0 0 -47px;
+	margin: -31px 0 0 0;
 	background: url('../img/loader.png') 0 0 no-repeat;
 }
 li.load_more {
@@ -367,6 +367,9 @@ li h3 {
     -webkit-text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
+}
+li.loader p.meta {
+	padding-left: 50px;
 }
 li p.meta, time {
 	font: 500 0.875em "Helvetica Neue", "Helvetica", sans-serif;

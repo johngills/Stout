@@ -1,4 +1,4 @@
-body(onclick="store();")
+body(onload="store();")
 	ul#index(title="The Tab", selected="true")
 		li
 			p Welcome 
@@ -17,5 +17,5 @@ body(onclick="store();")
 	ul#find_friend(title="Find Friends")
 		li.input-text
 			form(id="friend_search", role="search", action="javascript:void(0);", autocorrect="off")
-				input#search_user.search(type="text", title="search", placeholder="Find friends by twitter handle")
+				input#search_user.search(type="text", title="search", placeholder="Find friends by name or twitter handle")
 		span.results
