@@ -1,4 +1,6 @@
 var limit = 0;
+var time = new Date();
+
 function store() {
 	var user_id = $('input#user_id').val();
 	var user_name = $('input#user_name').val();
@@ -10,6 +12,10 @@ function store() {
 }
 
 function storeCheck() {
+	if (localStorage['revision1'] == null) {
+		localStorage.clear();
+		localStorage['revision1'] = time;
+	}
 	if (localStorage['user_id'] != null) {
 		var user_name = localStorage['user_name'];
 		var user_id = localStorage['user_id'];
