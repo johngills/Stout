@@ -94,8 +94,8 @@ var oa = new OAuth(
 	"Nmqm7UthsfdjaDQ4HcxPw",
 	"PIFvIPSXlTIbqnnnjBIqoWs0VIxpQivNrIJuWxtkLI",
 	"1.0",
-	"http://localhost:1337/auth/twitter/callback",
-	// "http://ps79519.dreamhostps.com:1337/auth/twitter/callback",
+	// "http://localhost:1337/auth/twitter/callback",
+	"http://ps79519.dreamhostps.com:1337/auth/twitter/callback",
 	"HMAC-SHA1"
 );
 
