@@ -15,6 +15,8 @@ function storeCheck() {
 			success: function(results) {
 						if (results != '') {
 							window.location='/dashboard';
+						} else {
+							window.location='/';
 						}
 					},
 			error: function(results) {

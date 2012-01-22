@@ -64,7 +64,7 @@ app.enable('jsonp callback');
 function checkAuth(req, res, next) {
 	if (!req.session.user_name) {
 		console.log('attempted to redirect to index...');
-		res.redirect('/');
+		res.redirect('/logout');
 	} else {
 		next();
 	}
