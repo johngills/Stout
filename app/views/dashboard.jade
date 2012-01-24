@@ -7,15 +7,42 @@ body(onload="store();")
 	ul#find_beer(title="Find Beer")
 		li.input-text
 			form(id="beer_search", role="search", action="javascript:void(0);", autocorrect="off")
-				input#beer_name.search(type="text", title="search", placeholder="Search here for the booze")
+				input#beer_name.search(type="text", title="search", placeholder="Find booze")
 		span.results
 
 	ul#beer_detail(title="Beer")
+
+	ul#add_beer(title="Add Beer")
+		form#add_beer_form(action="javascript:void(0);")
+			li
+				input#add_beer_name.text(type="text", name="add_beer_name", placeholder="Beer name")
+			li.textarea
+				textarea.text(placeholder="Beer description (Optional)")
+			li.abv_attribute.hide
+				input#add_beer_name.text(type="text", name="add_beer_name", placeholder="Alcohol by volume (%)")
+			li.cat_attribute.hide
+				input#add_beer_name.text(type="text", name="add_beer_name", placeholder="Category", disabled="disabled")
+			li.style_attribute.hide
+				input#add_beer_name.text(type="text", name="add_beer_name", placeholder="Style", disabled="disabled")
+			li
+				ul.add_attributes
+					li.abv_select(onclick="showAttribute('abv')") ABV
+						span.left +
+					li.cat_select(onclick="showAttribute('cat')") Category
+						span.left +
+					li.style_select(onclick="showAttribute('style')") Style
+						span.left +
+			li(style="display:none;")
+				select
+					option British Ale
+					option Irish Ale
+			li
+				a.btn.orange(href="javascript:void(0);") Beer Me
 
 	ul#profile(title="Profile")
 
 	ul#find_friend(title="Find Friends")
 		li.input-text
 			form(id="friend_search", role="search", action="javascript:void(0);", autocorrect="off")
-				input#search_user.search(type="text", title="search", placeholder="Find friends by name or twitter handle")
+				input#search_user.search(type="text", title="search", placeholder="Find drinking buddies")
 		span.results

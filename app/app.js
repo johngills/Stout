@@ -21,17 +21,6 @@ parser.parse('.class { width: 1 + 1 }', function (e, tree) {
     tree.toCSS({ compress: true }); // Minify CSS output
 });
 
-// SOCKET.IO
-//
-// io.sockets.on('connection', function (socket) {
-//   socket.emit('news', { hello: 'world' });
-//   socket.on('my other event', function (data) {
-//     console.log(data);
-//   });
-// });
-
-// client._connection.on('connect', function() { client.query('use db'); });
-
 // Twitter stuff
 //
 // var timestamp = Math.round((new Date()).getTime() / 1000);
@@ -54,7 +43,6 @@ process.on('uncaughtException', function(err) {
 	console.log('Caught exception: ' + err.stack);
 });
 
-// app.use(express.cookieParser());
 app.use(express.compiler({ src: __dirname + '/views', enable: ['less'] }));
 app.use('/css', express.static(__dirname + '/views'));
 app.set('views', __dirname + '/views');
@@ -164,6 +152,15 @@ app.get('/find-beer', checkAuth, function(req, res) {
 			}
 		});
 });
+
+// SOCKET.IO
+// 
+// io.sockets.on('connection', function (socket) {
+//   socket.emit('news', { hello: 'world' });
+//   socket.on('my other event', function (data) {
+//     console.log(data);
+//   });
+// });
 
 app.get('/beer-detail', checkAuth, function(req, res) {
 	client.query(
