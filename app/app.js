@@ -10,7 +10,7 @@ var $ = require('jquery');
 // var base64 = require('base64');
 
 var time = new Date();
-var now = dateToString(time);
+var current = dateToString(time);
 
 // CSS ---------------------------------------------------
 var less = require('less');
@@ -133,9 +133,9 @@ app.get('/dashboard', checkAuth, function(req, res) {
 
 app.get('/get-feed', checkAuth, function(req, res) {
 	var time = new Date();
-	var now = dateToString(time);
+	var current = dateToString(time);
 	client.query(
-		'SELECT DISTINCT feed.user_name, feed.user_id, users.first_name, users.last_name, users.avatar, feed.beer_id, feed.rating, ROUND(TIMESTAMPDIFF(SECOND,feed.created_date,"' + now + '")/60) AS time, beers.name AS beer_name '
+		'SELECT DISTINCT feed.user_name, feed.user_id, users.first_name, users.last_name, users.avatar, feed.beer_id, feed.rating, ROUND(TIMESTAMPDIFF(SECOND,feed.created_date,"' + current + '")/60) AS time, beers.name AS beer_name '
 		+ 'FROM feed, beers, users, followers '
 		+ 'WHERE ((feed.user_id = users.user_id) AND (feed.beer_id = beers.id)) AND (((followers.owner_id = feed.user_id) AND (followers.follower_id = ' + req.session.user_id + ')) '
 		+ 'OR ((feed.user_id = ' + req.session.user_id + '))) '
@@ -208,7 +208,7 @@ everyone.now.insertNewBeer = function(name, brewery, description, abv, category,
 	client.query(
 		'INSERT INTO beers ' +
 		'SET name = ?, brewery_id = ?, description = ?, cat_id = ?, style_id = ?, abv = ?, last_mod = ?',
-		[name, brewery, description, category, style, abv, now],
+		[name, brewery, description, category, style, abv, current],
 		function(err, results, fields) {
 			if (err) throw err;
 			console.log(results);
@@ -237,7 +237,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 				console.log(sql_results);
 				var rate = '';
 				var time = new Date();
-				var now = dateToString(time);
+				var current = dateToString(time);
 				switch(req.query.rate) {
 					case 'love':
 						rate = 1;
@@ -255,7 +255,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 				client.query(
 					'INSERT INTO feed ' +
 					'SET user_id = ?, user_name = ?, beer_id = ?, rating = ?, created_date = ?',
-					[req.session.user_id, req.session.user_name, req.query.beer_id, rate, now],
+					[req.session.user_id, req.session.user_name, req.query.beer_id, rate, current],
 					function(err, sql_results, fields) {
 						if (err) throw err;
 						if (sql_results != undefined) {
@@ -312,11 +312,11 @@ app.get('/get-profile', checkAuth, function(req, res) {
 
 app.get('/follow', checkAuth, function(req, res) {
 	var time = new Date();
-	var now = dateToString(time);
+	var current = dateToString(time);
 	client.query(
 		'INSERT INTO followers ' +
 		'SET owner_id = ?, follower_id = ?, created_date = ?',
-		[req.query.owner_id, req.session.user_id, now],
+		[req.query.owner_id, req.session.user_id, current],
 		function(err, sql_results, fields) {
 			if (err) throw err;
 			if (sql_results != undefined) {
@@ -328,7 +328,7 @@ app.get('/follow', checkAuth, function(req, res) {
 
 app.get('/unfollow', checkAuth, function(req, res) {
 	var time = new Date();
-	var now = dateToString(time);
+	var current = dateToString(time);
 	client.query(
 		'DELETE FROM followers WHERE (owner_id = ' + req.query.owner_id + ') AND (follower_id = ' + req.session.user_id + ')',
 		function(err, sql_results, fields) {
@@ -380,7 +380,7 @@ app.get('/auth/twitter/callback', function(req, res, next) {
 		var has_user = false;
 		
 		var time = new Date();
-		var now = dateToString(time);
+		var current = dateToString(time);
 		
 		// console.log('decode: ' + base64.encode(now)); // creates nonce;
 		
@@ -413,15 +413,15 @@ app.get('/auth/twitter/callback', function(req, res, next) {
 						console.log('does user exist already? ' + has_user);
 						// Get user creation datetime
 						var time = new Date();
-						var now = dateToString(time);
+						var current = dateToString(time);
 						// Checks if user is already in database
 						if (has_user) {
 							req.session.user_name = results.screen_name;
 							req.session.user_id = results.user_id;
-							console.log(now);
+							console.log(current);
 							res.redirect('/dashboard');
 						} else {
-							console.log(now);
+							console.log(current);
 							user_name = results.screen_name;
 							req.session.user_name = user_name;
 							req.session.user_id = results.user_id;
@@ -437,7 +437,7 @@ app.get('/auth/twitter/callback', function(req, res, next) {
 											client.query(
 												'INSERT INTO ' + user_table + ' ' +
 												'SET user_id = ?, user_name = ?, first_name = ?, last_name = ?, avatar = ?, access_token = ?, access_token_secret = ?, created_date = ?',
-												[results.user_id, results.screen_name, name[0], name[1], avatar, oauth_access_token, oauth_access_token_secret, now]
+												[results.user_id, results.screen_name, name[0], name[1], avatar, oauth_access_token, oauth_access_token_secret, current]
 											);
 											res.redirect('/dashboard');
 										}
