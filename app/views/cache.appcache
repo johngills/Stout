@@ -1,0 +1,25 @@
+CACHE MANIFEST
+
+# Version 1
+
+CACHE:
+/img/app-startup.hd.png
+/img/app-startup.png
+/img/backbutton.hd.png
+/img/backbutton.png
+/img/index_beer.hd.png
+/img/index_beer.png
+/img/sprite.hd.png
+/img/sprites.hd.png
+/img/sprite.png
+/img/sprites.png
+/img/stout-app-icon-hd.png
+/img/wood-mahogany.jpg
+/js/iui.js
+/js/jquery.autoSuggest.packed.js
+/js/less-1.2.1.min.js
+
+https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js
+
+NETWORK:
+*

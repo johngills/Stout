@@ -1,4 +1,4 @@
-var express = require('./node_modules/express');
+var express = require('express');
 				
 var static = require('node-static');
 var jade = require('jade');
@@ -7,8 +7,10 @@ var url = require('url');
 var fs = require('fs');
 var http = require('http');
 var $ = require('jquery');
-// var io = require('socket.io').listen(app);
 // var base64 = require('base64');
+
+var time = new Date();
+var now = dateToString(time);
 
 // CSS ---------------------------------------------------
 var less = require('less');
@@ -38,6 +40,8 @@ var app = express.createServer(
 				express.cookieParser(),
 				express.session({secret: 'FlurbleGurgleBurgle',
 				                store: new express.session.MemoryStore({ reapInterval: -1 }) }));
+app.listen(1337);
+var everyone = require("now").initialize(app);
 
 process.on('uncaughtException', function(err) {
 	console.log('Caught exception: ' + err.stack);
@@ -51,6 +55,8 @@ app.enable('jsonp callback');
 
 function checkAuth(req, res, next) {
 	if (!req.session.user_name) {
+		delete req.session.user_name;
+		delete req.session.user_id;
 		console.log('attempted to redirect to index...');
 		res.redirect('/');
 	} else {
@@ -59,19 +65,19 @@ function checkAuth(req, res, next) {
 }
 
 // DATABASE INFO -----------------------------------------
-var mysql = require('mysql'),
-	database = 'stout',
-	user_table = 'users',
-	client = mysql.createClient({ user: 'sterlingrules', password: '@y&7~s45', host: 'mysql.mynameissterling.com', port: 3306 });
-	client.query('USE ' + database);
-	client.database = 'stout';
-
 // var mysql = require('mysql'),
-// 	database = 'beer',
+// 	database = 'stout',
 // 	user_table = 'users',
-// 	client = mysql.createClient({ user: 'root', password: '' });
+// 	client = mysql.createClient({ user: 'sterlingrules', password: '@y&7~s45', host: 'mysql.mynameissterling.com', port: 3306 });
 // 	client.query('USE ' + database);
-// 	client.database = 'beer';
+// 	client.database = 'stout';
+
+var mysql = require('mysql'),
+	database = 'beer',
+	user_table = 'users',
+	client = mysql.createClient({ user: 'root', password: '' });
+	client.query('USE ' + database);
+	client.database = 'beer';
 
 // OAUTH SETUP --------------------------------------------
 var oa = new OAuth(
@@ -80,8 +86,8 @@ var oa = new OAuth(
 	"Nmqm7UthsfdjaDQ4HcxPw",
 	"PIFvIPSXlTIbqnnnjBIqoWs0VIxpQivNrIJuWxtkLI",
 	"1.0",
-	//"http://localhost:1337/auth/twitter/callback",
-	"http://ps79519.dreamhostps.com:1337/auth/twitter/callback",
+	"http://localhost:1337/auth/twitter/callback",
+	//"http://ps79519.dreamhostps.com:1337/auth/twitter/callback",
 	"HMAC-SHA1"
 );
 
@@ -93,8 +99,11 @@ function dateToString(date){
 	return ""; 
 }
 
+
+
+
+
 app.get('/', function(req, res) {
-	// console.log('cookies: ' + req.cookies);
 	if (req.session.user_name != undefined) {
 		res.redirect('/dashboard');
 	} else {
@@ -153,15 +162,6 @@ app.get('/find-beer', checkAuth, function(req, res) {
 		});
 });
 
-// SOCKET.IO
-// 
-// io.sockets.on('connection', function (socket) {
-//   socket.emit('news', { hello: 'world' });
-//   socket.on('my other event', function (data) {
-//     console.log(data);
-//   });
-// });
-
 app.get('/beer-detail', checkAuth, function(req, res) {
 	client.query(
 		'SELECT beers.name, beers.description, beers.abv, beers.love, beers.like, beers.meh, beers.dislike, breweries.name AS brewery, categories.cat_name, styles.style_name, feed.rating FROM beers, breweries, categories, styles LEFT OUTER JOIN feed ON (feed.user_id = ' + req.session.user_id + ' AND feed.beer_id = ' + req.query.beer_id + ') WHERE (beers.id = ' + req.query.beer_id + ') AND (beers.brewery_id = breweries.id) AND (beers.cat_id = categories.id) AND (beers.style_id = styles.id)',
@@ -173,6 +173,54 @@ app.get('/beer-detail', checkAuth, function(req, res) {
 			}
 		});
 });
+
+everyone.now.addBeer = function(msg){
+    console.log(msg);
+}
+everyone.now.getBreweries = function(){
+    client.query(
+		'SELECT name, id AS value FROM breweries',
+		function(err, results, fields) {
+			if (err) throw err;
+			console.log(results);
+			everyone.now.showBreweries(results);
+	});
+}
+everyone.now.getBeerCategories = function(){
+    client.query(
+		'SELECT * FROM categories',
+		function(err, results, fields) {
+			if (err) throw err;
+			console.log(results);
+			everyone.now.showBeerCategories(results);
+	});
+}
+everyone.now.getBeerStyles = function(id){
+    client.query(
+		'SELECT * FROM styles WHERE cat_id = ' + id,
+		function(err, results, fields) {
+			if (err) throw err;
+			console.log(results);
+			everyone.now.showBeerStyles(results);
+	});
+}
+everyone.now.insertNewBeer = function(name, brewery, description, abv, category, style) {
+	client.query(
+		'INSERT INTO beers ' +
+		'SET name = ?, brewery_id = ?, description = ?, cat_id = ?, style_id = ?, abv = ?, last_mod = ?',
+		[name, brewery, description, category, style, abv, now],
+		function(err, results, fields) {
+			if (err) throw err;
+			console.log(results);
+			client.query(
+				'SELECT id, name FROM beers WHERE name = "' + name + '";',
+				function(err, results, fields) {
+					if (err) throw err;
+					console.log(results)
+					everyone.now.showNewBeer(results);
+			});
+	});
+}
 
 app.get('/beer-checkin', checkAuth, function(req, res) {
 	console.log('beerid: ' + req.query.beer_id);
@@ -225,7 +273,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 app.get('/find-friend', checkAuth, function(req, res) {
 	console.log('search term: ' + req.query.user_name);
 	client.query(
-		'SELECT DISTINCT users.user_name, users.first_name, users.last_name, users.user_id, users.avatar, beers.name AS beer_name, beers.id FROM users, feed, beers WHERE (beers.id = feed.beer_id) AND (users.user_id = feed.user_id) AND users.user_name LIKE "%' + req.query.user_name + '%" OR users.first_name LIKE "%' + req.query.user_name + '%" OR users.last_name LIKE "%' + req.query.user_name + '%" ORDER BY users.created_date DESC LIMIT 0,10;',
+		'SELECT DISTINCT users.user_name, users.first_name, users.last_name, users.user_id, users.avatar FROM users WHERE users.user_name LIKE "%' + req.query.user_name + '%" OR users.first_name LIKE "%' + req.query.user_name + '%" OR users.last_name LIKE "%' + req.query.user_name + '%" ORDER BY users.created_date DESC LIMIT 0,10;',
 		function(err, sql_results, fields) {
 			if (err) throw err;
 			if (sql_results != undefined) {
@@ -406,11 +454,7 @@ app.get('/auth/twitter/callback', function(req, res, next) {
 app.get('/logout', function(req, res) {
 	delete req.session.user_name;
 	delete req.session.user_id;
-	// res.clearCookie('user_name');
-	// res.clearCookie('user_id');
 	res.json({'status':'success'});
-	// res.redirect('/');
 });
 
-app.listen(1337);
 console.log('Connected...');

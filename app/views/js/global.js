@@ -1,5 +1,16 @@
-var limit = 0;
+var limit = 0,
+	breweries = '';
 var time = new Date();
+
+function load(message,error) {
+	$('#load_overlay').remove();
+	if (message != undefined) {
+		$('body').append('<section id="load_overlay" style="display:block;"><section class="dialogue">' + message + '</section></section>');
+	}
+	if (error != '') {
+		setTimeout("$('#load_overlay').remove();",1000);
+	}
+}
 
 function store() {
 	var user_id = $('input#user_id').val();
@@ -79,7 +90,8 @@ function tabSelect(name) {
 	}
 }
 
-function loadTab(limit) {	
+function loadTab(limit) {
+	
 	if (limit == 0) {
 		$('html, body').animate({scrollTop: '0px'}, 0);
 		$('#index').empty();
@@ -241,6 +253,7 @@ function loadProfile(id) {
 }
 
 function follow(id) {
+	load('Brewing...');
 	$.ajax({
 		cache: false,
 		url: '/follow',
@@ -248,7 +261,9 @@ function follow(id) {
 		success: function(results) {
 					if (results != '') {
 						$('a.' + id).replaceWith('<a href="javascript:void(0);" onclick="unfollow(' + id + ');" class="btn light ' + id + '">Unfollow</a>');
+						load();
 					} else {
+						load('Something went wrong!','error');
 						console.log('There was an error!');
 					}
 				},
@@ -259,6 +274,7 @@ function follow(id) {
 }
 
 function unfollow(id) {
+	load('Brewing...');
 	$.ajax({
 		cache: false,
 		url: '/unfollow',
@@ -266,7 +282,9 @@ function unfollow(id) {
 		success: function(results) {
 					if (results != '') {
 						$('a.' + id).replaceWith('<a href="javascript:void(0);" onclick="follow(' + id + ');" class="btn orange ' + id + '">Follow</a>');
+						load();
 					} else {
+						load('Something went wrong!','error');
 						console.log('There was an error!');
 					}
 				},
@@ -278,6 +296,7 @@ function unfollow(id) {
 
 function beerDetail(id) {
 	$('html, body').animate({scrollTop: '0px'}, 0);
+	load('Brewing...');
 	$.ajax({
 		cache: false,
 		url: '/beer-detail',
@@ -285,6 +304,7 @@ function beerDetail(id) {
 		success: function(results) {
 					if (results != '') {
 						var beer_name = escape(results[0].name);
+						var brewery = (results[0].cat_name != '') ? '<p class="stats"><b>Brewery:</b>' + results[0].brewery + '</p>' : '';
 						var abv = (results[0].abv > 0) ? '<p class="stats"><b>ABV:</b>' + results[0].abv + '%</p>' : '';
 						var category = (results[0].cat_name != '') ? '<p class="stats"><b>Category:</b>' + results[0].cat_name + '</p>' : '';
 						var style = (results[0].style_name != '') ? '<p class="stats"><b>Style:</b>' + results[0].style_name + '</p>' : '';
@@ -322,6 +342,9 @@ function beerDetail(id) {
 															+ style
 															+ '</li>'
 															+ '<li style="display:none;"><a href="#index" onclick="loadTab();" class="btn orange">Beer Me</a></li>');
+						load();
+					} else {
+						load('Something went wrong!','error');
 					}
 				},
 		error: function() {
@@ -339,7 +362,13 @@ function updateBeerCount(id,unrate) {
 		$('ul.' + id + ' li.' + unrate + ' p.rate_count').empty().append(uncount);
 	}
 }
-
+function getAttributes() {
+	load('Brewing...');
+	now.getBreweries();
+	now.getBeerCategories();
+	var q = $('#beer_name').val();
+	$('#add_beer_name').val(q);
+}
 function showAttribute(id) {
 	var field = $('.' + id + '_attribute');
 	var select = $('.' + id + '_select');
@@ -347,12 +376,105 @@ function showAttribute(id) {
 		select.removeClass('active');
 		field.addClass('hide').val('');
 	} else {
-		select.addClass('active');
 		field.removeClass('hide').val('');
+		switch(id) {
+			case 'cat':
+				select.addClass('active');
+				var cat = $('select#beer_categories option:selected').text();
+				$('#add_beer_category').val(cat);
+				$('select#beer_categories').focus();
+				break;
+			case 'style':
+				var style = $('select#beer_styles option:selected').text();
+				$('#add_beer_style').val(style);
+				$('select#beer_styles').focus();
+				break;
+			case 'abv':
+				select.addClass('active');
+				$('input#add_beer_abv').focus();
+				break;
+		}
+	}
+}
+now.showBeerCategories = function(cat) {
+	for(var i = 0; i < cat.length; i++) {
+		$('select#beer_categories').append('<option val="' + cat[i].id + '">' + cat[i].cat_name + '</option>');
+	}
+	console.log(cat);
+}
+now.updateBeerCategory = function() {
+	var id = $('select#beer_categories option:selected').attr('val');
+	var cat = $('select#beer_categories option:selected').text();
+	$('#add_beer_category').val(cat);
+	now.getBeerStyles(id);
+}
+
+now.updateBeerStyle = function() {
+	var style = $('select#beer_styles option:selected').text();
+	$('#add_beer_style').val(style);
+}
+now.showBeerStyles = function(style) {
+	$('select#beer_styles').empty();
+	for(var i = 0; i < style.length; i++) {
+		$('select#beer_styles').append('<option val="' + style[i].id + '">' + style[i].style_name + '</option>');
+	}
+	showAttribute('style');
+	console.log(style);
+}
+now.showBreweries = function(breweries) {
+	load();
+	console.log(breweries);
+	data = { items: breweries };
+	$('input#add_beer_brewery').autoSuggest(data.items, {
+		startText: 'Brewery',
+		limitText: 'You can only choose one brewery',
+		selectedItemProp: 'name',
+		selectedValuesProp: 'value',
+		searchObjProps: 'name',
+		retrieveLimit: 3,
+		neverSubmit: true,
+		selectionLimit: 1,
+		selectionAdded: function() { $('#add_beer_description').focus(); $('#add_beer_form ul.as-selections li.as-original input').css('display','none'); },
+		selectionRemoved: function() { clearBrewery(); }
+	});
+}
+function clearBrewery() {
+	$('#add_beer_form ul.as-selections li.as-original input').css('display','block');
+	$('#add_beer_form input.as-values').val('');
+	$('#add_beer_form ul.as-selections li.as-selection-item').remove();
+}
+function addNewBeer() { // TODO: check if any fields are empty before inserting into database
+	load('Brewing...');
+	var name = $('input#add_beer_name').val();
+	var brewery = $('#add_beer_form input.as-values').val().replace(',','');
+	var description = $('#add_beer_description').val();
+	var abv = $('input#add_beer_abv').val().replace('%','');
+	var category = $('select#beer_categories option:selected').attr('val');
+	var style = $('select#beer_styles option:selected').attr('val');
+	if (brewery == '') {
+		brewery = 1425;
+	}
+	if (!$('.cat_selet').hasClass('active')) {
+		category = 11;
+		style = 132;
+	}
+	if (!$('.abv_selet').hasClass('active')) {
+		abv = 0;
+	}
+	now.insertNewBeer(name, brewery, description, abv, category, style);
+	// alert(name + ' ' + brewery + ' ' + description + ' ' + abv + ' ' + category + ' ' + style);
+}
+now.showNewBeer = function(data) {
+	load('Beer added successfully!');
+	console.log(data);
+	if (data[0].id != undefined) {
+		window.location='/dashboard#_beer_detail';
+		beerDetail(data[0].id);
 	}
 }
 
 function rateBeer(id,rate) {
+	load('Brewing...');
 	var unrate = '';
 	if ($('ul.' + id + ' li').hasClass('active')) {
 		if ($('ul.' + id + ' li.love').hasClass('active')) {
@@ -378,6 +500,7 @@ function rateBeer(id,rate) {
 		dataType: 'json',
 		success: function(results) {
 					if (results.status == 'success') {
+						load();
 						var rate_count = $('ul.' + id + ' li.' + rate + ' p.rate_count');
 						$('ul.' + id + ' li.' + rate).addClass('active');
 						var count = parseInt(rate_count.text());
@@ -387,6 +510,7 @@ function rateBeer(id,rate) {
 							rate_count.empty().append(count + 1);
 						}
 					} else {
+						load('Something went wrong!','error');
 						alert('There was an error!');
 					}
 				},
@@ -423,16 +547,16 @@ function findBeer() {
 								 									+ '</a></li>');
 							}
 							if (results.length < 5) {
-								$('ul#find_beer span.results').append('<li><a href="#add_beer" class="ac btn orange" style="display:none;">Add new beer</a></li>');
+								$('ul#find_beer span.results').append('<li><a href="#add_beer" onclick="getAttributes();" class="ac btn orange">Add new beer</a></li>');
 							} else {
-								$('ul#find_beer span.results').append('<li><a href="#add_beer" class="ac btn orange" style="display:none;">Add new beer</a></li>');
+								$('ul#find_beer span.results').append('<li><a href="#add_beer" onclick="getAttributes();" class="ac btn orange">Add new beer</a></li>');
 							}
 						} else {
-							$('ul#find_beer span.results').empty().append('<li><a href="#add_beer" class="ac btn orange" style="display:none;">Add new beer</a></li>');
+							$('ul#find_beer span.results').empty().append('<li><a href="#add_beer" onclick="getAttributes();" class="ac btn orange">Add new beer</a></li>');
 						}
 					},
 			error: function(results) {
-						$('#find_beer span.results').empty().append('<li class="loader"><p class="meta">There was a problem loading your tab!</a></li>');
+						$('#find_beer span.results').empty().append('<li class="loader"><p class="meta">Something went wrong!</p></li>');
 						return false;
 					}
 		});
@@ -472,7 +596,7 @@ function findFriend() {
 						}
 					},
 			error: function(results) {
-						$('#find_friend span.results').empty().append('<li>There was a problem loading your tab!</li>');
+						$('#find_friend span.results').empty().append('<li class="loader"><p class="meta">Something went wrong!</p></li>');
 						return false;
 					}
 		});
@@ -486,6 +610,8 @@ $(document).ready(function() {
 			loadTab(0);
 		}
 	});
+	
+	// $('input.text').watermark();
 	
 	$('#backButton').live('click',function() {
 		tabSelect('');

@@ -15,29 +15,29 @@ body(onload="store();")
 	ul#add_beer(title="Add Beer")
 		form#add_beer_form(action="javascript:void(0);")
 			li
-				input#add_beer_name.text(type="text", name="add_beer_name", placeholder="Beer name")
+				input#add_beer_name.text(type="text", name="add_beer_name", placeholder="Name", title="Name")
+			li(style="position:relative; z-index:999;")
+				input#add_beer_brewery.text(type="text", name="add_beer_brewery", placeholder="Brewery", title="Brewery", autocorrect="off", onfocus="$('html, body').animate({scrollTop: '84px'}, 0);")
 			li.textarea
-				textarea.text(placeholder="Beer description (Optional)")
+				textarea#add_beer_description.text(placeholder="Description (Optional)", title="Description (Optional)")
 			li.abv_attribute.hide
-				input#add_beer_name.text(type="text", name="add_beer_name", placeholder="Alcohol by volume (%)")
-			li.cat_attribute.hide
-				input#add_beer_name.text(type="text", name="add_beer_name", placeholder="Category", disabled="disabled")
-			li.style_attribute.hide
-				input#add_beer_name.text(type="text", name="add_beer_name", placeholder="Style", disabled="disabled")
+				input#add_beer_abv.text(type="number", name="add_beer_abv", placeholder="Alcohol by volume (%)", title="Alcohol by volume (%)")
+			li.cat_attribute.hide(onclick="$('select#beer_categories').focus();")
+				input#add_beer_category.text(type="text", name="add_beer_category", placeholder="Add Category", disabled="disabled")
+				select#beer_categories(onchange="now.updateBeerCategory();")
+			li.style_attribute.hide(onclick="$('select#beer_styles').focus();")
+				input#add_beer_style.text(type="text", name="add_beer_style", placeholder="Add Style (Optional)", disabled="disabled")
+				select#beer_styles(onchange="now.updateBeerStyle();")
 			li
 				ul.add_attributes
-					li.abv_select(onclick="showAttribute('abv')") ABV
-						span.left +
-					li.cat_select(onclick="showAttribute('cat')") Category
-						span.left +
-					li.style_select(onclick="showAttribute('style')") Style
-						span.left +
-			li(style="display:none;")
-				select
-					option British Ale
-					option Irish Ale
+					li.abv_select.ac(onclick="showAttribute('abv')")
+						b +
+						| ABV
+					li.cat_select.ac(onclick="showAttribute('cat')")
+						b +
+						| Category
 			li
-				a.btn.orange(href="javascript:void(0);") Beer Me
+				a.btn.orange(href="javascript:void(0);", onclick="addNewBeer();") Add Beer
 
 	ul#profile(title="Profile")
 

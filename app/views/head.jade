@@ -1,5 +1,5 @@
 !!! 5
-html(lang='en')
+html(lang="en",  manifest="/cache.appcache")
 	head
 		meta(http-equiv='Content-Type', content='text/html; charset=utf-8')
 		meta(http-equiv='Content-Language', content='en-us')
@@ -12,14 +12,9 @@ html(lang='en')
 		link(rel="stylesheet", type="text/css", href="css/iui.css")
 		link(rel="stylesheet", type="text/css", href="css/style.css")
 		script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js')
-		script(src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js')
 		script(src='http://static.ak.fbcdn.net/connect/en_US/core.js')
-		script(src="js/socket.io.js")
+		script(type="text/javascript", src="http://localhost:1337/nowjs/now.js")
+		script(src="js/jquery.autoSuggest.packed.js")
+		script(src="js/jquery.watermark.js")
 		script(src="js/iui.js")
 		script(src="js/global.js")
-		script
-			var socket = io.connect('http://localhost');
-			socket.on('news', function (data) {
-			console.log(data);
-			socket.emit('my other event', { my: 'data' });
-			});
