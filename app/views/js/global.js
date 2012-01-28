@@ -23,9 +23,9 @@ function store() {
 }
 
 function storeCheck() {
-	if (localStorage['revision2'] == null) {
+	if (localStorage['revision3'] == null) {
 		localStorage.clear();
-		localStorage['revision2'] = time;
+		localStorage['revision3'] = time;
 	}
 	if (localStorage['user_id'] != null) {
 		var user_name = localStorage['user_name'];
