@@ -562,7 +562,7 @@ function addNewBeer() { // TODO: check if any fields are empty before inserting 
 	var abv = $('input#add_beer_abv').val().replace('%','');
 	var category = $('select#beer_categories option:selected').attr('val');
 	var style = $('select#beer_styles option:selected').attr('val');
-	if (brewery == '' && brewery_name == '') {
+	if (brewery == '' && !$('#add_beer_form li.as-selection-item').text().is(':empty')) {
 		brewery = 1425;
 	} else {
 		brewery = addNewBrewery(brewery_name);
