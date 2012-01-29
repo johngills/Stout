@@ -24,10 +24,10 @@ body(onload="store();")
 				input#add_beer_abv.text(type="number", name="add_beer_abv", placeholder="Alcohol by volume (%)", title="Alcohol by volume (%)")
 			li.cat_attribute.hide(onclick="$('select#beer_categories').focus();")
 				input#add_beer_category.text(type="text", name="add_beer_category", placeholder="Add Category", disabled="disabled")
-				select#beer_categories(onchange="now.updateBeerCategory();")
+				select#beer_categories
 			li.style_attribute.hide(onclick="$('select#beer_styles').focus();")
 				input#add_beer_style.text(type="text", name="add_beer_style", placeholder="Add Style (Optional)", disabled="disabled")
-				select#beer_styles(onchange="now.updateBeerStyle();")
+				select#beer_styles
 			li
 				ul.add_attributes
 					li.abv_select.ac(onclick="showAttribute('abv')")

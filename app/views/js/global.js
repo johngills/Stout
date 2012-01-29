@@ -19,6 +19,8 @@ function store() {
 		localStorage.clear();
 		localStorage['user_id'] = user_id;
 		localStorage['user_name'] = user_name;
+	} else {
+		logout();
 	}
 }
 
@@ -337,6 +339,7 @@ function beerDetail(id) {
 															+ '<li onclick="rateBeer(' + id + ',\'dislike\');" class="dislike' + dislike_active + '"><p class="rate_count right">' + dislike + '</p><span></span></li>'
 															+ '</ul></li>'
 															+ '<li id="' + id + '">'
+															+ brewery
 															+ abv
 															+ category
 															+ style
@@ -364,10 +367,80 @@ function updateBeerCount(id,unrate) {
 }
 function getAttributes() {
 	load('Brewing...');
-	now.getBreweries();
-	now.getBeerCategories();
+	// now.getBreweries();
+	// now.getBeerCategories();
+	getBreweries();
+	getBeerCategories();
 	var q = $('#beer_name').val();
 	$('#add_beer_name').val(q);
+}
+function getBreweries() {
+	$.ajax({
+		cache: false,
+		url: '/get-breweries',
+		success: function(breweries) {
+					load();
+					console.log(breweries);
+					data = { items: breweries };
+					$('input#add_beer_brewery').autoSuggest(data.items, {
+						startText: 'Brewery',
+						limitText: 'You can only choose one brewery',
+						selectedItemProp: 'name',
+						selectedValuesProp: 'value',
+						searchObjProps: 'name',
+						retrieveLimit: 3,
+						neverSubmit: true,
+						selectionLimit: 1,
+						selectionAdded: function() { $('#add_beer_description').focus(); $('#add_beer_form ul.as-selections li.as-original input').css('display','none'); },
+						selectionRemoved: function() { clearBrewery(); }
+					});
+				},
+		error: function() {
+					console.log('Something went wrong!');
+					return false;
+				}
+	});
+}
+function getBeerCategories() {
+	$.ajax({
+		cache: false,
+		url: '/get-beer-categories',
+		success: function(results) {
+					if (results != '') {
+						for(var i = 0; i < results.length; i++) {
+							$('select#beer_categories').append('<option val="' + results[i].id + '">' + results[i].cat_name + '</option>');
+						}
+					} else {
+						load('Something went wrong!','error');
+					}
+				},
+		error: function() {
+					console.log('Something went wrong!');
+					return false;
+				}
+	});
+}
+function getBeerStyles(id) {
+	$.ajax({
+		cache: false,
+		url: '/get-beer-styles',
+		data: { cat_id: id },
+		success: function(results) {
+					if (results != '') {
+						$('select#beer_styles').empty();
+						for(var i = 0; i < results.length; i++) {
+							$('select#beer_styles').append('<option val="' + results[i].id + '">' + results[i].style_name + '</option>');
+						}
+						showAttribute('style');
+					} else {
+						load('Something went wrong!','error');
+					}
+				},
+		error: function() {
+					console.log('Something went wrong!');
+					return false;
+				}
+	});
 }
 function showAttribute(id) {
 	var field = $('.' + id + '_attribute');
@@ -375,6 +448,9 @@ function showAttribute(id) {
 	if (select.hasClass('active')) {
 		select.removeClass('active');
 		field.addClass('hide').val('');
+		if (id == 'cat') {
+			$('.style_attribute').addClass('hide').val('');
+		}
 	} else {
 		field.removeClass('hide').val('');
 		switch(id) {
@@ -396,63 +472,101 @@ function showAttribute(id) {
 		}
 	}
 }
-now.showBeerCategories = function(cat) {
-	for(var i = 0; i < cat.length; i++) {
-		$('select#beer_categories').append('<option val="' + cat[i].id + '">' + cat[i].cat_name + '</option>');
-	}
-	console.log(cat);
-}
-now.updateBeerCategory = function() {
+
+// now.showBeerCategories = function(cat) {
+// 	for(var i = 0; i < cat.length; i++) {
+// 		$('select#beer_categories').append('<option val="' + cat[i].id + '">' + cat[i].cat_name + '</option>');
+// 	}
+// 	console.log(cat);
+// }
+
+// now.updateBeerCategory = function() {
+// 	var id = $('select#beer_categories option:selected').attr('val');
+// 	var cat = $('select#beer_categories option:selected').text();
+// 	$('#add_beer_category').val(cat);
+// 	now.getBeerStyles(id);
+// }
+
+function updateBeerCategory() {
 	var id = $('select#beer_categories option:selected').attr('val');
 	var cat = $('select#beer_categories option:selected').text();
 	$('#add_beer_category').val(cat);
-	now.getBeerStyles(id);
+	getBeerStyles(id);
 }
 
-now.updateBeerStyle = function() {
+// now.updateBeerStyle = function() {
+// 	var style = $('select#beer_styles option:selected').text();
+// 	$('#add_beer_style').val(style);
+// }
+
+function updateBeerStyle() {
 	var style = $('select#beer_styles option:selected').text();
 	$('#add_beer_style').val(style);
 }
-now.showBeerStyles = function(style) {
-	$('select#beer_styles').empty();
-	for(var i = 0; i < style.length; i++) {
-		$('select#beer_styles').append('<option val="' + style[i].id + '">' + style[i].style_name + '</option>');
-	}
-	showAttribute('style');
-	console.log(style);
-}
-now.showBreweries = function(breweries) {
-	load();
-	console.log(breweries);
-	data = { items: breweries };
-	$('input#add_beer_brewery').autoSuggest(data.items, {
-		startText: 'Brewery',
-		limitText: 'You can only choose one brewery',
-		selectedItemProp: 'name',
-		selectedValuesProp: 'value',
-		searchObjProps: 'name',
-		retrieveLimit: 3,
-		neverSubmit: true,
-		selectionLimit: 1,
-		selectionAdded: function() { $('#add_beer_description').focus(); $('#add_beer_form ul.as-selections li.as-original input').css('display','none'); },
-		selectionRemoved: function() { clearBrewery(); }
-	});
-}
+
+// now.showBeerStyles = function(style) {
+// 	$('select#beer_styles').empty();
+// 	for(var i = 0; i < style.length; i++) {
+// 		$('select#beer_styles').append('<option val="' + style[i].id + '">' + style[i].style_name + '</option>');
+// 	}
+
+// 	showAttribute('style');
+// 	console.log(style);
+// }
+
+// now.showBreweries = function(breweries) {
+// 	load();
+// 	console.log(breweries);
+// 	data = { items: breweries };
+// 	$('input#add_beer_brewery').autoSuggest(data.items, {
+// 		startText: 'Brewery',
+// 		limitText: 'You can only choose one brewery',
+// 		selectedItemProp: 'name',
+// 		selectedValuesProp: 'value',
+// 		searchObjProps: 'name',
+// 		retrieveLimit: 3,
+// 		neverSubmit: true,
+// 		selectionLimit: 1,
+// 		selectionAdded: function() { $('#add_beer_description').focus(); $('#add_beer_form ul.as-selections li.as-original input').css('display','none'); },
+// 		selectionRemoved: function() { clearBrewery(); }
+// 	});
+// }
 function clearBrewery() {
 	$('#add_beer_form ul.as-selections li.as-original input').css('display','block');
 	$('#add_beer_form input.as-values').val('');
 	$('#add_beer_form ul.as-selections li.as-selection-item').remove();
 }
+function addNewBrewery(name) {
+	$.ajax({
+		cache: false,
+		url: '/add-new-brewery',
+		success: function(results) {
+					if (results != '') {
+						return results[0].id;
+					} else {
+						load('Something went wrong!','error');
+					}
+				},
+		error: function() {
+					console.log('Something went wrong!');
+					return false;
+				}
+	});
+}
 function addNewBeer() { // TODO: check if any fields are empty before inserting into database
 	load('Brewing...');
 	var name = $('input#add_beer_name').val();
+	var brewery_name = $('#add_beer_form input.as-values').val();
 	var brewery = $('#add_beer_form input.as-values').val().replace(',','');
 	var description = $('#add_beer_description').val();
 	var abv = $('input#add_beer_abv').val().replace('%','');
 	var category = $('select#beer_categories option:selected').attr('val');
 	var style = $('select#beer_styles option:selected').attr('val');
-	if (brewery == '') {
+	if (brewery == '' && brewery_name == '') {
 		brewery = 1425;
+	} else {
+		brewery = addNewBrewery(brewery_name);
+		console.log('new brewery: ' + brewery);
 	}
 	if (!$('.cat_selet').hasClass('active')) {
 		category = 11;
@@ -461,10 +575,34 @@ function addNewBeer() { // TODO: check if any fields are empty before inserting 
 	if (!$('.abv_selet').hasClass('active')) {
 		abv = 0;
 	}
-	now.insertNewBeer(name, brewery, description, abv, category, style);
+	//now.insertNewBeer(name, brewery, description, abv, category, style);
+	$.ajax({
+		cache: false,
+		url: '/new-beer',
+		data: { name: name, brewery: brewery, description: description, abv: abv, category: category, style: style },
+		success: function(results) {
+					if (results != '') {
+						showNewBeer(results);
+					} else {
+						load('Something went wrong!','error');
+					}
+				},
+		error: function() {
+					console.log('Something went wrong!');
+					return false;
+				}
+	});
 	// alert(name + ' ' + brewery + ' ' + description + ' ' + abv + ' ' + category + ' ' + style);
 }
-now.showNewBeer = function(data) {
+// now.showNewBeer = function(data) {
+// 	load('Beer added successfully!');
+// 	console.log(data);
+// 	if (data[0].id != undefined) {
+// 		window.location='/dashboard#_beer_detail';
+// 		beerDetail(data[0].id);
+// 	}
+// }
+function showNewBeer(data) {
 	load('Beer added successfully!');
 	console.log(data);
 	if (data[0].id != undefined) {
@@ -610,6 +748,10 @@ $(document).ready(function() {
 			loadTab(0);
 		}
 	});
+	
+	$('select#beer_categories').change(function() { updateBeerCategory(); });
+	// $('select#beer_categories').blur(function() { updateBeerCategory(); });
+	$('select#beer_styles').change(function() { updateBeerStyle(); });
 	
 	// $('input.text').watermark();
 	

@@ -177,50 +177,110 @@ app.get('/beer-detail', checkAuth, function(req, res) {
 everyone.now.addBeer = function(msg){
     console.log(msg);
 }
-everyone.now.getBreweries = function(){
-    client.query(
+// everyone.now.getBreweries = function(){
+//     client.query(
+// 		'SELECT name, id AS value FROM breweries',
+// 		function(err, results, fields) {
+// 			if (err) throw err;
+// 			console.log(results);
+// 			everyone.now.showBreweries(results);
+// 	});
+// }
+app.get('/get-breweries', checkAuth, function(req, res) {
+	client.query(
 		'SELECT name, id AS value FROM breweries',
 		function(err, results, fields) {
 			if (err) throw err;
 			console.log(results);
-			everyone.now.showBreweries(results);
+			res.send(results);
 	});
-}
-everyone.now.getBeerCategories = function(){
-    client.query(
+});
+// everyone.now.getBeerCategories = function(){
+//     client.query(
+// 		'SELECT * FROM categories',
+// 		function(err, results, fields) {
+// 			if (err) throw err;
+// 			console.log(results);
+// 			everyone.now.showBeerCategories(results);
+// 	});
+// }
+app.get('/get-beer-categories', checkAuth, function(req, res) {
+	client.query(
 		'SELECT * FROM categories',
 		function(err, results, fields) {
 			if (err) throw err;
 			console.log(results);
-			everyone.now.showBeerCategories(results);
+			res.send(results);
 	});
-}
-everyone.now.getBeerStyles = function(id){
-    client.query(
-		'SELECT * FROM styles WHERE cat_id = ' + id,
+});
+// everyone.now.getBeerStyles = function(id){
+//     client.query(
+// 		'SELECT * FROM styles WHERE cat_id = ' + id,
+// 		function(err, results, fields) {
+// 			if (err) throw err;
+// 			console.log(results);
+// 			everyone.now.showBeerStyles(results);
+// 	});
+// }
+app.get('/get-beer-styles', checkAuth, function(req, res) {
+	client.query(
+		'SELECT * FROM styles WHERE cat_id = ' + req.query.cat_id,
 		function(err, results, fields) {
 			if (err) throw err;
 			console.log(results);
-			everyone.now.showBeerStyles(results);
+			res.send(results);
 	});
-}
-everyone.now.insertNewBeer = function(name, brewery, description, abv, category, style) {
+});
+// everyone.now.insertNewBeer = function(name, brewery, description, abv, category, style) {
+// 	client.query(
+// 		'INSERT INTO beers ' +
+// 		'SET name = ?, brewery_id = ?, description = ?, cat_id = ?, style_id = ?, abv = ?, last_mod = ?',
+// 		[name, brewery, description, category, style, abv, current],
+// 		function(err, results, fields) {
+// 			if (err) throw err;
+// 			console.log(results);
+// 			client.query(
+// 				'SELECT id, name FROM beers WHERE name = "' + name + '";',
+// 				function(err, results, fields) {
+// 					if (err) throw err;
+// 					console.log(results);
+// 					everyone.now.showNewBeer(results);
+// 			});
+// 	});
+// }
+app.get('/add-new-brewery', checkAuth, function(req, res) {
 	client.query(
-		'INSERT INTO beers ' +
-		'SET name = ?, brewery_id = ?, description = ?, cat_id = ?, style_id = ?, abv = ?, last_mod = ?',
-		[name, brewery, description, category, style, abv, current],
+		'INSERT INTO breweries SET name = ?',
+		[req.query.name],
 		function(err, results, fields) {
 			if (err) throw err;
 			console.log(results);
 			client.query(
-				'SELECT id, name FROM beers WHERE name = "' + name + '";',
+				'SELECT id, name FROM breweries WHERE name = "' + req.query.name + '";',
 				function(err, results, fields) {
 					if (err) throw err;
-					console.log(results)
-					everyone.now.showNewBeer(results);
+					console.log(results);
+					res.send(results);
 			});
 	});
-}
+});
+app.get('/new-beer', checkAuth, function(req, res) {
+	client.query(
+		'INSERT INTO beers ' +
+		'SET name = ?, brewery_id = ?, description = ?, cat_id = ?, style_id = ?, abv = ?, last_mod = ?',
+		[req.query.name, req.query.brewery, req.query.description, req.query.category, req.query.style, req.query.abv, current],
+		function(err, results, fields) {
+			if (err) throw err;
+			console.log(results);
+			client.query(
+				'SELECT id, name FROM beers WHERE name = "' + req.query.name + '";',
+				function(err, results, fields) {
+					if (err) throw err;
+					console.log(results);
+					res.send(results);
+			});
+	});
+});
 
 app.get('/beer-checkin', checkAuth, function(req, res) {
 	console.log('beerid: ' + req.query.beer_id);
