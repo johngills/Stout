@@ -562,11 +562,14 @@ function addNewBeer() { // TODO: check if any fields are empty before inserting 
 	var abv = $('input#add_beer_abv').val().replace('%','');
 	var category = $('select#beer_categories option:selected').attr('val');
 	var style = $('select#beer_styles option:selected').attr('val');
-	if (brewery == '' && !$('#add_beer_form li.as-selection-item').text().is(':empty')) {
+	// if (brewery == '' && !$('#add_beer_form li.as-selection-item').text().is(':empty')) {
+	// 	brewery = 1425;
+	// } else {
+	// 	brewery = addNewBrewery(brewery_name);
+	// 	console.log('new brewery: ' + brewery);
+	// }
+	if (brewery == '') {
 		brewery = 1425;
-	} else {
-		brewery = addNewBrewery(brewery_name);
-		console.log('new brewery: ' + brewery);
 	}
 	if (!$('.cat_selet').hasClass('active')) {
 		category = 11;
