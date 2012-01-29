@@ -41,7 +41,7 @@ var app = express.createServer(
 				express.session({secret: 'FlurbleGurgleBurgle',
 				                store: new express.session.MemoryStore({ reapInterval: -1 }) }));
 app.listen(1337);
-var everyone = require("now").initialize(app);
+// var everyone = require("now").initialize(app);
 
 process.on('uncaughtException', function(err) {
 	console.log('Caught exception: ' + err.stack);
