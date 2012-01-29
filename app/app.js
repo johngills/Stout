@@ -174,9 +174,6 @@ app.get('/beer-detail', checkAuth, function(req, res) {
 		});
 });
 
-everyone.now.addBeer = function(msg){
-    console.log(msg);
-}
 // everyone.now.getBreweries = function(){
 //     client.query(
 // 		'SELECT name, id AS value FROM breweries',
@@ -439,10 +436,10 @@ app.get('/auth/twitter/callback', function(req, res, next) {
 		var oauth = req.session.oauth;
 		var has_user = false;
 		
-		var time = new Date();
-		var current = dateToString(time);
+		// var time = new Date();
+		// var current = dateToString(time);
 		
-		// console.log('decode: ' + base64.encode(now)); // creates nonce;
+		// console.log('decode: ' + base64.encode(current)); // creates nonce;
 		
 		oa.getOAuthAccessToken(oauth.token,oauth.token_secret,oauth.verifier, 
 		function(error, oauth_access_token, oauth_access_token_secret, results) {
