@@ -40,7 +40,8 @@ var app = express.createServer(
 				express.cookieParser(),
 				express.session({secret: 'FlurbleGurgleBurgle',
 				                store: new express.session.MemoryStore({ reapInterval: -1 }) }));
-app.listen(1337);
+//app.listen(1337);
+app.listen(80);
 // var everyone = require("now").initialize(app);
 
 process.on('uncaughtException', function(err) {
