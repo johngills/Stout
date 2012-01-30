@@ -41,19 +41,8 @@ var app = express.createServer(
 				express.session({secret: 'FlurbleGurgleBurgle',
 				                store: new express.session.MemoryStore({ reapInterval: -1 }) }));
 // var everyone = require("now").initialize(app);
-//app.listen(1337);
-app.listen(80);
-var forever = require('forever');
-
-var child = new (forever.Monitor)('app.js', {
-  max: 3,
-  silent: true,
-  options: []
-});
-
-forever.startServer(child);
-child.on('exit', this.callback);
-child.start();
+app.listen(1337);
+//app.listen(80);
 
 process.on('uncaughtException', function(err) {
 	console.log('Caught exception: ' + err.stack);
