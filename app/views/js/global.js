@@ -1,6 +1,6 @@
-var limit = 0,
-	breweries = '';
-var time = new Date();
+var limit = 0;
+var date = new Date();
+var time = encodeURIComponent(date);
 
 function load(message,error) {
 	$('#load_overlay').remove();
@@ -15,20 +15,23 @@ function load(message,error) {
 function store() {
 	var user_id = $('input#user_id').val();
 	var user_name = $('input#user_name').val();
-	if ((user_id != undefined && user_name != undefined) || (user_id != '' && user_name != '')) {
+	if (user_name != '' || user_id != '') {
 		localStorage.clear();
 		localStorage['user_id'] = user_id;
 		localStorage['user_name'] = user_name;
+		console.log(localStorage['user_id']);
+		console.log(localStorage['user_name']);
+		loadTab(0);
 	} else {
 		logout();
 	}
 }
 
 function storeCheck() {
-	if (localStorage['revision3'] == null) {
-		localStorage.clear();
-		localStorage['revision3'] = time;
-	}
+	// if (localStorage['revision'] == null) {
+	// 	localStorage.clear();
+	// 	localStorage['revision'] = time;
+	// }
 	if (localStorage['user_id'] != null) {
 		var user_name = localStorage['user_name'];
 		var user_id = localStorage['user_id'];
@@ -47,22 +50,7 @@ function storeCheck() {
 						return false;
 					}
 		});
-	} else {
-		localStorage.clear();
-		return false;
 	}
-}
-
-function test() {
-	$.ajax({
-		cache: false,
-		url: 'https://api.twitter.com/1/users/show.json',
-		data: { screen_name: 'marloyearight', user_id: '25537168' },
-		dataType: 'jsonp',
-		success: function(results) {
-					console.log(results);
-				}
-	});
 }
 
 function logout() {
@@ -562,13 +550,15 @@ function addNewBeer() { // TODO: check if any fields are empty before inserting 
 	var abv = $('input#add_beer_abv').val().replace('%','');
 	var category = $('select#beer_categories option:selected').attr('val');
 	var style = $('select#beer_styles option:selected').attr('val');
-	// if (brewery == '' && !$('#add_beer_form li.as-selection-item').text().is(':empty')) {
-	// 	brewery = 1425;
-	// } else {
-	// 	brewery = addNewBrewery(brewery_name);
-	// 	console.log('new brewery: ' + brewery);
+	// if (brewery == '') {
+	// 	if (brewery_name == '') {
+	// 		brewery = 1425;
+	// 	} else {
+	// 		brewery = addNewBrewery(brewery_name);
+	// 		console.log('new brewery: ' + brewery);
+	// 	}
 	// }
-	if (brewery == '') {
+	if (brewery_name == '') {
 		brewery = 1425;
 	}
 	if (!$('.cat_selet').hasClass('active')) {
@@ -724,12 +714,11 @@ function findFriend() {
 								var user_id = results[i].user_id;
 								var beer_name = '<h3>' + results[i].beer_name + '</h3>';
 								var avatar = '<p class="meta">' + results[i].avatar + '</p>';
-								$('ul#find_friend span.results').append('<li>'
+								$('ul#find_friend span.results').append('<li style="height:55px;">'
 																	+ '<a href="#profile" id="' + user_id + '" onclick="javascript:loadProfile(' + user_id + ');">'
 																	+ '<section class="icon arrow right"></section>'
 								 									+ '<img src="' + results[0].avatar + '" width="32px" class="avatar left" />'
 																	+ '<h3>' + first_name + ' ' + last_name + '</h3>'
-																	+ '<p class="meta">Last seen drinking a <b>' + results[0].beer_name + '</b></p>'
 								 									+ '</a></li>');
 							}
 						} else {
@@ -746,11 +735,15 @@ function findFriend() {
 
 $(document).ready(function() {
 	$('html, body').animate({scrollTop: '0px'}, 0);
-	$(function() {
-		if ($('#index[title="The Tab"]').is(':visible') && $('#user_id').val() != '') {
-			loadTab(0);
-		}
-	});
+	// $(function() {
+	// 	if ($('#index[title="The Tab"]').is(':visible') && ($('#user_id').val() != '' || $('#user_id').val() != undefined) && ($('#user_name').val() != '' || $('#user_name').val() != undefined)) {
+	// 		alert('mmm');
+	// 		loadTab(0);
+	// 	} else {
+	// 		alert('youre signed out');
+	// 		logout();
+	// 	}
+	// });
 	
 	$('select#beer_categories').change(function() { updateBeerCategory(); });
 	// $('select#beer_categories').blur(function() { updateBeerCategory(); });
