@@ -16,7 +16,7 @@ function store() {
 	var user_id = $('input#user_id').val();
 	var user_name = $('input#user_name').val();
 	if (user_name != '' || user_id != '') {
-		localStorage.clear();
+		// localStorage.clear();
 		localStorage['user_id'] = user_id;
 		localStorage['user_name'] = user_name;
 		console.log(localStorage['user_id']);
@@ -28,11 +28,12 @@ function store() {
 }
 
 function storeCheck() {
-	// if (localStorage['revision'] == null) {
-	// 	localStorage.clear();
-	// 	localStorage['revision'] = time;
-	// }
+	if (localStorage['revision'] == null) {
+		localStorage.clear();
+		localStorage['revision'] = time;
+	}
 	if (localStorage['user_id'] != null) {
+		load('Logging in...');
 		var user_name = localStorage['user_name'];
 		var user_id = localStorage['user_id'];
 		$.ajax({
@@ -40,6 +41,7 @@ function storeCheck() {
 			url: '/logged',
 			data: { user_name: user_name, user_id: user_id },
 			success: function(results) {
+						load();
 						console.log(results);
 						if (results.status == 'success') {
 							window.location='/dashboard';
