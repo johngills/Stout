@@ -41,10 +41,11 @@ function storeCheck() {
 			url: '/logged',
 			data: { user_name: user_name, user_id: user_id },
 			success: function(results) {
-						load();
 						console.log(results);
 						if (results.status == 'success') {
 							window.location='/dashboard';
+						} else {
+							load();
 						}
 					},
 			error: function(results) {
