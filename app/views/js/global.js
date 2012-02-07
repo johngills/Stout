@@ -269,7 +269,7 @@ function feedDetail(id) {
 												+ '<img src="' + results[i].avatar + '" width="32px" class="avatar left" />'
 												+ time
 												+ '<h3>' + user_name + '</h3>'
-												+ '<p class="meta">' + results[i].comment + '</p>'
+												+ '<p>' + results[i].comment + '</p>'
 												+ '</a></li>');
 						}
 						
