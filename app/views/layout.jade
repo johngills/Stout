@@ -29,5 +29,8 @@ body
 					a(href='#profile', onclick='loadProfile(#{user_id});')
 						span
 						| Profile
+		
+		form#add_comment(action="#", method="#")
+			textarea#add_comment_text(placeholder="Add Comment")
 
 	!= body

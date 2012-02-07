@@ -137,21 +137,44 @@ app.get('/dashboard', checkAuth, function(req, res) {
 });
 
 app.get('/get-feed', checkAuth, function(req, res) {
-	var time = new Date();
-	var current = dateToString(time);
+	// var time = new Date();
+	// var current = dateToString(time);
 	client.query(
-		'SELECT DISTINCT feed.user_name, feed.user_id, users.first_name, users.last_name, users.avatar, feed.beer_id, feed.rating, ROUND(TIMESTAMPDIFF(SECOND,feed.created_date,"' + current + '")/60) AS time, beers.name AS beer_name '
+		'SELECT DISTINCT feed.id, feed.user_name, feed.user_id, feed.beer_id, feed.rating, feed.comment_count, ROUND(TIMESTAMPDIFF(SECOND,feed.created_date,"' + current + '")/60) AS time, users.first_name, users.last_name, users.avatar, beers.name AS beer_name, comment '
 		+ 'FROM feed, beers, users, followers '
 		+ 'WHERE ((feed.user_id = users.user_id) AND (feed.beer_id = beers.id)) AND (((followers.owner_id = feed.user_id) AND (followers.follower_id = ' + req.session.user_id + ')) '
 		+ 'OR ((feed.user_id = ' + req.session.user_id + '))) '
-		+ 'ORDER BY feed.created_date DESC LIMIT ' + req.query.limit + ',10',
-		function(err, sql_results, field) {
+		+ 'ORDER BY feed.created_date DESC LIMIT ' + req.query.limit + ',10 ',
+		function(err, results, field) {
 			if (err) throw err;
-			if (sql_results != undefined) {
-				console.log(sql_results);
-				res.send(sql_results);
+			if (results != undefined) {
+				console.log(results);
+				res.send(results);
 			}
 		});
+});
+
+app.get('/get-feed-detail', checkAuth, function(req, res) {
+	client.query(
+		'SELECT DISTINCT comments.owner_id, comments.partner_id, comments.rating, comments.beer_id, beers.name, beers.description, comments.comment, comments.created_date, ROUND(TIMESTAMPDIFF(SECOND,comments.created_date,"' + current + '")/60) AS time, users.avatar, users.first_name, users.last_name FROM comments, users, beers '
+		+ 'WHERE comments.feed_id = ' + req.query.id + ' AND comments.partner_id = users.user_id AND comments.beer_id = beers.id ORDER BY comments.created_date',
+		function(err, results, field) {
+			if (err) throw err;
+			console.log(results);
+			if (results == '') {
+				client.query(
+					'SELECT feed.user_id, feed.beer_id, feed.rating, beers.name, beers.description, users.first_name, users.last_name, users.avatar, feed.created_date '
+					+ 'FROM feed, beers, users WHERE feed.id = ' + req.query.id + ' AND feed.beer_id = beers.id AND feed.user_id = users.user_id',
+					function(err, results, field) {
+						if (err) throw err;
+						console.log('second sql query');
+						console.log(results);
+						res.send(results);
+				});
+			} else {
+				res.send(results);
+			}
+	});
 });
 
 app.get('/find-beer', checkAuth, function(req, res) {
@@ -179,15 +202,6 @@ app.get('/beer-detail', checkAuth, function(req, res) {
 		});
 });
 
-// everyone.now.getBreweries = function(){
-//     client.query(
-// 		'SELECT name, id AS value FROM breweries',
-// 		function(err, results, fields) {
-// 			if (err) throw err;
-// 			console.log(results);
-// 			everyone.now.showBreweries(results);
-// 	});
-// }
 app.get('/get-breweries', checkAuth, function(req, res) {
 	client.query(
 		'SELECT name, id AS value FROM breweries',
@@ -197,15 +211,7 @@ app.get('/get-breweries', checkAuth, function(req, res) {
 			res.send(results);
 	});
 });
-// everyone.now.getBeerCategories = function(){
-//     client.query(
-// 		'SELECT * FROM categories',
-// 		function(err, results, fields) {
-// 			if (err) throw err;
-// 			console.log(results);
-// 			everyone.now.showBeerCategories(results);
-// 	});
-// }
+
 app.get('/get-beer-categories', checkAuth, function(req, res) {
 	client.query(
 		'SELECT * FROM categories',
@@ -215,15 +221,7 @@ app.get('/get-beer-categories', checkAuth, function(req, res) {
 			res.send(results);
 	});
 });
-// everyone.now.getBeerStyles = function(id){
-//     client.query(
-// 		'SELECT * FROM styles WHERE cat_id = ' + id,
-// 		function(err, results, fields) {
-// 			if (err) throw err;
-// 			console.log(results);
-// 			everyone.now.showBeerStyles(results);
-// 	});
-// }
+
 app.get('/get-beer-styles', checkAuth, function(req, res) {
 	client.query(
 		'SELECT * FROM styles WHERE cat_id = ' + req.query.cat_id,
@@ -233,43 +231,6 @@ app.get('/get-beer-styles', checkAuth, function(req, res) {
 			res.send(results);
 	});
 });
-// everyone.now.insertNewBeer = function(name, brewery, description, abv, category, style) {
-// 	client.query(
-// 		'INSERT INTO beers ' +
-// 		'SET name = ?, brewery_id = ?, description = ?, cat_id = ?, style_id = ?, abv = ?, last_mod = ?',
-// 		[name, brewery, description, category, style, abv, current],
-// 		function(err, results, fields) {
-// 			if (err) throw err;
-// 			console.log(results);
-// 			client.query(
-// 				'SELECT id, name FROM beers WHERE name = "' + name + '";',
-// 				function(err, results, fields) {
-// 					if (err) throw err;
-// 					console.log(results);
-// 					everyone.now.showNewBeer(results);
-// 			});
-// 	});
-// }
-
-
-// CAN PROBABLY DELETE THIS FUNCTION -------
-//
-// app.get('/add-new-brewery', checkAuth, function(req, res) {
-// 	client.query(
-// 		'INSERT INTO breweries SET name = ?',
-// 		[req.query.name],
-// 		function(err, results, fields) {
-// 			if (err) throw err;
-// 			console.log(results);
-// 			client.query(
-// 				'SELECT id, name FROM breweries WHERE name = "' + req.query.name + '";',
-// 				function(err, results, fields) {
-// 					if (err) throw err;
-// 					console.log(results);
-// 					res.send(results);
-// 			});
-// 	});
-// });
 
 app.get('/new-beer', checkAuth, function(req, res) {
 	
@@ -281,6 +242,7 @@ app.get('/new-beer', checkAuth, function(req, res) {
 	var abv = req.query.abv;
 	
 	if (!hasNumbers(req.query.brewery)) { // Checks if new brewery
+		console.log(req.query.brewery);
 		client.query( // If new brewery, add it to database
 			'INSERT INTO breweries ' +
 			'SET name = ?, last_mod = ?',
@@ -288,27 +250,15 @@ app.get('/new-beer', checkAuth, function(req, res) {
 			function(err, results, fields) {
 				if (err) throw err;
 				console.log(results);
-				client.query( // grab id of new brewery
-					'SELECT id, name FROM breweries WHERE name = "' + req.query.brewery + '";',
+				brewery = results.insertId;
+				client.query( // add new brewery with id to new beer
+					'INSERT INTO beers ' +
+					'SET name = ?, brewery_id = ?, description = ?, cat_id = ?, style_id = ?, abv = ?, last_mod = ?',
+					[name, brewery, description, category, style, abv, current],
 					function(err, results, fields) {
 						if (err) throw err;
-						console.log(results);
-						brewery = results[0].id;
-						client.query( // add new brewery with id to new beer
-							'INSERT INTO beers ' +
-							'SET name = ?, brewery_id = ?, description = ?, cat_id = ?, style_id = ?, abv = ?, last_mod = ?',
-							[name, brewery, description, category, style, abv, current],
-							function(err, results, fields) {
-								if (err) throw err;
-								console.log(results);
-								client.query( // grab id of new beer
-									'SELECT id, name, brewery_id FROM beers WHERE name = "' + name + '" ORDER BY id DESC;',
-									function(err, results, fields) {
-										if (err) throw err;
-										console.log(results);
-										res.send(results);
-								});
-						});
+						console.log(results.insertId);
+						res.json({"status":"success", "id":results.insertId});
 				});
 		});
 	} else { // if there's already a brewery in our database
@@ -319,34 +269,10 @@ app.get('/new-beer', checkAuth, function(req, res) {
 			function(err, results, fields) {
 				if (err) throw err;
 				console.log(results);
-				client.query( // get new beer idea
-					'SELECT id, name, brewery_id FROM beers WHERE name = "' + name + '" ORDER BY id DESC;',
-					function(err, results, fields) {
-						if (err) throw err;
-						console.log(results);
-						res.send(results);
-				});
+				res.json({"status":"success", "id":results.insertId});
 		});
 	}
 });
-
-// function insertBeer(name, brewery, description, category, style, abv) {
-// 	client.query(
-// 		'INSERT INTO beers ' +
-// 		'SET name = ?, brewery_id = ?, description = ?, cat_id = ?, style_id = ?, abv = ?, last_mod = ?',
-// 		[name, brewery, description, category, style, abv, current],
-// 		function(err, results, fields) {
-// 			if (err) throw err;
-// 			console.log(results);
-// 			client.query(
-// 				'SELECT id, name, brewery_id FROM beers WHERE name = "' + name + '";',
-// 				function(err, results, fields) {
-// 					if (err) throw err;
-// 					console.log(results);
-// 					res.send(results);
-// 			});
-// 	});
-// }
 
 app.get('/beer-checkin', checkAuth, function(req, res) {
 	console.log('beerid: ' + req.query.beer_id);
@@ -380,19 +306,57 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 				}
 				client.query(
 					'INSERT INTO feed ' +
-					'SET user_id = ?, user_name = ?, beer_id = ?, rating = ?, created_date = ?',
+					'SET user_id = ?, user_name = ?, beer_id = ?, rating = ?, created_date = ? ',
 					[req.session.user_id, req.session.user_name, req.query.beer_id, rate, current],
-					function(err, sql_results, fields) {
+					function(err, results, fields) {
 						if (err) throw err;
-						if (sql_results != undefined) {
-							console.log(sql_results);
-							res.send('{"status":"success"}');
-						}
+						console.log(results);
+						res.json({"status":"success", "feed_id": results.insertId, "beer_id": req.query.beer_id, "rate":rate });
 					}
 				);
 			} else {
-				res.send('{"status":"failure"}');
+				res.json({"status":"failure"});
 			}
+		});
+});
+
+app.get('/share-beer', checkAuth, function(req, res) {
+	client.query(
+		'INSERT INTO comments ' +
+		'SET feed_id = ?, owner_id = ?, partner_id = ?, beer_id = ?, rating = ?, comment = ?, created_date = ?',
+		[req.query.feed_id, req.session.user_id, req.session.user_id, req.query.beer_id, req.query.rating, req.query.comment, current],
+		function(err, results, fields) {
+			if (err) throw err;
+			client.query(
+				'UPDATE feed SET comment = "' + req.query.comment + '", comment_count = 1 WHERE feed.id = ' + req.query.feed_id + ';',
+				function(err, results, fields) {
+					if (err) throw err;
+					if (results != undefined) {
+						res.json({"status":"success"});
+					}
+				});
+		});
+});
+
+app.get('/add-comment', checkAuth, function(req, res) {
+	client.query(
+		'INSERT INTO comments ' +
+		'SET feed_id = ?, owner_id = ?, partner_id = ?, beer_id = ?, rating = ?, comment = ?, created_date = ?',
+		[req.query.feed_id, req.query.owner_id, req.session.user_id, req.query.beer_id, req.query.rating, req.query.comment, current],
+		function(err, sql_results, fields) {
+			if (err) throw err;
+			console.log(sql_results);
+			client.query('UPDATE feed SET feed.comment_count = feed.comment_count + 1 WHERE feed.id = ' + req.query.feed_id,
+				function(err, results, fields) {
+					if (err) throw err;
+					console.log(results);
+					client.query(
+						'SELECT users.user_id, users.first_name, users.last_name, users.avatar FROM users WHERE users.user_id = ' + req.session.user_id + ';', // change to store these in the session
+						function(err, results, fields) {
+							console.log(results);
+							res.send(results);
+					});
+			});
 		});
 });
 
@@ -410,29 +374,20 @@ app.get('/find-friend', checkAuth, function(req, res) {
 });
 
 app.get('/get-profile', checkAuth, function(req, res) {
-	var user_id = req.session.user_id;
-	if (req.query.user_id != '') {
-		user_id = req.query.user_id;
-	}
+	var user_id = req.query.user_id;
 	console.log('profile for user id: ' + user_id);
 	client.query(
-		'SELECT users.user_name, users.first_name, users.last_name, users.avatar, users.user_id, feed.beer_id, feed.rating, beers.name AS beer_name, followers.created_date FROM users, feed, beers LEFT OUTER JOIN followers ON (follower_id = ' + req.session.user_id + ') AND (owner_id = ' + req.query.user_id + ') WHERE (users.user_id = ' + user_id + ') AND (feed.user_id = ' + user_id + ') AND (feed.beer_id = beers.id) ORDER BY feed.created_date DESC LIMIT 0,5;',
-		function(err, sql_results, fields) {
+		'SELECT users.user_name, users.first_name, users.last_name, users.avatar, users.user_id, feed.beer_id, feed.rating, beer_number.beer_count, beers.name AS beer_name, follows.follower_number, following.following_number, followers.created_date '
+		+ 'FROM users, feed, beers, '
+		+ '(SELECT COUNT(feed.beer_id) AS beer_count FROM feed WHERE user_id = ' + req.query.user_id + ') AS beer_number, '
+		+ '(SELECT COUNT(owner_id) AS follower_number FROM followers WHERE owner_id = ' + req.query.user_id + ') AS follows, '
+		+ '(SELECT COUNT(follower_id) AS following_number FROM followers WHERE follower_id = ' + req.query.user_id + ') AS following '
+		+ 'LEFT OUTER JOIN followers ON (follower_id = ' + req.session.user_id + ') AND (owner_id = ' + req.query.user_id + ') '
+		+ 'WHERE (users.user_id = ' + user_id + ') AND (feed.user_id = ' + user_id + ') AND (feed.beer_id = beers.id) ORDER BY feed.created_date DESC;',
+		function(err, results, fields) {
 			if (err) throw err;
-			if (sql_results != undefined && sql_results != '') {
-				console.log(sql_results);
-				res.send(sql_results);
-			} else {
-				client.query(
-					'SELECT users.user_name, users.avatar, users.user_id FROM users WHERE users.user_id = ' + req.query.user_id,
-					function(err, sql_results, fields) {
-						if (err) throw err;
-						if (sql_results != undefined && sql_results != '') {
-							console.log(sql_results);
-							res.send(sql_results);
-						}
-					});
-			}
+			console.log(results);
+			res.send(results);
 		});
 });
 
@@ -465,23 +420,6 @@ app.get('/unfollow', checkAuth, function(req, res) {
 			}
 		});
 });
-
-// app.get('/check-connection', checkAuth, function(req, res) {
-// 	var owner_id = '';
-// 	if (req.query.owner_id != '') {
-// 		owner_id = ' AND (owner_id = ' + req.query.user_id + ')';
-// 	}
-// 	client.query(
-// 		'SELECT created_date CASE WHEN (follower_id = ' + req.session.user_id + ')' + owner_id + ' THEN 1 ELSE 0 END AS following FROM followers',
-// 		function(err, sql_results, fields) {
-// 			if (err) throw err;
-// 			if (sql_results != undefined) {
-// 				console.log('follow? ' + sql_results);
-// 				res.send(sql_results);
-// 			}
-// 		}
-// 	);
-// });
 
 app.get('/auth/twitter', function(req, res){
 	oa.getOAuthRequestToken(function(error, oauth_token, oauth_token_secret, results) {
@@ -519,12 +457,6 @@ app.get('/auth/twitter/callback', function(req, res, next) {
 				req.session.oauth.access_token = oauth_access_token;
 				req.session.oauth.access_token_secret = oauth_access_token_secret;
 				
-				// sets cookies upon initial login
-				// res.cookie('user_name', results.screen_name, { expires: new Date(Date.now() + 900000), httpOnly: true });
-				// res.cookie('user_id', results.user_id, { expires: new Date(Date.now() + 900000), httpOnly: true });
-				// localStorage['user_name'] = results.screen_name;
-				// localStorage['user_id'] = results.user_id;
-				
 				// Check database for user
 				client.query(
 					'SELECT user_name FROM ' + user_table + ' WHERE user_name = "' + results.screen_name + '";',
@@ -557,13 +489,13 @@ app.get('/auth/twitter/callback', function(req, res, next) {
 								data: { screen_name: results.screen_name, user_id: results.user_id },
 								dataType: 'jsonp',
 								success: function(data) {
-											var avatar = data.profile_image_url;
+											req.session.avatar = data.profile_image_url;
 											var full_name = data.name;
 											var name = full_name.split(' ');
 											client.query(
 												'INSERT INTO ' + user_table + ' ' +
 												'SET user_id = ?, user_name = ?, first_name = ?, last_name = ?, avatar = ?, access_token = ?, access_token_secret = ?, created_date = ?',
-												[results.user_id, results.screen_name, name[0], name[1], avatar, oauth_access_token, oauth_access_token_secret, current]
+												[results.user_id, results.screen_name, name[0], name[1], req.session.avatar, oauth_access_token, oauth_access_token_secret, current]
 											);
 											res.redirect('/dashboard');
 										}
