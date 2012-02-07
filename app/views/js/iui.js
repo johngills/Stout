@@ -10,8 +10,6 @@
    it will not work with webapps that call `iui.showPage()` or `iui.showPageByHref()` directly.
    This issue will be resolved in a later version. */
 
-(function() {
-
 var slideSpeed = 20;
 var slideInterval = 0;
 var ajaxTimeoutVal = 30000;
@@ -28,6 +26,8 @@ var checkTimer;
 var hasOrientationEvent = false;
 var portraitVal = "portrait";
 var landscapeVal = "landscape";
+
+(function() {
 
 // *************************************************************************************************
 
@@ -100,6 +100,8 @@ window.iui =
 				console.log("page = currentPage = " + page.id);
 				iui.busy = false;	//  Don't do anything, just clear the busy flag and exit
 				return;
+			} else {
+				console.log(page.id);
 			}
 			
 			if (currentDialog)

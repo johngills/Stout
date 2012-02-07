@@ -1,14 +1,22 @@
 body(onload="store();")
+
 	input#user_id(type="hidden", value="#{user_id}")
 	input#user_name(type="hidden", value="#{user_name}")
+
 	ul#index(title="The Tab", selected="true")
 		li
 			p Welcome 
 				a(href='/profile')= user_name
+	
+	ul#feed_detail(title="Details")
+		input#feed-item-id(type="hidden")
+		input#feed-item-beer_id(type="hidden")
+		input#feed-item-rating(type="hidden")
+		span.results
 
 	ul#find_beer(title="Find Beer")
 		li.input-text
-			form(id="beer_search", role="search", action="javascript:void(0);", autocorrect="off")
+			form#beer_search(role="search", action="javascript:void(0);", autocorrect="off")
 				input#beer_name.search(type="text", title="search", placeholder="Find booze")
 		span.results
 
@@ -19,7 +27,7 @@ body(onload="store();")
 			li
 				input#add_beer_name.text(type="text", name="add_beer_name", placeholder="Name", title="Name")
 			li(style="position:relative; z-index:999;")
-				input#add_beer_brewery.text(type="text", name="add_beer_brewery", placeholder="Brewery", title="Brewery", autocorrect="off", onfocus="$('html, body').animate({scrollTop: '84px'}, 0);")
+				input#add_beer_brewery.text(type="text", name="add_beer_brewery", placeholder="Brewery", title="Brewery", autocorrect="off", onfocus="$('html, body').animate({scrollTop: '82px'}, 0);")
 			li.textarea
 				textarea#add_beer_description.text(placeholder="Description (Optional)", title="Description (Optional)")
 			li.abv_attribute.hide
@@ -48,3 +56,9 @@ body(onload="store();")
 			form(id="friend_search", role="search", action="javascript:void(0);", autocorrect="off")
 				input#search_user.search(type="text", title="search", placeholder="Find drinking buddies")
 		span.results
+
+	ul#share(title="Share Beer")
+		li.textarea
+			textarea.comment(placeholder="Drop some knowledge")
+		li.share_button
+			a.btn.orange(href="#index", onclick="load('Something went wrong!');") Bottom's Up
