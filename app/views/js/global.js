@@ -296,6 +296,10 @@ function loadFindBeer() {
 function loadFindFriend() {
 	$('#user_name').val('');
 	$('html, body').animate({scrollTop: '0px'}, 0);
+	
+	// reset footer
+	$('#add_comment').fadeOut();
+	$('#footer').fadeIn();
 }
 
 function loadProfile(id) {
