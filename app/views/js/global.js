@@ -277,8 +277,14 @@ function feedDetail(id) {
 						var owner_id = (results[0].owner_id == null) ? results[0].user_id : results[0].owner_id;
 						$('#add_comment_text').attr('onblur','addComment(' + results[0].beer_id + ',' + results[0].rating + ',' + id + ',' + owner_id + ');');
 						
+						if (results[0].owner_id == results[0].partner_id) {
+							var i = 1;
+						} else {
+							var i = 0;
+						}
+						
 						// Activity stream
-						for(var i = 1; i < results.length; i++) {
+						for(i; i < results.length; i++) {
 							
 							var first_name = (results[i].first_name == null) ? '' : results[i].first_name;
 							var last_name = (results[i].last_name == null) ? '' : results[i].last_name;
@@ -880,7 +886,7 @@ function addComment(beer_id,rate,feed_id,owner_id) {
 												+ '<a href="javascript:void(0);" onclick="loadProfile(\'' + results[0].user_id + '\')">'
 												+ '<img src="' + results[0].avatar + '" width="32px" class="avatar left" />'
 												+ '<h3>' + user_name + '</h3>'
-												+ '<p class="meta">' + comment + '</p>'
+												+ '<p class="comment">' + comment + '</p>'
 												+ '</a></li>');
 							loadTab(0);
 						} else {
