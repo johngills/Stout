@@ -73,19 +73,19 @@ function hasNumbers(t) {
 }
 
 // DATABASE INFO -----------------------------------------
-var mysql = require('mysql'),
-	database = 'stout',
-	user_table = 'users',
-	client = mysql.createClient({ user: 'sterlingrules', password: '@y&7~s45', host: 'mysql.mynameissterling.com', port: 3306 });
-	client.query('USE ' + database);
-	client.database = 'stout';
-
 // var mysql = require('mysql'),
-// 	database = 'beer',
+// 	database = 'stout',
 // 	user_table = 'users',
-// 	client = mysql.createClient({ user: 'root', password: '' });
+// 	client = mysql.createClient({ user: 'sterlingrules', password: '@y&7~s45', host: 'mysql.mynameissterling.com', port: 3306 });
 // 	client.query('USE ' + database);
-// 	client.database = 'beer';
+// 	client.database = 'stout';
+
+var mysql = require('mysql'),
+	database = 'beer',
+	user_table = 'users',
+	client = mysql.createClient({ user: 'root', password: '' });
+	client.query('USE ' + database);
+	client.database = 'beer';
 
 // OAUTH SETUP --------------------------------------------
 var oa = new OAuth(
@@ -94,9 +94,9 @@ var oa = new OAuth(
 	"Nmqm7UthsfdjaDQ4HcxPw",
 	"PIFvIPSXlTIbqnnnjBIqoWs0VIxpQivNrIJuWxtkLI",
 	"1.0",
-	//"http://localhost:1337/auth/twitter/callback",
+	"http://localhost:1337/auth/twitter/callback",
 	//"http://stoutapp.com:1337/auth/twitter/callback",
-	"http://ps79519.dreamhostps.com:1337/auth/twitter/callback",
+	//"http://ps79519.dreamhostps.com:1337/auth/twitter/callback",
 	"HMAC-SHA1"
 );
 
@@ -137,8 +137,9 @@ app.get('/dashboard', checkAuth, function(req, res) {
 });
 
 app.get('/get-feed', checkAuth, function(req, res) {
-	// var time = new Date();
-	// var current = dateToString(time);
+	var time = new Date();
+	var current = dateToString(time);
+	
 	client.query(
 		'SELECT DISTINCT feed.id, feed.user_name, feed.user_id, feed.beer_id, feed.rating, feed.comment_count, ROUND(TIMESTAMPDIFF(SECOND,feed.created_date,"' + current + '")/60) AS time, users.first_name, users.last_name, users.avatar, beers.name AS beer_name, comment '
 		+ 'FROM feed, beers, users, followers '
@@ -154,9 +155,10 @@ app.get('/get-feed', checkAuth, function(req, res) {
 		});
 });
 
-app.get('/get-feed-detail', checkAuth, function(req, res) {
+app.get('/get-comments', checkAuth, function(req, res) {
 	client.query(
-		'SELECT DISTINCT comments.owner_id, comments.partner_id, comments.rating, comments.beer_id, beers.name, beers.description, comments.comment, comments.created_date, ROUND(TIMESTAMPDIFF(SECOND,comments.created_date,"' + current + '")/60) AS time, users.avatar, users.first_name, users.last_name FROM comments, users, beers '
+		'SELECT DISTINCT comments.owner_id, comments.partner_id, comments.rating, comments.beer_id, beers.name, beers.description, comments.comment, comments.created_date, ROUND(TIMESTAMPDIFF(SECOND,comments.created_date,"' + current + '")/60) AS time, users.avatar, users.first_name, users.last_name '
+		+ 'FROM comments, users, beers '
 		+ 'WHERE comments.feed_id = ' + req.query.id + ' AND comments.partner_id = users.user_id AND comments.beer_id = beers.id ORDER BY comments.created_date',
 		function(err, results, field) {
 			if (err) throw err;
@@ -275,6 +277,9 @@ app.get('/new-beer', checkAuth, function(req, res) {
 });
 
 app.get('/beer-checkin', checkAuth, function(req, res) {
+	var time = new Date();
+	var current = dateToString(time);
+	
 	console.log('beerid: ' + req.query.beer_id);
 	var unrate = '';
 	if (req.query.unrate != '') {
@@ -288,8 +293,6 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 			if (sql_results != undefined) {
 				console.log(sql_results);
 				var rate = '';
-				var time = new Date();
-				var current = dateToString(time);
 				switch(req.query.rate) {
 					case 'love':
 						rate = 1;
@@ -321,12 +324,17 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 });
 
 app.get('/share-beer', checkAuth, function(req, res) {
+	var time = new Date();
+	var current = dateToString(time);
+	
+	console.log(current);
 	client.query(
 		'INSERT INTO comments ' +
 		'SET feed_id = ?, owner_id = ?, partner_id = ?, beer_id = ?, rating = ?, comment = ?, created_date = ?',
 		[req.query.feed_id, req.session.user_id, req.session.user_id, req.query.beer_id, req.query.rating, req.query.comment, current],
 		function(err, results, fields) {
 			if (err) throw err;
+			console.log(results);
 			client.query(
 				'UPDATE feed SET comment = "' + req.query.comment + '", comment_count = 1 WHERE feed.id = ' + req.query.feed_id + ';',
 				function(err, results, fields) {
@@ -339,6 +347,9 @@ app.get('/share-beer', checkAuth, function(req, res) {
 });
 
 app.get('/add-comment', checkAuth, function(req, res) {
+	var time = new Date();
+	var current = dateToString(time);
+	
 	client.query(
 		'INSERT INTO comments ' +
 		'SET feed_id = ?, owner_id = ?, partner_id = ?, beer_id = ?, rating = ?, comment = ?, created_date = ?',
@@ -363,7 +374,7 @@ app.get('/add-comment', checkAuth, function(req, res) {
 app.get('/find-friend', checkAuth, function(req, res) {
 	console.log('search term: ' + req.query.user_name);
 	client.query(
-		'SELECT DISTINCT users.user_name, users.first_name, users.last_name, users.user_id, users.avatar FROM users WHERE users.user_name LIKE "%' + req.query.user_name + '%" OR users.first_name LIKE "%' + req.query.user_name + '%" OR users.last_name LIKE "%' + req.query.user_name + '%" ORDER BY users.created_date DESC LIMIT 0,10;',
+		'SELECT DISTINCT users.user_name, users.first_name, users.last_name, users.user_id, users.avatar FROM users WHERE users.user_name LIKE "%' + req.query.user_name + '%" OR users.full_name LIKE "%' + req.query.user_name + '%" ORDER BY users.created_date DESC LIMIT 0,10;',
 		function(err, sql_results, fields) {
 			if (err) throw err;
 			if (sql_results != undefined) {
@@ -394,6 +405,7 @@ app.get('/get-profile', checkAuth, function(req, res) {
 app.get('/follow', checkAuth, function(req, res) {
 	var time = new Date();
 	var current = dateToString(time);
+	
 	client.query(
 		'INSERT INTO followers ' +
 		'SET owner_id = ?, follower_id = ?, created_date = ?',
@@ -410,6 +422,7 @@ app.get('/follow', checkAuth, function(req, res) {
 app.get('/unfollow', checkAuth, function(req, res) {
 	var time = new Date();
 	var current = dateToString(time);
+	
 	client.query(
 		'DELETE FROM followers WHERE (owner_id = ' + req.query.owner_id + ') AND (follower_id = ' + req.session.user_id + ')',
 		function(err, sql_results, fields) {
@@ -494,8 +507,8 @@ app.get('/auth/twitter/callback', function(req, res, next) {
 											var name = full_name.split(' ');
 											client.query(
 												'INSERT INTO ' + user_table + ' ' +
-												'SET user_id = ?, user_name = ?, first_name = ?, last_name = ?, avatar = ?, access_token = ?, access_token_secret = ?, created_date = ?',
-												[results.user_id, results.screen_name, name[0], name[1], req.session.avatar, oauth_access_token, oauth_access_token_secret, current]
+												'SET user_id = ?, user_name = ?, full_name = ?, first_name = ?, last_name = ?, avatar = ?, access_token = ?, access_token_secret = ?, created_date = ?',
+												[results.user_id, results.screen_name, full_name, name[0], name[1], req.session.avatar, oauth_access_token, oauth_access_token_secret, current]
 											);
 											res.redirect('/dashboard');
 										}
