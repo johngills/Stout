@@ -156,19 +156,21 @@ function loadTab(limit) {
 							var comment_count = '';
 							if (results[i].comment_count != 0) {
 								if (results[i].comment_count > 1) {
-									comment_count = '<p class="meta right">' + results[i].comment_count + ' comments &nbsp; </p>';
+									comment_count = '<span class="comment_count right"><span class="icon comment right"></span>' + results[i].comment_count + '</span>';
 								} else {
-									comment_count = '<p class="meta right">' + results[i].comment_count + ' comment &nbsp; </p>';
+									comment_count = '<span class="comment_count right"><span class="icon comment right"></span>' + results[i].comment_count + '</span>';
 								}
 							}
 							
 							var avatar = '<img src="' + results[i].avatar + '" width="32px" class="left avatar" />'
 							var item_heading = '<p class="meta">' + results[i].first_name + ' ' + action + '</p>';
-							var beer_name = '<h3 class="beer_name">' + results[i].beer_name + '</h3>';
+							var beer_name = '<h3 id="' + results[i].beer_id + '" class="beer_name">' + results[i].beer_name + '</h3>';
 							$('#index').append('<li id="feed-item-' + results[i].id + '" class="feed-item"><a href="javascript:void(0);" onclick="feedDetail(' + results[i].id + ');">'
 												+ '<section class="icon arrow right"></section>'
+												+ '<span class="info">'
 												+ time
 												+ comment_count
+												+ '</span>'
 												+ avatar
 												+ item_heading
 												+ beer_name
@@ -198,13 +200,27 @@ function loadTab(limit) {
 
 function feedDetail(id) {
 	load('Brewing...');
+	var item_detail = $('#feed-item-' + id + ' a').html();
+	var title = $('#feed-item-' + id + ' h3.beer_name').text();
+	var avatar = $('#feed-item-' + id + ' img').attr('src');
+	var beer_id = $('#feed-item-' + id + ' h3.beer_name').attr('id');
+	
+	$('ul#feed_detail').attr('title',title);
+	$('ul#feed_detail span.results').empty().append('<li>'
+						+ '<a href="javascript:void(0);" onclick="beerDetail(' + beer_id + ');">'
+						+ '<img class="left avatar" width="48px" src="' + avatar + '">'
+						+ item_detail
+						+ '<section class="push"></section>'
+						+ '</a></li>');
+	$('ul#feed_detail img[width="32px"]').remove();
+	
 	$.ajax({
 		cache: false,
-		url: '/get-feed-detail',
+		url: '/get-comments',
 		data: { id: id },
 		success: function(results) {
 					if (results != '') {
-						
+						console.log('got here');
 						// to top
 						$('html, body').animate({scrollTop: '0px'}, 0);
 						
@@ -212,46 +228,51 @@ function feedDetail(id) {
 						$('#add_comment').fadeIn();
 						$('#footer').fadeOut();
 						
-						// RATING ------------------------
-						var action = '';
-						if (results[0].rating != '') {
-							switch(results[0].rating) {
-								case 1:
-									action = 'loves';
-									break;
-								case 2:
-									action = 'likes';
-									break;
-								case 3:
-									action = 'is meh for';
-									break;
-								case 4:
-									action = 'dislikes';
-									break;
-							}
-						}
-						
-						var item_heading = '<p class="meta">' + results[0].first_name + ' ' + action + '</p>';
-						var beer_name = '<h3 class="beer_name">' + results[0].name + '</h3>';
-						var first_name = (results[0].first_name == null) ? '' : results[0].first_name;
-						var last_name = (results[0].last_name == null) ? '' : results[0].last_name;
-						var user_name = first_name + ' ' + last_name;
-						var comment = (results[0].comment == undefined) ? '' : '<blockquote>' + results[0].comment + '</blockquote>';
-						var comment_heading = (results[0].comment == undefined) ? '' : '<li class="heading">Comments</li>';
-						var time = (results[0].time == undefined) ? '' : fixTime(results[0].time);
-						var user_id = (results[0].partner_id == undefined) ? results[0].user_id : results[0].partner_id;
-
-						$('ul#feed_detail').attr('title',results[0].name);
-						$('ul#feed_detail span.results').empty().append('<li style="height:80px;">'
-											+ '<a href="javascript:void(0);" onclick="beerDetail(' + results[0].beer_id + ');">'
-											+ '<section class="icon arrow right"></section>'
-											+ '<img src="' + results[0].avatar + '" width="48px" class="avatar left" onclick="loadProfile(' + user_id + ');" />'
-											+ time
-											+ item_heading
-											+ beer_name
-											+ comment
-											+ '</a></li>'
-											+ comment_heading);
+						// // RATING ------------------------
+						// var action = '';
+						// if (results[0].rating != '') {
+						// 	switch(results[0].rating) {
+						// 		case 1:
+						// 			action = 'loves';
+						// 			break;
+						// 		case 2:
+						// 			action = 'likes';
+						// 			break;
+						// 		case 3:
+						// 			action = 'is meh for';
+						// 			break;
+						// 		case 4:
+						// 			action = 'dislikes';
+						// 			break;
+						// 	}
+						// }
+						// 
+						// var item_heading = '<p class="meta">' + results[0].first_name + ' ' + action + '</p>';
+						// var beer_name = '<h3 class="beer_name">' + results[0].name + '</h3>';
+						// var first_name = (results[0].first_name == null) ? '' : results[0].first_name;
+						// var last_name = (results[0].last_name == null) ? '' : results[0].last_name;
+						// var user_name = first_name + ' ' + last_name;
+						// if (results[0].owner_id == results[0].partner_id) {
+						// 	var i = 1;
+						// 	var comment = (results[0].comment == undefined) ? '' : '<blockquote>' + results[0].comment + '</blockquote>';
+						// } else {
+						// 	var i = 0;
+						// }
+						// var comment_heading = (results[0].comment == undefined) ? '' : '<li class="heading">Comments</li>';
+						// var time = (results[0].time == undefined) ? '' : fixTime(results[0].time);
+						// var user_id = (results[0].partner_id == undefined) ? results[0].user_id : results[0].partner_id;
+						// 
+						// $('ul#feed_detail').attr('title',results[0].name);
+						// $('ul#feed_detail span.results').empty().append('<li style="height:80px;">'
+						// 					+ '<a href="javascript:void(0);" onclick="beerDetail(' + results[0].beer_id + ');">'
+						// 					+ '<section class="icon arrow right"></section>'
+						// 					+ '<img src="' + results[0].avatar + '" width="48px" class="avatar left" onclick="loadProfile(' + user_id + ');" />'
+						// 					+ time
+						// 					+ item_heading
+						// 					+ beer_name
+						// 					+ comment
+						// 					+ '</a></li>'
+						// 					+ comment_heading);
 						
 						var owner_id = (results[0].owner_id == null) ? results[0].user_id : results[0].owner_id;
 						$('#add_comment_text').attr('onblur','addComment(' + results[0].beer_id + ',' + results[0].rating + ',' + id + ',' + owner_id + ');');
@@ -261,24 +282,20 @@ function feedDetail(id) {
 							
 							var first_name = (results[i].first_name == null) ? '' : results[i].first_name;
 							var last_name = (results[i].last_name == null) ? '' : results[i].last_name;
-							var user_name = first_name + ' ' + last_name;
+							var user_name = first_name;
 							var time = (results[i].time == undefined) ? '' : fixTime(results[i].time);
 							
 							$('ul#feed_detail span.results').append('<li>'
 												+ '<a href="javascript:void(0);" onclick="loadProfile(\'' + results[i].partner_id + '\')">'
 												+ '<img src="' + results[i].avatar + '" width="32px" class="avatar left" />'
 												+ time
-												+ '<h3>' + user_name + '</h3>'
-												+ '<p>' + results[i].comment + '</p>'
+												+ '<p class="meta">' + user_name + '</p>'
+												+ '<p class="comment">' + results[i].comment + '</p>'
 												+ '</a></li>');
 						}
 						
 						window.location='/dashboard#_feed_detail';
 						load();
-						
-						if (results.length > 5) {
-							$('#profile').append('<li style="height:40px;"></li>');
-						}
 					}
 				},
 		error: function(results) {
@@ -941,11 +958,11 @@ function findFriend() {
 								var last_name = (results[i].last_name == null) ? '' : results[i].last_name;
 								var user_id = results[i].user_id;
 								var beer_name = '<h3>' + results[i].beer_name + '</h3>';
-								var avatar = '<p class="meta">' + results[i].avatar + '</p>';
+								var avatar = results[i].avatar;
 								$('ul#find_friend span.results').append('<li style="height:55px;">'
 																	+ '<a href="#profile" id="' + user_id + '" onclick="javascript:loadProfile(' + user_id + ');">'
 																	+ '<section class="icon arrow right"></section>'
-								 									+ '<img src="' + results[0].avatar + '" width="32px" class="avatar left" />'
+								 									+ '<img src="' + avatar + '" width="32px" class="avatar left" />'
 																	+ '<h3>' + first_name + ' ' + last_name + '</h3>'
 								 									+ '</a></li>');
 							}
