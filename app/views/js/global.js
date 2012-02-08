@@ -28,9 +28,9 @@ function store() {
 }
 
 function storeCheck() {
-	if (localStorage['revision4'] == null) {
+	if (localStorage['revision5'] == null) {
 		localStorage.clear();
-		localStorage['revision4'] = time;
+		localStorage['revision5'] = time;
 	}
 	if (localStorage['user_id'] != null) {
 		load('Logging in...');
