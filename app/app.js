@@ -7,7 +7,7 @@ var url = require('url');
 var fs = require('fs');
 var http = require('http');
 var $ = require('jquery');
-var base64 = require('base64');
+// var base64 = require('base64');
 var request = require('request');
 var crypto = require("crypto");
 
