@@ -1177,7 +1177,7 @@ BODY:first-of-type ul.as-list, x:-moz-any-link, x:default { /* Target FF 3.5+ */
 			height: 24px;
 			width: 24px;
 			background: url('../img/sprites.hd.png');
-			background-size: 120px 120px;
+			background-size: @sprites-size;
 			background-position: -95px -95px;
 		}
 		
@@ -1215,6 +1215,13 @@ BODY:first-of-type ul.as-list, x:-moz-any-link, x:default { /* Target FF 3.5+ */
 			width: 30px;
 			background: url('../img/sprites.hd.png');
 			background-size: @sprites-size;
+		}
+		
+		li.addToDrink span {
+			background-position: 0 -120px;
+		}
+		li.addToDrink.active span {
+			background-position: -30px -120px;
 		}
 
 }
