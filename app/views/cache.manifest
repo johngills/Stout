@@ -21,7 +21,6 @@ CACHE:
 /js/less-1.2.1.min.js
 
 https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js
-http://ps79519.dreamhostps.com:1337/nowjs/now.js
 
 NETWORK:
 *
