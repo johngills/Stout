@@ -17,7 +17,7 @@ body(onload="store();")
 	ul#find_beer(title="Find Beer")
 		li.input-text
 			form#beer_search(role="search", action="javascript:void(0);", autocorrect="off")
-				input#beer_name.search(type="text", title="search", placeholder="Find booze")
+				input#beer_name.search(type="text", title="search", placeholder="Find beer")
 		span.results
 
 	ul#beer_detail(title="Beer")
@@ -50,6 +50,8 @@ body(onload="store();")
 				a.btn.orange(href="javascript:void(0);", onclick="addNewBeer();") Add Beer
 
 	ul#profile(title="Profile")
+
+	ul#profile_detail(title="Profile")
 
 	ul#find_friend(title="Find Friends")
 		li.input-text
