@@ -186,7 +186,7 @@ blockquote:before {
 .ac { text-align: center; }
 .ar { text-align: right; }
 .left { float: left; }
-.center { margin: 0 auto; }
+.center, .icon.center { margin: 0 auto; }
 .right { float: right; }
 
 .push { clear:both; }
@@ -214,6 +214,11 @@ ul { list-style:none; }
 	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
 	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
 	box-sizing: border-box;         /* Opera/IE 8+ */
+}
+.transition {
+	-webkit-transition: all 1.5s ease-in-out;
+    -moz-transition: all 1.5s ease-in-out;
+    -o-transition: all 1.5s ease-in-out;
 }
 
 .avatar {
@@ -532,9 +537,11 @@ li.heading {
 }
 
 li > a[selected], li > a:active {
-	box-shadow: 0 2px 4px rgba(0,0,0,0.8) inset;
-	-webkit-box-shadow: 0 2px 4px rgba(0,0,0,0.8) inset;
-	-moz-box-shadow: 0 2px 4px rgba(0,0,0,0.8) inset;
+	margin: -6px -10px;
+	padding: 6px 10px;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.8) inset;
+	-webkit-box-shadow: 0 1px 2px rgba(0,0,0,0.8) inset;
+	-moz-box-shadow: 0 1px 2px rgba(0,0,0,0.8) inset;
 	background: rgb(254,252,234); /* Old browsers */
 	background: -moz-linear-gradient(top,  rgba(254,252,234,1) 0%, rgba(255,255,204,1) 100%); /* FF3.6+ */
 	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(254,252,234,1)), color-stop(100%,rgba(255,255,204,1))); /* Chrome,Safari4+ */
@@ -597,6 +604,22 @@ li.share {
 	.type(500,0.6875em);
 }
 
+#profile {
+	.box-sizing;
+	padding: 15px;
+}
+#profile li:first-child {
+	border-radius: 5px 5px 0 0;
+	-webkit-border-radius: 5px 5px 0 0;
+	-moz-border-radius: 5px 5px 0 0;
+}
+#profile li:last-child {
+	border-radius: 0 0 5px 5px;
+	-webkit-border-radius: 0 0 5px 5px;
+	-moz-border-radius: 0 0 5px 5px;
+	.box-shadow;
+}
+
 li.profile_item a {
 	padding: 0.75em 0.5em 0.75em 1em;
 }
@@ -618,6 +641,37 @@ li.profile_item span {
 	.orangeGradient;
 }
 
+ul#profile_meta {
+	list-style: none;
+	display: block;
+	margin: -5px -10px -9px;
+	padding: 0;
+}
+ul#profile_meta li, ul#profile_meta li:first-child, ul#profile_meta li:last-child {
+	cursor: pointer;
+	display: inline-block;
+	border: none;
+	border-left: 1px solid #ffffff;
+	border-right: 1px solid #cccccc;
+	.border-radius(0);
+	.box-sizing;
+	.grayGradient;
+	width: 50%;
+	color: #888888;
+	margin: 0;
+	padding: 0.625em;
+	text-align: center;
+	font: bold 1em/3.125em "Helvetica Neue", "Helvetica", sans-serif;
+	box-shadow: none;
+	-webkit-box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: inset 0 0 1px 1px #f6f6f6;
+	-moz-box-shadow: inset 0 0 1px 1px #f6f6f6;
+	-ms-box-shadow: inset 0 0 1px 1px #f6f6f6;
+	-o-box-shadow: inset 0 0 1px 1px #f6f6f6;
+	box-shadow: inset 0 0 1px 1px #f6f6f6;
+	text-shadow: 0 1px 1px rgba(255,255,255,1);
+}
 
 
 /* LOADER
@@ -646,6 +700,31 @@ li.profile_item span {
 	.ac;
 	.border-radius(5px);
 	.box-shadow;
+}
+
+
+/* NOTIFICATION
+------------------------------- */
+
+#notifier {
+	display: none;
+	width: 100%;
+	margin-top: 0;
+	height: 40px;
+	.blueGradient;
+	opacity: 0.8;
+	.transition;
+}
+#notifier a {
+	display: block;
+	padding: 8px 10px 12px;
+}
+#notifier.active {
+	display: block;
+	margin-top: -40px;
+}
+#profile_detail li.unread {
+	.blueGradient;
 }
 
 
@@ -712,9 +791,15 @@ li.profile_item span {
 	color: #2c2c2c;
 	text-align: center;
 	text-shadow: 0 1px 2px rgba(255,255,255,0.5);
-	.border-radius(0.1875em);
+	.border-radius(0.3125em);
 	margin: 0.5em;
 	padding: 0.5em;
+}
+a.btn:active {
+	margin: 0.5em;
+	padding: 0.5em;
+	color: #2c2c2c;
+	text-shadow: 0 1px 2px rgba(255,255,255,0.5);
 }
 a.twitter.btn {
 	height: 32px;
@@ -786,8 +871,22 @@ a.twitter.btn {
 	background-size: @sprites-size;
 	background-position: -95px -95px;
 }
+.icon.notifications {
+	height: 30px;
+	width: 30px;
+	background: url('../img/sprites.png');
+	background-size: @sprites-size;
+	background-position: -60px -120px;
+}
+.icon.settings {
+	height: 30px;
+	width: 30px;
+	background: url('../img/sprites.png');
+	background-size: @sprites-size;
+	background-position: -90px -120px;
+}
 
-/* RATE CONTROLS
+/* RATE CONTROLS & FUNKY ROW BUTTONS
 ------------------------------- */
 
 ul.rate_controls, ul.add_attributes {
@@ -1180,6 +1279,20 @@ BODY:first-of-type ul.as-list, x:-moz-any-link, x:default { /* Target FF 3.5+ */
 			background-size: @sprites-size;
 			background-position: -95px -95px;
 		}
+		.icon.notifications {
+			height: 30px;
+			width: 30px;
+			background: url('../img/sprites.hd.png');
+			background-size: @sprites-size;
+			background-position: -60px -120px;
+		}
+		.icon.settings {
+			height: 30px;
+			width: 30px;
+			background: url('../img/sprites.hd.png');
+			background-size: @sprites-size;
+			background-position: -90px -120px;
+		}
 		
 		#addFriend {
 			height: 30px;
@@ -1203,7 +1316,7 @@ BODY:first-of-type ul.as-list, x:-moz-any-link, x:default { /* Target FF 3.5+ */
 			display: block;
 			height: 30px;
 			width: 30px;
-			background: url('../img/sprites.png') -61px -90px;
+			background: url('../img/sprites.hd.png') -61px -90px;
 			background-size: @sprites-size;
 		}
 		
