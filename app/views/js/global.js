@@ -246,21 +246,25 @@ function feedDetail(id,notification) {
 						// 	var i = 0;
 						// }
 						
-						// Activity stream
-						for(var i = 0; i < results.length; i++) {
+						if (results[0].comment != undefined) {
+						
+							// Activity stream
+							for(var i = 0; i < results.length; i++) {
 							
-							var first_name = (results[i].first_name == null) ? '' : results[i].first_name;
-							var last_name = (results[i].last_name == null) ? '' : results[i].last_name;
-							var user_name = first_name;
-							var time = (results[i].time == undefined) ? '' : fixTime(results[i].time);
+								var first_name = (results[i].first_name == null) ? '' : results[i].first_name;
+								var last_name = (results[i].last_name == null) ? '' : results[i].last_name;
+								var user_name = first_name;
+								var time = (results[i].time == undefined) ? '' : fixTime(results[i].time);
 							
-							$('ul#feed_detail span.results').append('<li>'
-												+ '<a href="javascript:void(0);" onclick="loadProfile(\'' + results[i].partner_id + '\')">'
-												+ '<img src="' + results[i].avatar + '" width="32px" class="avatar left" />'
-												+ time
-												+ '<p class="meta">' + user_name + '</p>'
-												+ '<p class="comment">' + results[i].comment + '</p>'
-												+ '</a></li>');
+								$('ul#feed_detail span.results').append('<li>'
+													+ '<a href="javascript:void(0);" onclick="loadProfile(\'' + results[i].partner_id + '\')">'
+													+ '<img src="' + results[i].avatar + '" width="32px" class="avatar left" />'
+													+ time
+													+ '<p class="meta">' + user_name + '</p>'
+													+ '<p class="comment">' + results[i].comment + '</p>'
+													+ '</a></li>');
+							}
+						
 						}
 						
 						window.location='/dashboard#_feed_detail';
