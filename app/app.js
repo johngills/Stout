@@ -149,6 +149,7 @@ app.get('/get-comments', checkAuth, function(req, res) {
 	var time = new Date();
 	var current = dateToString(time);
 	
+	// Checks comments table
 	client.query(
 		'SELECT DISTINCT comments.owner_id, comments.partner_id, comments.rating, comments.beer_id, beers.name, beers.description, comments.comment, comments.created_date, ROUND(TIMESTAMPDIFF(SECOND,comments.created_date,"' + current + '")/60) AS time, users.avatar, users.first_name, users.last_name '
 		+ 'FROM comments, users, beers '
@@ -157,18 +158,26 @@ app.get('/get-comments', checkAuth, function(req, res) {
 			if (err) throw err;
 			console.log(results);
 			if (results == '') {
+				// Checks feed for latest comment if comments table is empty
 				client.query(
 					'SELECT feed.user_id, feed.beer_id, feed.rating, beers.name, beers.description, users.first_name, users.last_name, users.avatar, feed.created_date '
 					+ 'FROM feed, beers, users WHERE feed.id = ' + req.query.id + ' AND feed.beer_id = beers.id AND feed.user_id = users.user_id',
 					function(err, results, field) {
 						if (err) throw err;
-						console.log('second sql query');
 						console.log(results);
 						res.send(results);
 				});
 			} else {
+				// If comment table is not empty, send the results!
 				res.send(results);
 			}
+			// Update notification table
+			client.query(
+				'UPDATE notifications SET notifications.read = 1 WHERE feed_id = ' + req.query.id + ' AND type = "COMMENT";',
+				function(err, results, field) {
+					if (err) throw err;
+					console.log(results);
+			});
 	});
 });
 
@@ -397,6 +406,14 @@ app.get('/add-comment', checkAuth, function(req, res) {
 				function(err, results, fields) {
 					if (err) throw err;
 					console.log(results);
+					// Add notification
+					client.query(
+						'INSERT INTO notifications ' +
+						'SET owner_id = ?, partner_id = ?, type = ?, feed_id = ?, created_date = ?',
+						[req.query.owner_id, req.session.user_id, "COMMENT", req.query.feed_id, current],
+						function(err, sql_results, fields) {
+							if (err) throw err;
+					});
 					client.query(
 						'SELECT users.user_id, users.first_name, users.last_name, users.avatar FROM users WHERE users.user_id = ' + req.session.user_id + ';', // change to store these in the session
 						function(err, results, fields) {
@@ -507,7 +524,33 @@ app.get('/get-profile', checkAuth, function(req, res) {
 		function(err, results, fields) {
 			if (err) throw err;
 			console.log(results);
-			res.send(results);
+			if (results == '') {
+				// New user profile
+				client.query(
+					'SELECT users.user_name, users.first_name, users.last_name, users.avatar, users.user_id, beer_number.beer_count, follows.follower_count, following.following_count, todrink_number.todrink_count, followers.created_date '
+					+ 'FROM users, '
+					+ '(SELECT COUNT(todrink.user_id) AS todrink_count FROM todrink WHERE todrink.user_id = ' + req.query.user_id + ') AS todrink_number, '
+					+ '(SELECT COUNT(feed.beer_id) AS beer_count FROM feed WHERE user_id = ' + req.query.user_id + ' AND feed.type = "RATE") AS beer_number, '
+					+ '(SELECT COUNT(owner_id) AS follower_count FROM followers WHERE owner_id = ' + req.query.user_id + ') AS follows, '
+					+ '(SELECT COUNT(follower_id) AS following_count FROM followers WHERE follower_id = ' + req.query.user_id + ') AS following '
+					+ 'LEFT OUTER JOIN followers ON (follower_id = ' + req.session.user_id + ') AND (owner_id = ' + req.query.user_id + ') '
+					+ 'WHERE users.user_id = ' + user_id,
+					function(err, results, fields) {
+						if (err) throw err;
+						console.log(results);
+						res.send(results);
+				});
+			} else {
+				res.send(results);
+			}
+	});
+	
+	// Update notification table
+	client.query(
+		'UPDATE notifications SET notifications.read = 1 WHERE partner_id = ' + req.query.user_id + ' AND type = "FOLLOW";',
+		function(err, results, field) {
+			if (err) throw err;
+			console.log(results);
 	});
 });
 
@@ -559,6 +602,31 @@ app.get('/get-following', checkAuth, function(req, res) {
 	});
 });
 
+app.get('/get-notifications', checkAuth, function(req, res) {
+	client.query(
+		'SELECT owner_id, partner_id, type, feed_id FROM notifications WHERE notifications.read = 0 AND notifications.owner_id = ' + req.session.user_id,
+		function(err, results, fields) {
+			if (err) throw err;
+			console.log(results);
+			res.send(results);
+	});
+});
+
+app.get('/get-notifications-list', checkAuth, function(req, res) {
+	var time = new Date();
+	var current = dateToString(time);
+	
+	client.query(
+		'SELECT notifications.owner_id, notifications.partner_id, notifications.type, notifications.read, notifications.feed_id, ROUND(TIMESTAMPDIFF(SECOND,notifications.created_date,"' + current + '")/60) AS time, notifications.created_date, users.first_name, users.last_name, users.avatar '
+		+ 'FROM notifications, users '
+		+ 'WHERE notifications.owner_id = ' + req.session.user_id + ' AND users.user_id = notifications.partner_id ORDER BY notifications.created_date DESC;',
+		function(err, results, fields) {
+			if (err) throw err;
+			console.log(results);
+			res.send(results);
+	});
+});
+
 app.get('/follow', checkAuth, function(req, res) {
 	var time = new Date();
 	var current = dateToString(time);
@@ -569,10 +637,18 @@ app.get('/follow', checkAuth, function(req, res) {
 		[req.query.owner_id, req.session.user_id, current],
 		function(err, sql_results, fields) {
 			if (err) throw err;
-			if (sql_results != undefined) {
-				console.log(sql_results);
-				res.send('{"status":"success"}');
+			console.log(sql_results);
+			if (req.query.owner_id != req.session.user_id) {
+				// Add notification
+				client.query(
+					'INSERT INTO notifications ' +
+					'SET owner_id = ?, partner_id = ?, type = ?, created_date = ?',
+					[req.query.owner_id, req.session.user_id, "FOLLOW", current],
+					function(err, sql_results, fields) {
+						if (err) throw err;
+				});
 			}
+			res.json({"status":"success"});
 		});
 });
 
@@ -586,7 +662,7 @@ app.get('/unfollow', checkAuth, function(req, res) {
 			if (err) throw err;
 			if (sql_results != undefined) {
 				console.log(sql_results);
-				res.send('{"status":"success"}');
+				res.json({"status":"success"});
 			}
 		});
 });

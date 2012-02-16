@@ -22,15 +22,16 @@ function store() {
 		console.log(localStorage['user_id']);
 		console.log(localStorage['user_name']);
 		loadTab(0);
+		setTimeout('getNotifications()',3000);
 	} else {
 		logout();
 	}
 }
 
 function storeCheck() {
-	if (localStorage['revision7'] == null) {
+	if (localStorage['revision8'] == null) {
 		localStorage.clear();
-		localStorage['revision7'] = time;
+		localStorage['revision8'] = time;
 	}
 	if (localStorage['user_id'] != null) {
 		load('Logging in...');
@@ -389,29 +390,32 @@ function loadProfile(id) {
 						var last_name = (results[0].last_name == null) ? '' : results[0].last_name;
 						var user_name = first_name + ' ' + last_name;
 						var user_id = results[0].user_id;
+						var activity = (results[0].beer_name == undefined) ? '' : '<p class="meta">Last seen drinking a <b>' + results[0].beer_name + '</b></p>';
 						
 						if (results[0].user_id != $('#user_id').val()) {
 							var follow  = (results[0].created_date == null) ? '<li><a href="javascript:void(0);" onclick="follow(' + id + ');" class="btn orange ' + id + '">Follow</a></li>' : '<li><a href="javascript:void(0);" onclick="unfollow(' + id + ');" class="btn light ' + id + '">Unfollow</a></li>';
 							var profile_settings = '';
-						} else { // My profile
+						} else {
+							// My profile
 							tabSelect('profile');
 							var follow = '';
-							var profile_settings = '<li><a href="mailto:me@mynameissterling.com" class="btn orange">Feedback</a><a href="javascript:void(0);" onclick="logout();" class="btn orange">Logout</a><p class="meta ac">Made with love by MyNIS Labs</p><br /><br /><br /></li>'
+							var profile_settings = '<li><ul id="profile_meta"><li onclick="loadNotifications();"><span class="icon notifications center"></span></li><li><span class="icon settings center"></span></li></ul></li>';
 						}
 
 						$('ul#profile').attr('title',user_name).empty();
 						$('ul#profile').append('<li style="height:60px;">'
 											+ '<img src="' + results[0].avatar + '" width="48px" class="avatar left" />'
 											+ '<h3>' + user_name + '</h3>'
-											+ '<p class="meta">Last seen drinking a <b>' + results[0].beer_name + '</b></p>'
+											+ activity
 											+ '</ul>'
 											+ '</li>'
 											+ follow
+											+ profile_settings
 											+ '<li class="profile_item"><a href="javascript:void(0);" onclick="loadToDrink(' + user_id + ');"><section class="icon arrow right"></section><span>' + results[0].todrink_count + '</span><b>To Drink list</b></a></li>'
 											+ '<li class="profile_item"><a href="javascript:void(0);" onclick="loadActivity(' + user_id + ');"><section class="icon arrow right"></section><span>' + results[0].beer_count + '</span><b>Beers</b></a></li>'
 											+ '<li class="profile_item"><a href="javascript:void(0);" onclick="loadFollowers(' + user_id + ');"><section class="icon arrow right"></section><span>' + results[0].follower_count + '</span><b>Followers</b></a></li>'
 											+ '<li class="profile_item"><a href="javascript:void(0);" onclick="loadFollowing(' + user_id + ');"><section class="icon arrow right"></section><span>' + results[0].following_count + '</span><b>Following</b></a></li>');
-
+						
 						window.location='/dashboard#_profile';
 						load();
 					}
@@ -567,7 +571,7 @@ function loadFollowing(user_id) {
 						window.location='/dashboard#_profile_detail';
 						load();
 					} else {
-						load('No Followers!','error');
+						load('Not Following anyone!','error');
 					}
 				},
 		error: function(results) {
@@ -1071,6 +1075,89 @@ function findBeer() {
 					}
 		});
 	}
+}
+
+// Check for notifications
+function getNotifications() {
+	var user_id = $('input#user_id').val();
+	var user_name = $('input#user_name').val();
+	if (user_name != '' || user_id != '') {
+		$.ajax({
+			cache: false,
+			url: '/get-notifications',
+			success: function(results) {
+						var message = '';
+						if (results != '') {
+							if (results.length > 1) {
+								$('#notifier').empty().append('<a href="javascript:void(0);" onclick="loadNotifications();">You have ' + results.length + ' new notifications!</a>').addClass('active');
+							} else {
+								switch(results[0].type) {
+									case 'COMMENT':
+										message = '<a href="javascript:void(0);" onclick="feedDetail(' + results[0].feed_id + ');">You have a new comment!</a>';
+										break;
+									case 'FOLLOW':
+										message = '<a href="javascript:void(0);" onclick="loadProfile(' + results[0].partner_id + ');">You have a new follower!</a>';
+										break;
+								}
+								$('#notifier').empty().append(message).addClass('active');
+							}
+						}
+					},
+			error: function(results) {
+						load('Something went wrong!','error');
+						return false;
+					}
+		});
+	}
+}
+
+function loadNotifications() {
+	$.ajax({
+		cache: false,
+		url: '/get-notifications-list',
+		success: function(results) {
+					var message = '';
+					if (results != '') {
+						$('#profile_detail').empty().attr('title','Notifications');
+						for(var i = 0; i < results.length; i++) {
+							
+							var first_name = (results[i].first_name == undefined) ? '' : results[i].first_name;
+							var last_name = (results[i].last_name == undefined) ? '' : results[i].last_name;
+							var avatar = results[i].avatar;
+							var time = (results[i].time == undefined) ? '' : fixTime(results[i].time);
+							var unread = (results[i].read == 0) ? ' class="unread"' : '';
+							
+							switch(results[i].type) {
+								case 'COMMENT':
+									message = '<a href="javascript:void(0);" onclick="feedDetail(' + results[i].feed_id + ');">'
+												+ '<section class="icon arrow right"></section>'
+												+ '<img src="' + avatar + '" width="32px" class="avatar left" />'
+												+ '<span class="info">' + time + '</span>'
+												+ '<p class="meta"><b>' + first_name + ' ' + last_name + '</b><br /> left you a comment</p></a>';
+									break;
+								case 'FOLLOW':
+									message = '<a href="javascript:void(0);" onclick="loadProfile(' + results[i].partner_id + ');">'
+												+ '<section class="icon arrow right"></section>'
+												+ '<img src="' + avatar + '" width="32px" class="avatar left" />'
+												+ '<span class="info">' + time + '</span>'
+												+ '<p class="meta"><b>' + first_name + ' ' + last_name + '</b><br /> is now following you</p></a>';
+									break;
+							}
+							$('#profile_detail').append('<li style="height:45px;"' + unread + '>' + message + '</li>');
+						}
+						window.location='/dashboard#_profile_detail';
+						
+						// Remove any notifications
+						$('#notifier').removeClass('active');
+					} else {
+						load('You have no notifications!','error');
+					}
+				},
+		error: function(results) {
+					load('Something went wrong!','error');
+					return false;
+				}
+	});
 }
 
 function findFriend() {
