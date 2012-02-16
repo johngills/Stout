@@ -29,9 +29,9 @@ function store() {
 }
 
 function storeCheck() {
-	if (localStorage['revision8'] == null) {
+	if (localStorage['revision9'] == null) {
 		localStorage.clear();
-		localStorage['revision8'] = time;
+		localStorage['revision9'] = time;
 	}
 	if (localStorage['user_id'] != null) {
 		load('Logging in...');
@@ -204,12 +204,16 @@ function loadTab(limit) {
 	});
 }
 
-function feedDetail(id) {
+function feedDetail(id,notification) {
 	load('Brewing...');
 	var item_detail = $('#feed-item-' + id + ' a').html();
 	var title = $('#feed-item-' + id + ' h3.beer_name').text();
 	var avatar = $('#feed-item-' + id + ' img').attr('src');
 	var beer_id = $('#feed-item-' + id + ' h3.beer_name').attr('id');
+	
+	if (notification) {
+		$('#notifier').removeClass('active');
+	}
 	
 	$('ul#feed_detail').attr('title',title);
 	$('ul#feed_detail span.results').empty().append('<li>'
@@ -226,7 +230,6 @@ function feedDetail(id) {
 		data: { id: id },
 		success: function(results) {
 					if (results != '') {
-						console.log('got here');
 						// to top
 						$('html, body').animate({scrollTop: '0px'}, 0);
 						
@@ -237,14 +240,14 @@ function feedDetail(id) {
 						var owner_id = (results[0].owner_id == null) ? results[0].user_id : results[0].owner_id;
 						$('#add_comment_text').attr('onblur','addComment(' + results[0].beer_id + ',' + results[0].rating + ',' + id + ',' + owner_id + ');');
 						
-						if (results[0].owner_id == results[0].partner_id) {
-							var i = 1;
-						} else {
-							var i = 0;
-						}
+						// if (results[0].owner_id == results[0].partner_id) {
+						// 	var i = 1;
+						// } else {
+						// 	var i = 0;
+						// }
 						
 						// Activity stream
-						for(i; i < results.length; i++) {
+						for(var i = 0; i < results.length; i++) {
 							
 							var first_name = (results[i].first_name == null) ? '' : results[i].first_name;
 							var last_name = (results[i].last_name == null) ? '' : results[i].last_name;
@@ -371,13 +374,17 @@ function loadFindFriend() {
 // 	});
 // }
 
-function loadProfile(id) {
+function loadProfile(id,notification) {
 	$('html, body').animate({scrollTop: '0px'}, 0);
 	load('Brewing...');
 	
 	// reset footer
 	$('#add_comment').fadeOut();
 	$('#footer').fadeIn();
+	
+	if (notification) {
+		$('#notifier').removeClass('active');
+	}
 	
 	$.ajax({
 		cache: false,
@@ -831,29 +838,45 @@ function clearBrewery() {
 }
 function addNewBeer() { // TODO: check if any fields are empty before inserting into database
 	load('Brewing...');
-	var name = $('input#add_beer_name').val();
+	var name = $('input#add_beer_name').val().toLowerCase().replace(/\b[a-z]/g, function(letter) {
+	    return letter.toUpperCase();
+	});
 	var obj = $('#as-selections-brewery li');
 	var breweryArray = $.makeArray(obj);
-	var brewery_name = $(breweryArray[0]).text();
-	var brewery_input = $('input#brewery').val();
-	var brewery = $('input#as-values-brewery').val();
+	var brewery_name = $(breweryArray[0]).text().toLowerCase().replace(/\b[a-z]/g, function(letter) {
+	    return letter.toUpperCase();
+	});
+	var brewery_input = $('input#brewery').val().toLowerCase().replace(/\b[a-z]/g, function(letter) {
+	    return letter.toUpperCase();
+	});
+	var brewery = $('input#as-values-brewery').val().toLowerCase().replace(/\b[a-z]/g, function(letter) {
+	    return letter.toUpperCase();
+	});
 	var description = $('#add_beer_description').val();
 	var abv = $('input#add_beer_abv').val();
-	var category = $('input#add_beer_category').val();
-	var style = $('input#add_beer_style').val();
+	var category = $('select#add_beer_category option:selected').val();
+	var style = $('select#add_beer_style option:selected').val();
 	
-	if (brewery_name == '') {
-		if (brewery == '') {
+	if (brewery == '') {
+		if (brewery_name != '') {
+			brewery = brewery_name;
+		} else if (brewery_input != '') {
 			brewery = brewery_input;
+		} else {
+			brewery = 1425;
 		}
-	} else {
-		brewery = brewery_name;
 	}
-	if (!$('.cat_selet').hasClass('active')) {
+	console.log('abv: ' + abv);
+	console.log('category: ' + category);
+	console.log('style: ' + style);
+	if (category == undefined) {
 		category = 11;
+		console.log(category);
+	}
+	if (style == undefined) {
 		style = 132;
 	}
-	if (!$('.abv_selet').hasClass('active')) {
+	if (!$('.abv_select').hasClass('active')) {
 		abv = 0;
 	}
 	//now.insertNewBeer(name, brewery, description, abv, category, style);
@@ -1093,10 +1116,10 @@ function getNotifications() {
 							} else {
 								switch(results[0].type) {
 									case 'COMMENT':
-										message = '<a href="javascript:void(0);" onclick="feedDetail(' + results[0].feed_id + ');">You have a new comment!</a>';
+										message = '<a href="javascript:void(0);" onclick="feedDetail(' + results[0].feed_id + ',true);">You have a new comment!</a>';
 										break;
 									case 'FOLLOW':
-										message = '<a href="javascript:void(0);" onclick="loadProfile(' + results[0].partner_id + ');">You have a new follower!</a>';
+										message = '<a href="javascript:void(0);" onclick="loadProfile(' + results[0].partner_id + ',true);">You have a new follower!</a>';
 										break;
 								}
 								$('#notifier').empty().append(message).addClass('active');
