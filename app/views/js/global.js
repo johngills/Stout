@@ -353,6 +353,7 @@ function loadFindFriend() {
 	$('#add_comment').fadeOut();
 	$('#footer').fadeIn();
 	
+	tabSelect();
 	$('#user_name').val('');
 	$('html, body').animate({scrollTop: '0px'}, 0);
 }
