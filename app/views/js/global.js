@@ -105,7 +105,8 @@ function fixTime(time) {
 
 function loadTab(limit,comment) {
 	
-	// reset footer
+	// resets
+	pageHistory = [];
 	if (comment == '') {
 		$('#add_comment').fadeOut();
 		$('#footer').fadeIn();
@@ -336,18 +337,24 @@ function feedDetail(id,notification) {
 }
 
 function loadFindBeer() {
+	
+	// resets
+	pageHistory = [];
+	
 	tabSelect('find_beer');
 	$('#beer_name').val('');
 	$('html, body').animate({scrollTop: '0px'}, 0);
 }
 
 function loadFindFriend() {
-	$('#user_name').val('');
-	$('html, body').animate({scrollTop: '0px'}, 0);
 	
-	// reset footer
+	// resets
+	pageHistory = [];
 	$('#add_comment').fadeOut();
 	$('#footer').fadeIn();
+	
+	$('#user_name').val('');
+	$('html, body').animate({scrollTop: '0px'}, 0);
 }
 
 
@@ -359,7 +366,8 @@ function loadProfile(id,notification) {
 	$('html, body').animate({scrollTop: '0px'}, 0);
 	load('Brewing...');
 	
-	// reset footer
+	// resets
+	pageHistory = [];
 	$('#add_comment').fadeOut();
 	$('#footer').fadeIn();
 	
@@ -748,6 +756,7 @@ function getBreweries() {
 	});
 }
 function getBeerCategories() {
+	load('Brewing...');
 	$.ajax({
 		cache: false,
 		url: '/get-beer-categories',
@@ -758,17 +767,20 @@ function getBeerCategories() {
 							var selected = (i == 0) ? 'selected="selected"' : '';
 							$('select#beer_categories').append('<option val="' + results[i].id + '" ' + selected + '>' + results[i].cat_name + '</option>');
 						}
+						load();
 					} else {
 						load('Something went wrong!','error');
 					}
 				},
 		error: function() {
+					load('Something went wrong!','error');
 					console.log('Something went wrong!');
 					return false;
 				}
 	});
 }
 function getBeerStyles(id) {
+	load('Brewing...');
 	$.ajax({
 		cache: false,
 		url: '/get-beer-styles',
@@ -780,11 +792,13 @@ function getBeerStyles(id) {
 							$('select#beer_styles').append('<option val="' + results[i].id + '">' + results[i].style_name + '</option>');
 						}
 						showAttribute('style');
+						load();
 					} else {
 						load('Something went wrong!','error');
 					}
 				},
 		error: function() {
+					load('Something went wrong!','error');
 					console.log('Something went wrong!');
 					return false;
 				}
