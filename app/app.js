@@ -7,9 +7,9 @@ var url = require('url');
 var fs = require('fs');
 var http = require('http');
 var $ = require('jquery');
-// var base64 = require('base64');
 var request = require('request');
 var crypto = require("crypto");
+// var base64 = require('base64');
 
 var time = new Date();
 var current = dateToString(time);
@@ -151,16 +151,18 @@ app.get('/get-comments', checkAuth, function(req, res) {
 	
 	// Checks comments table
 	client.query(
-		'SELECT DISTINCT comments.owner_id, comments.partner_id, comments.rating, comments.beer_id, beers.name, beers.description, comments.comment, comments.created_date, ROUND(TIMESTAMPDIFF(SECOND,comments.created_date,"' + current + '")/60) AS time, users.avatar, users.first_name, users.last_name '
-		+ 'FROM comments, users, beers '
-		+ 'WHERE comments.feed_id = ' + req.query.id + ' AND comments.partner_id = users.user_id AND comments.beer_id = beers.id ORDER BY comments.created_date',
+		'SELECT DISTINCT comments.owner_id, comments.partner_id, comments.rating, comments.beer_id AS beer_id, beers.name AS beer_name, beers.description, comments.comment, comments.created_date, comment_number.comment_count, ROUND(TIMESTAMPDIFF(SECOND,comments.created_date,"' + current + '")/60) AS time, users.avatar, users.first_name, users.last_name '
+		+ 'FROM users, beers, feed, comments, '
+		+ '(SELECT COUNT(comments.comment) AS comment_count FROM comments WHERE comments.feed_id = ' + req.query.id + ') AS comment_number '
+		// + 'LEFT OUTER JOIN comments ON (follower_id = ' + req.session.user_id + ') AND (owner_id = ' + req.query.user_id + ') '
+		+ 'WHERE comments.feed_id = ' + req.query.id + ' AND comments.partner_id = users.user_id AND comments.owner_id = users.user_id AND comments.beer_id = beers.id ORDER BY comments.created_date',
 		function(err, results, field) {
 			if (err) throw err;
 			console.log(results);
 			if (results == '') {
 				// Checks feed for latest comment if comments table is empty
 				client.query(
-					'SELECT feed.user_id, feed.beer_id, feed.rating, beers.name, beers.description, users.first_name, users.last_name, users.avatar, feed.created_date '
+					'SELECT feed.user_id, feed.beer_id AS beer_id, feed.rating, feed.type, feed.comment, feed.comment_count, beers.name AS beer_name, beers.description, users.first_name, users.last_name, users.avatar, ROUND(TIMESTAMPDIFF(SECOND,feed.created_date,"' + current + '")/60) AS time, feed.created_date '
 					+ 'FROM feed, beers, users WHERE feed.id = ' + req.query.id + ' AND feed.beer_id = beers.id AND feed.user_id = users.user_id',
 					function(err, results, field) {
 						if (err) throw err;
@@ -171,7 +173,7 @@ app.get('/get-comments', checkAuth, function(req, res) {
 				// If comment table is not empty, send the results!
 				res.send(results);
 			}
-			// Update notification table
+			// Update notification table - mark as read
 			client.query(
 				'UPDATE notifications SET notifications.read = 1 WHERE feed_id = ' + req.query.id + ' AND type = "COMMENT";',
 				function(err, results, field) {
@@ -294,7 +296,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 		client.query('DELETE FROM feed WHERE (feed.user_id = ' + req.session.user_id + ') AND (feed.beer_id = ' + req.query.beer_id + ')');
 	}
 	client.query(
-		'UPDATE beers SET beers.' + req.query.rate + ' = beers.' + req.query.rate + ' + 1' + unrate + ' WHERE id = ' + req.query.beer_id + ';',
+		'UPDATE beers SET beers.' + req.query.rate + ' = beers.' + req.query.rate + ' + 1' + unrate + ', last_mod = "' + current + '" WHERE id = ' + req.query.beer_id + ';',
 		function(err, sql_results, fields) {
 			if (err) throw err;
 			if (sql_results != undefined) {
@@ -316,8 +318,8 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 				}
 				client.query(
 					'INSERT INTO feed ' +
-					'SET user_id = ?, user_name = ?, beer_id = ?, type = ?, rating = ?, created_date = ? ',
-					[req.session.user_id, req.session.user_name, req.query.beer_id, "RATE", rate, current],
+					'SET user_id = ?, user_name = ?, beer_id = ?, type = ?, rating = ?, latitude = ?, longitude = ?, created_date = ? ',
+					[req.session.user_id, req.session.user_name, req.query.beer_id, "RATE", rate, req.query.latitude, req.query.longitude, current],
 					function(err, results, fields) {
 						if (err) throw err;
 						console.log(results);
@@ -436,7 +438,8 @@ app.get('/add-comment', checkAuth, function(req, res) {
 // 	
 // 			// Twitter stuff
 // 			var consumer_key = 'Nmqm7UthsfdjaDQ4HcxPw';
-// 			var consumer_secret = '19cnrCnCH8C7bn7xxvXl1N4jVWPtIvTZjJ8zbBthSS0';
+// 			//var consumer_secret = '19cnrCnCH8C7bn7xxvXl1N4jVWPtIvTZjJ8zbBthSS0';
+// 			var consumer_secret = 'PIFvIPSXlTIbqnnnjBIqoWs0VIxpQivNrIJuWxtkLI';
 // 
 // 			var consumer_secret_encode = encodeURIComponent(consumer_secret);
 // 			var oauth_token_secret_encode = encodeURIComponent(oauth_token_secret);
@@ -471,10 +474,10 @@ app.get('/add-comment', checkAuth, function(req, res) {
 // 				function(err, results, fields) {
 // 					if (err) throw err;
 // 			
-// 					request.post({
+// 					request.get({
 // 							url: 'https://api.twitter.com/1/friendships/lookup.json?screen_name=' + req.session.user_name,
 // 							headers: {
-// 								'Content-Type': 'application/json',
+// 								'Content-Type': 'application/x-www-form-urlencoded',
 // 								'Authorization': 'OAuth oauth_consumer_key="' + consumer_key + '", '
 // 											+ 'oauth_nonce="' + base64.encode(current) + '", '
 // 											+ 'oauth_signature="' + digest + '", '
@@ -489,7 +492,6 @@ app.get('/add-comment', checkAuth, function(req, res) {
 // 					});
 // 			
 // 					console.log(results);
-// 					// res.send(results); -- uncomment after twitter testing
 // 			});
 // 		
 // 	});
