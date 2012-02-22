@@ -2,6 +2,8 @@ body(onload="store();")
 
 	input#user_id(type="hidden", value="#{user_id}")
 	input#user_name(type="hidden", value="#{user_name}")
+	input#latitude(type="hidden")
+	input#longitude(type="hidden")
 
 	ul#index(title="The Tab", selected="true")
 		li
@@ -38,6 +40,7 @@ body(onload="store();")
 			li.style_attribute.hide(onclick="$('select#beer_styles').focus();")
 				input#add_beer_style.text(type="text", name="add_beer_style", placeholder="Add Style (Optional)", disabled="disabled")
 				select#beer_styles
+					option(selected="selected", value="132") Out of Category
 			li
 				ul.add_attributes
 					li.abv_select.ac(onclick="showAttribute('abv')")

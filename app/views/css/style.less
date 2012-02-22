@@ -540,18 +540,26 @@ li.heading {
 }
 
 li > a[selected], li > a:active {
+	color: #ffffff;
 	margin: -6px -10px;
 	padding: 6px 10px;
 	box-shadow: 0 1px 2px rgba(0,0,0,0.8) inset;
 	-webkit-box-shadow: 0 1px 2px rgba(0,0,0,0.8) inset;
 	-moz-box-shadow: 0 1px 2px rgba(0,0,0,0.8) inset;
-	background: rgb(254,252,234); /* Old browsers */
-	background: -moz-linear-gradient(top,  rgba(254,252,234,1) 0%, rgba(255,255,204,1) 100%); /* FF3.6+ */
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(254,252,234,1)), color-stop(100%,rgba(255,255,204,1))); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(top,  rgba(254,252,234,1) 0%,rgba(255,255,204,1) 100%); /* Chrome10+,Safari5.1+ */
-	background: -o-linear-gradient(top,  rgba(254,252,234,1) 0%,rgba(255,255,204,1) 100%); /* Opera 11.10+ */
-	background: -ms-linear-gradient(top,  rgba(254,252,234,1) 0%,rgba(255,255,204,1) 100%); /* IE10+ */
-	background: linear-gradient(top,  rgba(254,252,234,1) 0%,rgba(255,255,204,1) 100%); /* W3C */
+	background: #28343b; /* Old browsers */
+	background: -moz-linear-gradient(top,  #28343b 0%, #828c95 8%, #828c95 94%, #b5bdc8 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#28343b), color-stop(8%,#828c95), color-stop(94%,#828c95), color-stop(100%,#b5bdc8)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  #28343b 0%,#828c95 8%,#828c95 94%,#b5bdc8 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  #28343b 0%,#828c95 8%,#828c95 94%,#b5bdc8 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  #28343b 0%,#828c95 8%,#828c95 94%,#b5bdc8 100%); /* IE10+ */
+	background: linear-gradient(top,  #28343b 0%,#828c95 8%,#828c95 94%,#b5bdc8 100%); /* W3C */
+}
+li > a[selected] p.meta, li > a:active p.meta, li > a[selected] h3, li > a:active h3 {
+	color: #ffffff;
+	text-shadow: 0 -1px 1px rgba(0,0,0,1);
+}
+li > a[selected] .avatar, li > a:active .avatar {
+	box-shadow: 0 -1px 1px #000000;
 }
 li.load-message {
 	padding-left: 60px;
@@ -698,7 +706,20 @@ ul#profile_meta li, ul#profile_meta li:first-child, ul#profile_meta li:last-chil
 	position: relative;
 	top: 25%;
 	width: 30%;
-	.type(normal,0.75em);
+	.type(normal,1em);
+	background: @stout;
+	.ac;
+	.border-radius(5px);
+	.box-shadow;
+}
+#load_overlay .welcome {
+	display: block;
+	margin: 0 auto;
+	padding: 10px 20px;
+	position: relative;
+	top: 25%;
+	width: 30%;
+	.type(normal,1em);
 	background: @stout;
 	.ac;
 	.border-radius(5px);
