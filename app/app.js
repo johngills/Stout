@@ -11,12 +11,9 @@ var $ = require('jquery');
 // var crypto = require("crypto");
 // var base64 = require('base64');
 
-var time = new Date();
-var current = dateToString(time);
-
 // CSS ---------------------------------------------------
 var less = require('less');
-var parser = new(less.Parser)({
+var parser = new (less.Parser)({
     paths: ['.', './views/css'], // Specify search paths for @import directives
     filename: 'style.less' // Specify a filename, for better error messages
 });
@@ -106,7 +103,7 @@ app.get('/', function(req, res) {
 		console.log('got here');
 		res.render('index', { layout: 'home', user_name: '', user_id: '', title: 'Stout' });
 	} else {
-		// res.redirect('/dashboard');
+		res.redirect('/dashboard');
 	}
 });
 
@@ -472,8 +469,11 @@ app.get('/share-beer', checkAuth, function(req, res) {
 					// {"status": tweet + " - http://www.stoutapp.com/detail/" + req.query.feed_id + " (via @StoutApp)"},
 					{"status": tweet + " (via @StoutApp)"},
 					function(error, data) {
-						if(error) console.log(require('sys').inspect(error))
-						else console.log(data)
+						if (error) {
+							console.log(require('sys').inspect(error));
+						} else {
+							console.log(data);
+						}
 				});
 		});
 	}
@@ -532,8 +532,11 @@ app.get('/get-twitter-friends', checkAuth, function(req, res) {
 				access_token,
 				access_token_secret,
 				function(error, results) {
-					if(error) console.log(require('sys').inspect(error))
-					else console.log(results)
+					if (error) {
+						console.log(require('sys').inspect(error));
+					} else {
+						console.log(results);
+					}
 					var data = $.parseJSON(results);
 					
 					// Cut friends query down to 99
@@ -558,8 +561,11 @@ app.get('/get-twitter-friends', checkAuth, function(req, res) {
 						access_token,
 						access_token_secret,
 						function(error, data) {
-							if(error) console.log(require('sys').inspect(error))
-							else console.log(data)
+							if (error) {
+								console.log(require('sys').inspect(error));
+							} else {
+								console.log(data);
+							}
 							twitter_friends = $.parseJSON(data);
 							res.json({"stout_friends":stout_friends,"twitter_friends":twitter_friends});
 					});
@@ -598,9 +604,12 @@ app.get('/send-twitter-invite', checkAuth, function(req, res) {
 			    results[0].access_token_secret,
 				{"status":text[i]},
 				function(error, data) {
-					if(error) console.log(require('sys').inspect(error))
-					else console.log(data)
-					res.json({"status":"success"});
+					if (error) {
+						console.log(require('sys').inspect(error));
+					} else {
+						console.log(data);
+					}
+					res.json({"status" : "success"});
 			});
 	});
 });
