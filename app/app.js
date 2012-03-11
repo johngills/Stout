@@ -89,7 +89,7 @@ var oa = new OAuth(
 	"HMAC-SHA1"
 );
 
-function dateToString(date){
+function dateToString(date) {
 	//check that date is a date object
 	if (date && date.getFullYear()){ 
 		return date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate() + ' ' + date.getHours() + '-' + date.getMinutes() + '-' + date.getSeconds();
@@ -513,14 +513,6 @@ app.get('/add-comment', checkAuth, function(req, res) {
 			});
 		});
 });
-
-// app.get('/find-friend', function(req, res) {
-// 	oa.post("http://api.twitter.com/1/statuses/update.json",'68529291-pm3SERe2nrCHbtTKR4j7Tit2PSCfeOgyVTfjtbAhI', 
-// 	                           'JCYBPGTsQA1ctdNIaIG8Mxi7zMTXhD4zwhgBj3Hgg', {"status":"testing!"}, function(error, data) {
-// 	                             if(error) console.log(require('sys').inspect(error))
-// 	                             else console.log(data)
-// 	});
-// });
 
 app.get('/get-twitter-friends', checkAuth, function(req, res) {
 	client.query(
