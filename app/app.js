@@ -8,9 +8,9 @@ var url = require('url');
 var fs = require('fs');
 var http = require('http');
 var $ = require('jquery');
-var request = require('request');
-var crypto = require("crypto");
-var base64 = require('base64');
+// var request = require('request');
+// var crypto = require("crypto");
+// var base64 = require('base64');
 
 var time = new Date();
 var current = dateToString(time);
@@ -31,8 +31,8 @@ var app = express.createServer(
 				express.cookieParser(),
 				express.session({secret: 'FlurbleGurgleBurgle',
 				                store: new express.session.MemoryStore({ reapInterval: -1 }) }));
-app.listen(1337);
-//app.listen(80);
+//app.listen(1337);
+app.listen(80);
 
 process.on('uncaughtException', function(err) {
 	console.log('Caught exception: ' + err.stack);
@@ -85,8 +85,8 @@ var oa = new OAuth(
 	"PIFvIPSXlTIbqnnnjBIqoWs0VIxpQivNrIJuWxtkLI",
 	"1.0",
 	//"http://localhost:1337/auth/twitter/callback",
-	//"http://stoutapp.com/auth/twitter/callback",
-	"http://ps79519.dreamhostps.com:1337/auth/twitter/callback",
+	"http://stoutapp.com/auth/twitter/callback",
+	//"http://ps79519.dreamhostps.com:1337/auth/twitter/callback",
 	"HMAC-SHA1"
 );
 
