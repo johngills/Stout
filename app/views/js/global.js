@@ -21,8 +21,6 @@ function store() {
 	if (user_name != undefined && user_id != undefined) {
 		localStorage['user_id'] = user_id;
 		localStorage['user_name'] = user_name;
-		console.log(localStorage['user_id']);
-		console.log(localStorage['user_name']);
 		$.ajax({
 			cache: false,
 			url: '/logged',

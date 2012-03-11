@@ -546,8 +546,8 @@ app.get('/get-twitter-friends', checkAuth, function(req, res) {
 					
 					client.query(
 						'SELECT DISTINCT users.user_id, users.first_name, users.last_name, users.avatar, followers.created_date '
-						+ 'FROM users, followers '
-						+ 'WHERE user_id in (' + twitter_friends + '0) AND followers.owner_id in (' + twitter_friends + '0) AND followers.follower_id = ' + req.session.user_id,
+						+ 'FROM users '
+						+ 'WHERE user_id in (' + twitter_friends + '0)',
 						function(err, results, fields) {
 							console.log(results);
 							stout_friends = results;
