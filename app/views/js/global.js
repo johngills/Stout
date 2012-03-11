@@ -16,14 +16,30 @@ function load(message,status) {
 function store() {
 	var user_id = $('input#user_id').val();
 	var user_name = $('input#user_name').val();
-	if (user_name != '' || user_id != '') {
-		// localStorage.clear();
+	console.log(user_name);
+	console.log(user_id);
+	if (user_name != undefined && user_id != undefined) {
 		localStorage['user_id'] = user_id;
 		localStorage['user_name'] = user_name;
 		console.log(localStorage['user_id']);
 		console.log(localStorage['user_name']);
-		loadTab(0);
-		setTimeout('getNotifications()',3000);
+		$.ajax({
+			cache: false,
+			url: '/logged',
+			data: { user_name: user_name, user_id: user_id },
+			success: function(results) {
+						if (results.status == 'success') {
+							loadTab(0);
+							setTimeout('getNotifications()',3000);
+						} else {
+							load();
+						}
+					},
+			error: function(results) {
+						console.log(results);
+						return false;
+					}
+		});
 	} else {
 		logout();
 	}
@@ -43,9 +59,8 @@ function storeCheck() {
 			url: '/logged',
 			data: { user_name: user_name, user_id: user_id },
 			success: function(results) {
-						console.log(results);
 						if (results.status == 'success') {
-							window.location='/dashboard';
+							window.location='/dashboard#_index';
 						} else {
 							load();
 						}
@@ -59,13 +74,17 @@ function storeCheck() {
 }
 
 function logout() {
+	load('Closing your tab');
 	$.ajax({
 		cache: false,
 		url: '/logout',
 		success: function(results) {
 					if (results.status == 'success') {
+						localStorage.removeItem('user_id');
+						localStorage.removeItem('user_name');
 						localStorage.clear();
 						window.location='/';
+						load();
 					}
 				},
 		error: function(results) {
@@ -106,7 +125,6 @@ function fixTime(time) {
 function loadTab(limit,comment) {
 	
 	// resets
-	pageHistory = [];
 	if (comment == '') {
 		$('#add_comment').fadeOut();
 		$('#footer').fadeIn();
@@ -213,7 +231,7 @@ function loadTab(limit,comment) {
 function feedDetail(id,notification) {
 	load('Brewing...');
 	
-	if (notification) {
+	if (notification == true) {
 		$('#notifier').removeClass('active');
 	}
 	
@@ -233,8 +251,8 @@ function feedDetail(id,notification) {
 						$('#footer').fadeOut();
 						
 						var title = results[0].name;
-						var first_name = (results[0].first_name == null) ? '' : results[0].first_name;
-						var last_name = (results[0].last_name == null) ? '' : results[0].last_name;
+						var first_name = (results[0].owner_first_name == null) ? '' : results[0].owner_first_name;
+						var last_name = (results[0].owner_last_name == null) ? '' : results[0].owner_last_name;
 						var user_name = first_name + ' ' + last_name;
 						
 						// RATING ------------------------
@@ -277,8 +295,8 @@ function feedDetail(id,notification) {
 							}
 						}
 						
-						var avatar = '<img src="' + results[0].avatar + '" width="32px" class="left avatar" />';
-						var item_heading = '<p class="meta">' + results[0].first_name + ' ' + action + '</p>';
+						var avatar = '<img src="' + results[0].owner_avatar + '" width="32px" class="left avatar" />';
+						var item_heading = '<p class="meta">' + results[0].owner_first_name + ' ' + action + '</p>';
 						var beer_name = '<h3 id="' + results[0].beer_id + '" class="beer_name">' + results[0].beer_name + '</h3>';
 						var owner_id = (results[0].owner_id == null) ? results[0].user_id : results[0].owner_id;
 						$('#add_comment_text').attr('onblur','addComment(' + results[0].beer_id + ',' + results[0].rating + ',' + id + ',' + owner_id + ');');
@@ -286,7 +304,7 @@ function feedDetail(id,notification) {
 						// sets up feed owner info
 						$('ul#feed_detail').attr('title',title);
 						$('ul#feed_detail span.results').empty().append('<li>'
-											+ '<a href="javascript:void(0);" onclick="beerDetail(' + results[0].beer_id + ');">'
+											+ '<a href="javascript:void(0);" onclick="beerDetail(' + results[0].beer_id + ',' + owner_id + ');">'
 											+ '<section class="icon arrow right"></section>'
 											+ '<span class="info">'
 											+ time
@@ -311,14 +329,14 @@ function feedDetail(id,notification) {
 						// adds additional comments
 						for(i; i < results.length; i++) {
 						
-							var first_name = (results[i].first_name == null) ? '' : results[i].first_name;
-							var last_name = (results[i].last_name == null) ? '' : results[i].last_name;
+							var first_name = (results[i].partner_first_name == null) ? '' : results[i].partner_first_name;
+							var last_name = (results[i].partner_last_name == null) ? '' : results[i].partner_last_name;
 							var user_name = first_name;
 							var time = (results[i].time == undefined) ? '' : fixTime(results[i].time);
-						
+							
 							$('ul#feed_detail span.results').append('<li>'
 												+ '<a href="javascript:void(0);" onclick="loadProfile(\'' + results[i].partner_id + '\')">'
-												+ '<img src="' + results[i].avatar + '" width="32px" class="avatar left" />'
+												+ '<img src="' + results[i].partner_avatar + '" width="32px" class="avatar left" />'
 												+ time
 												+ '<p class="meta">' + user_name + '</p>'
 												+ '<p class="comment">' + results[i].comment + '</p>'
@@ -336,20 +354,96 @@ function feedDetail(id,notification) {
 	});
 }
 
-function loadFindBeer() {
-	
-	// resets
-	pageHistory = [];
-	
+function loadFindBeer() {	
 	tabSelect('find_beer');
 	$('#beer_name').val('');
 	$('html, body').animate({scrollTop: '0px'}, 0);
 }
 
+function loadTwitterFriends() {
+	load('Brewing...');
+	$.ajax({
+		cache: false,
+		timeout: 5000,
+		url: '/get-twitter-friends',
+		success: function(results) {
+					if (results != '') {
+						$('ul#find_friend span.results').empty();
+						var stout_ids = [];
+						
+						// Stout Friends
+						for(var i = 0; i < results.stout_friends.length; i++) {
+							var first_name = (results.stout_friends[i].first_name == null) ? '' : results.stout_friends[i].first_name;
+							var last_name = (results.stout_friends[i].last_name == null) ? '' : results.stout_friends[i].last_name;
+							var user_id = results.stout_friends[i].user_id;
+							var beer_name = '<h3>' + results.stout_friends[i].beer_name + '</h3>';
+							var avatar = results.stout_friends[i].avatar;
+							
+							stout_ids[i] = user_id;
+							
+							$('ul#find_friend span.results').append('<li style="height:55px;">'
+																+ '<a href="javascript:void(0);" onclick="follow(' + user_id + ')" class="btn orange ' + user_id + '" style="max-height:20px; float:right;">Follow</a>'
+																+ '<a href="#profile" id="' + user_id + '" onclick="javascript:loadProfile(' + user_id + ');">'
+							 									+ '<img src="' + avatar + '" width="32px" class="avatar left" />'
+																+ '<h3 class="left">' + first_name + ' ' + last_name + '</h3>'
+							 									+ '</a></li>');
+						}
+						
+						// Twitter Friends
+						for(var i = 0; i < results.twitter_friends.length; i++) {
+							var name = (results.twitter_friends[i].name == null) ? '' : '<h3 class="beer_name">' + results.twitter_friends[i].name + '</h3>';
+							var screen_name = (results.twitter_friends[i].screen_name == null) ? '' : '<p class="meta" style="margin-top:2px;">' + results.twitter_friends[i].screen_name + '</p>';
+							var twitter_id = results.twitter_friends[i].id;
+							var avatar = results.twitter_friends[i].profile_image_url;
+							
+							if ($.inArray(twitter_id,stout_ids) == -1) {
+								$('ul#find_friend span.results').append('<li style="height:55px;">'
+																	+ '<a href="javascript:void(0);" onclick="inviteTwitter(\'' + results.twitter_friends[i].screen_name + '\',' + twitter_id + ');" class="btn blue ' + twitter_id + '" style="max-height:20px; float:right;">Invite</a>'
+								 									+ '<img src="' + avatar + '" width="32px" class="avatar left" />'
+																	+ screen_name
+																	+ name
+																	+ '</li>');
+							}
+						}
+					}
+					load();
+				},
+		error: function(results) {
+					return false;
+				}
+	});
+}
+
+function inviteTwitter(screen_name,id) {
+	load('Brewing...');
+	var style = $('a.' + id).attr('style');
+	
+	$.ajax({
+		cache: false,
+		url: '/send-twitter-invite',
+		timeout: 5000,
+		data: { screen_name: screen_name },
+		success: function(results) {
+					if (results.status == 'success') {
+						$('a.' + id).replaceWith('<a href="javascript:void(0);" class="btn light ' + id + '" style="' + style + '">Invited</a>');
+					} else {
+						load('Something went wrong!','error');
+						return false;
+					}
+					load();
+				},
+		error: function(results) {
+					load('Something went wrong!','error');
+					return false;
+				}
+	});
+}
+
 function loadFindFriend() {
 	
-	// resets
-	pageHistory = [];
+	loadTwitterFriends();
+	
+	// resets footer
 	$('#add_comment').fadeOut();
 	$('#footer').fadeIn();
 	
@@ -360,19 +454,17 @@ function loadFindFriend() {
 
 
 
-
 // PROFILE FUNCTIONS -------------------------------------------------------
 
 function loadProfile(id,notification) {
 	$('html, body').animate({scrollTop: '0px'}, 0);
 	load('Brewing...');
 	
-	// resets
-	pageHistory = [];
+	// resets footer
 	$('#add_comment').fadeOut();
 	$('#footer').fadeIn();
 	
-	if (notification) {
+	if (notification == true) {
 		$('#notifier').removeClass('active');
 	}
 	
@@ -396,7 +488,7 @@ function loadProfile(id,notification) {
 							// My profile
 							tabSelect('profile');
 							var follow = '';
-							var profile_settings = '<li><ul id="profile_meta"><li onclick="loadNotifications();"><span class="icon notifications center"></span></li><li><span class="icon settings center"></span></li></ul></li>';
+							var profile_settings = '<li><ul id="profile_meta"><li onclick="loadNotifications();"><span class="icon notifications center"></span></li><li onclick="window.location=\'/dashboard#_profile_settings\';"><span class="icon settings center"></span></li></ul></li>';
 						}
 
 						$('ul#profile').attr('title',user_name).empty();
@@ -581,13 +673,15 @@ function loadFollowing(user_id) {
 
 function follow(id) {
 	load('Brewing...');
+	var style = $('a.' + id).attr('style');
+	
 	$.ajax({
 		cache: false,
 		url: '/follow',
 		data: { owner_id: id },
 		success: function(results) {
 					if (results != '') {
-						$('a.' + id).replaceWith('<a href="javascript:void(0);" onclick="unfollow(' + id + ');" class="btn light ' + id + '">Unfollow</a>');
+						$('a.' + id).replaceWith('<a href="javascript:void(0);" onclick="unfollow(' + id + ');" class="btn light ' + id + '" style="' + style + '">Unfollow</a>');
 						load();
 					} else {
 						load('Something went wrong!','error');
@@ -602,13 +696,15 @@ function follow(id) {
 
 function unfollow(id) {
 	load('Brewing...');
+	var style = $('a.' + id).attr('style');
+	
 	$.ajax({
 		cache: false,
 		url: '/unfollow',
 		data: { owner_id: id },
 		success: function(results) {
 					if (results != '') {
-						$('a.' + id).replaceWith('<a href="javascript:void(0);" onclick="follow(' + id + ');" class="btn orange ' + id + '">Follow</a>');
+						$('a.' + id).replaceWith('<a href="javascript:void(0);" onclick="follow(' + id + ');" class="btn orange ' + id + '" style="' + style + '">Follow</a>');
 						load();
 					} else {
 						load('Something went wrong!','error');
@@ -621,7 +717,7 @@ function unfollow(id) {
 	});
 }
 
-function beerDetail(id) {
+function beerDetail(id,partner_id) {
 	$('html, body').animate({scrollTop: '0px'}, 0);
 	load('Brewing...');
 	
@@ -667,12 +763,12 @@ function beerDetail(id) {
 						}
 						
 						$('#beer_detail').empty().attr('title',unescape(beer_name)).append('<li><ul class="rate_controls ' + id + '">'
-															+ '<li onclick="rateBeer(' + id + ',\'love\');" class="love' + love_active + '"><p class="rate_count right">' + love + '</p><span></span></li>'
-															+ '<li onclick="rateBeer(' + id + ',\'like\');" class="like' + like_active + '"><p class="rate_count right">' + like + '</p><span></span></li>'
-															+ '<li onclick="rateBeer(' + id + ',\'meh\');" class="meh' + meh_active + '"><p class="rate_count right">' + meh + '</p><span></span></li>'
-															+ '<li onclick="rateBeer(' + id + ',\'dislike\');" class="dislike' + dislike_active + '"><p class="rate_count right">' + dislike + '</p><span></span></li>'
+															+ '<li onclick="rateBeer(' + id + ',\'love\',' + partner_id + ');" class="love' + love_active + '"><p class="rate_count right">' + love + '</p><span></span></li>'
+															+ '<li onclick="rateBeer(' + id + ',\'like\',' + partner_id + ');" class="like' + like_active + '"><p class="rate_count right">' + like + '</p><span></span></li>'
+															+ '<li onclick="rateBeer(' + id + ',\'meh\',' + partner_id + ');" class="meh' + meh_active + '"><p class="rate_count right">' + meh + '</p><span></span></li>'
+															+ '<li onclick="rateBeer(' + id + ',\'dislike\',' + partner_id + ');" class="dislike' + dislike_active + '"><p class="rate_count right">' + dislike + '</p><span></span></li>'
 															+ '</ul></li>'
-															+ '<li class="addToDrink ' + id + '' + todrink_active + '" onclick="addToDrink(' + id + ');">Add' + ed + ' to Drink List<span></span></li>'
+															+ '<li class="addToDrink ' + id + '' + todrink_active + '" onclick="addToDrink(' + id + ',' + partner_id + ');">Add' + ed + ' to Drink List<span></span></li>'
 															+ '<li id="' + id + '">'
 															+ brewery
 															+ abv
@@ -764,6 +860,7 @@ function getBeerCategories() {
 		success: function(results) {
 					console.log(results);
 					if (results != '') {
+						$('select#beer_categories').empty();
 						for(var i = 0; i < results.length; i++) {
 							var selected = (i == 0) ? 'selected="selected"' : '';
 							$('select#beer_categories').append('<option val="' + results[i].id + '" ' + selected + '>' + results[i].cat_name + '</option>');
@@ -924,7 +1021,7 @@ function showNewBeer(data) {
 
 // BEER DETAIL FUNCTIONS -------------------------------------------------------
 
-function addToDrink(id) {
+function addToDrink(id,partner_id) {
 	load('Brewing...');
 	if ($('li.' + id).hasClass('active')) {
 		removeList = '';
@@ -936,7 +1033,7 @@ function addToDrink(id) {
 	$.ajax({
 		cache: false,
 		url: '/add-to-drink-list',
-		data: { beer_id: id, removeList: removeList },
+		data: { beer_id: id, removeList: removeList, partner_id: partner_id },
 		success: function(results) {
 					load();
 				},
@@ -946,7 +1043,7 @@ function addToDrink(id) {
 	});
 }
 
-function rateBeer(id,rate) {
+function rateBeer(id,rate,partner_id) {
 	load('Brewing...');
 	
 	var latitude = $('#latitude').val();
@@ -980,7 +1077,7 @@ function rateBeer(id,rate) {
 	$.ajax({
 		cahce: false,
 		url: '/beer-checkin',
-		data: { beer_id: id, rate: rate, unrate: unrate, latitude: latitude, longitude: longitude },
+		data: { beer_id: id, rate: rate, unrate: unrate, latitude: latitude, longitude: longitude, partner_id: partner_id },
 		dataType: 'json',
 		success: function(results) {
 					if (results.status == 'success') {
@@ -1009,9 +1106,19 @@ function rateBeer(id,rate) {
 	});
 }
 
+function twitterToggle() {
+	var tweet = $('ul.rate_controls li.twitter');
+	if (tweet.hasClass('active')) {
+		tweet.removeClass('active');
+	} else {
+		tweet.addClass('active');
+	}
+}
+
 function share(beer_id,rate,feed_id) {
 	load('Brewing...');
 	var comment = $('#share textarea.comment').val();
+	var send_tweet = ($('ul.rate_controls li.twitter').hasClass('active')) ? true : false;
 
 	if (comment == '') {
 		window.location='/dashboard#_index';
@@ -1021,7 +1128,7 @@ function share(beer_id,rate,feed_id) {
 		$.ajax({
 			cache: false,
 			url: '/share-beer',
-			data: { feed_id: feed_id, beer_id: beer_id, rating: rate, comment: comment },
+			data: { feed_id: feed_id, beer_id: beer_id, rating: rate, comment: comment, send_tweet: send_tweet },
 			success: function(results) {
 						if (results.status == 'success') {
 							window.location='/dashboard#_index';
@@ -1101,6 +1208,16 @@ function findBeer() {
 			data: { beer_name: name },
 			dataType: 'json',
 			success: function(results) {
+						
+						var search_help = '<li class="meta">'
+											+ '<h3>Not What You\'re Looking For?</h3>'
+											+ '<ul>'
+											+ '<li>Double check the spelling</li>'
+											+ '<li>Try searching just the beer name, not the brewery (ex. Choklat instead of Southern Tier Choklat)</li>'
+											+ '<li>Try searching part of the beer name (ex. Heine instead of Heineken)</li>'
+											+ '</ul>'
+											'</li>'
+						
 						if (results != '') {
 							$('ul#find_beer span.results').empty();
 							for(var i = 0; i < results.length; i++) {
@@ -1116,12 +1233,12 @@ function findBeer() {
 								 									+ '</a></li>');
 							}
 							if (results.length < 5) {
-								$('ul#find_beer span.results').append('<li><a href="javascript:void(0);" onclick="getAttributes();" class="ac btn orange">Add new beer</a></li>');
+								$('ul#find_beer span.results').append(search_help + '<li><a href="javascript:void(0);" onclick="getAttributes();" class="ac btn orange">Add new beer</a></li>');
 							} else {
-								$('ul#find_beer span.results').append('<li><a href="javascript:void(0);" onclick="getAttributes();" class="ac btn orange">Add new beer</a></li>');
+								$('ul#find_beer span.results').append(search_help + '<li><a href="javascript:void(0);" onclick="getAttributes();" class="ac btn orange">Add new beer</a></li>');
 							}
 						} else {
-							$('ul#find_beer span.results').empty().append('<li><a href="javascript:void(0);" onclick="getAttributes();" class="ac btn orange">Add new beer</a></li>');
+							$('ul#find_beer span.results').empty().append(search_help + '<li><a href="javascript:void(0);" onclick="getAttributes();" class="ac btn orange">Add new beer</a></li>');
 						}
 					},
 			error: function(results) {
@@ -1195,6 +1312,12 @@ function getNotifications() {
 									case 'FOLLOW':
 										message = '<a href="javascript:void(0);" onclick="loadProfile(' + results[0].partner_id + ',true);">You have a new follower!</a>';
 										break;
+									case 'RATE':
+										message = '<a href="javascript:void(0);" onclick="feedDetail(' + results[0].feed_id + ',true);">Your beer was tasted!</a>';
+										break;
+									case 'LIST':
+										message = '<a href="javascript:void(0);" onclick="feedDetail(' + results[0].feed_id + ',true);">Your beer was added as a To Drink!</a>';
+										break;
 								}
 								$('#notifier').empty().append(message).addClass('active');
 							}
@@ -1238,6 +1361,20 @@ function loadNotifications() {
 												+ '<img src="' + avatar + '" width="32px" class="avatar left" />'
 												+ '<span class="info">' + time + '</span>'
 												+ '<p class="meta"><b>' + first_name + ' ' + last_name + '</b><br /> is now following you</p></a>';
+									break;
+								case 'RATE':
+									message = '<a href="javascript:void(0);" onclick="feedDetail(' + results[i].feed_id + ');">'
+												+ '<section class="icon arrow right"></section>'
+												+ '<img src="' + avatar + '" width="32px" class="avatar left" />'
+												+ '<span class="info">' + time + '</span>'
+												+ '<p class="meta"><b>' + first_name + ' ' + last_name + '</b><br /> tried one of your beers</p></a>';
+									break;
+								case 'LIST':
+									message = '<a href="javascript:void(0);" onclick="feedDetail(' + results[i].feed_id + ');">'
+												+ '<section class="icon arrow right"></section>'
+												+ '<img src="' + avatar + '" width="32px" class="avatar left" />'
+												+ '<span class="info">' + time + '</span>'
+												+ '<p class="meta"><b>' + first_name + ' ' + last_name + '</b><br /> added your beer to their <b>To Drink</b> list</p></a>';
 									break;
 							}
 							$('#profile_detail').append('<li style="height:45px;"' + unread + '>' + message + '</li>');

@@ -1,14 +1,9 @@
 body(onload="store();")
 
-	input#user_id(type="hidden", value="#{user_id}")
-	input#user_name(type="hidden", value="#{user_name}")
-	input#latitude(type="hidden")
-	input#longitude(type="hidden")
-
 	ul#index(title="The Tab", selected="true")
 		li
 			p Welcome 
-				a(href='/profile')= user_name
+				a(href='#')= user_name
 	
 	ul#feed_detail(title="Details")
 		input#feed-item-id(type="hidden")
@@ -56,6 +51,10 @@ body(onload="store();")
 
 	ul#profile_detail(title="Profile")
 
+	ul#profile_settings(title="Settings")
+		li
+			a.btn.orange(href="javascript:void(0);", onclick="logout();") Logout
+
 	ul#find_friend(title="Find Friends")
 		li.input-text
 			form(id="friend_search", role="search", action="javascript:void(0);", autocorrect="off")
@@ -64,6 +63,10 @@ body(onload="store();")
 
 	ul#share(title="Share Beer")
 		li.textarea
-			textarea.comment(placeholder="Drop some knowledge")
+			textarea.comment(placeholder="Comment")
+		li.push
+			ul.rate_controls
+				li.twitter.active(onclick="twitterToggle();")
+					span
 		li.share_button
-			a.btn.orange(href="#index", onclick="load('Something went wrong!');") Bottom's Up
+			a.btn.orange(href="#index", onclick="load('Something went wrong!','error');") Bottom's Up

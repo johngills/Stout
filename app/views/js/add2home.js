@@ -114,10 +114,11 @@ var addToHome = (function (w) {
 			platform = nav.platform.split(' ')[0],
 			language = nav.language.replace('-', '_'),
 			i, l;
-
+		
 		balloon = document.createElement('div');
 		balloon.id = 'addToHomeScreen';
 		balloon.style.cssText += 'left:-9999px;-webkit-transition-property:-webkit-transform,opacity;-webkit-transition-duration:0;-webkit-transform:translate3d(0,0,0);position:' + (OSVersion < 5 ? 'absolute' : 'fixed');
+		balloon.className = 'addtohome';
 
 		// Localize message
 		if ( options.message in intl ) {		// You may force a language despite the user's locale
