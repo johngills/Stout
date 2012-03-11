@@ -7,9 +7,9 @@ var url = require('url');
 var fs = require('fs');
 var http = require('http');
 var $ = require('jquery');
-// var request = require('request');
-// var crypto = require("crypto");
-// var base64 = require('base64');
+var request = require('request');
+var crypto = require("crypto");
+var base64 = require('base64');
 
 // CSS ---------------------------------------------------
 var less = require('less');
@@ -144,10 +144,10 @@ app.get('/get-feed', checkAuth, function(req, res) {
 	
 	client.query(
 		'SELECT DISTINCT feed.id, feed.user_name, feed.user_id, feed.beer_id, feed.rating, feed.comment_count, feed.type, ROUND(TIMESTAMPDIFF(SECOND,feed.created_date,"' + current + '")/60) AS time, users.first_name, users.last_name, users.avatar, beers.name AS beer_name, comment '
-		+ 'FROM feed, beers, users, followers '
-		+ 'WHERE ((feed.user_id = users.user_id) AND (feed.beer_id = beers.id)) AND (((followers.owner_id = feed.user_id) AND (followers.follower_id = ' + req.session.user_id + ')) '
-		+ 'OR ((feed.user_id = ' + req.session.user_id + '))) '
-		+ 'ORDER BY feed.created_date DESC LIMIT ' + req.query.limit + ',10 ',
+			+ 'FROM feed, beers, users, followers '
+			+ 'WHERE ((feed.user_id = users.user_id) AND (feed.beer_id = beers.id)) AND (((followers.owner_id = feed.user_id) AND (followers.follower_id = ' + req.session.user_id + ')) '
+			+ 'OR ((feed.user_id = ' + req.session.user_id + '))) '
+			+ 'ORDER BY feed.created_date DESC LIMIT ' + req.query.limit + ',10 ',
 		function(err, results, field) {
 			if (err) throw err;
 			if (results != undefined) {
@@ -815,7 +815,6 @@ app.get('/auth/twitter/callback', function(req, res, next) {
 		function(error, oauth_access_token, oauth_access_token_secret, results) {
 			if (error) {
 				console.log(error);
-				
 				// res.send("yeah something broke.");
 				res.send(error[0].data);
 			} else {
@@ -849,7 +848,7 @@ app.get('/auth/twitter/callback', function(req, res, next) {
 							res.redirect('/dashboard');
 						} else {
 							console.log(current);
-							user_name = results.screen_name;
+							var user_name = results.screen_name;
 							// session storage
 							req.session.user_name = user_name;
 							req.session.user_id = results.user_id;
