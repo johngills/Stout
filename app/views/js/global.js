@@ -364,7 +364,7 @@ function loadTwitterFriends() {
 	load('Brewing...');
 	$.ajax({
 		cache: false,
-		timeout: 5000,
+		timeout: 20000,
 		url: '/get-twitter-friends',
 		success: function(results) {
 					if (results != '') {
@@ -405,10 +405,14 @@ function loadTwitterFriends() {
 																	+ '</li>');
 							}
 						}
+					} else {
+						load('Something went wrong!','error');
+						return false;
 					}
 					load();
 				},
 		error: function(results) {
+					load('Something went wrong!','error');
 					return false;
 				}
 	});
