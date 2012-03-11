@@ -9,7 +9,7 @@ var http = require('http');
 var $ = require('jquery');
 var request = require('request');
 var crypto = require('crypto');
-var base64 = require('base64');
+// var base64 = require('base64');
 
 // CSS ---------------------------------------------------
 var less = require('less');
