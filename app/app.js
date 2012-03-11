@@ -81,7 +81,7 @@ var oa = new OAuth(
 	"PIFvIPSXlTIbqnnnjBIqoWs0VIxpQivNrIJuWxtkLI",
 	"1.0",
 	//"http://localhost:1337/auth/twitter/callback",
-	"http://stoutapp.com/auth/twitter/callback",
+	"http://www.stoutapp.com:80/auth/twitter/callback",
 	//"http://ps79519.dreamhostps.com:1337/auth/twitter/callback",
 	"HMAC-SHA1"
 );
