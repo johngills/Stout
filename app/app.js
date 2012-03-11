@@ -34,65 +34,7 @@ process.on('uncaughtException', function(err) {
 	console.log('Caught exception: ' + err.stack);
 });
 
-app.use(express.compiler({ src: __dirname + '/views', enable: ['less'] }));
-app.use('/css', express.static(__dirname + '/views'));
-app.set('views', __dirname + '/views');
-app.set('view engine', 'jade');
-app.enable('jsonp callback');
 
-// COMMON FUNCTIONS --------------------------------------
-
-function checkAuth(req, res, next) {
-	if (req.session.user_name == undefined) {
-		delete req.session.user_name;
-		delete req.session.user_id;
-		console.log('attempted to redirect to index...');
-		res.redirect('/');
-	} else {
-		next();
-	}
-}
-
-function hasNumbers(t) {
-	var regex = /\d/g;
-	return regex.test(t);
-}
-
-// DATABASE INFO -----------------------------------------
-var mysql = require('mysql'),
-	database = 'stout',
-	user_table = 'users',
-	client = mysql.createClient({ user: 'sterlingrules', password: '@y&7~s45', host: 'mysql.mynameissterling.com', port: 3306 });
-	client.query('USE ' + database);
-	client.database = 'stout';
-
-// var mysql = require('mysql'),
-// 	database = 'beer',
-// 	user_table = 'users',
-// 	client = mysql.createClient({ user: 'root', password: '' });
-// 	client.query('USE ' + database);
-// 	client.database = 'beer';
-
-// OAUTH SETUP --------------------------------------------
-var oa = new OAuth(
-	"https://api.twitter.com/oauth/request_token",
-	"https://api.twitter.com/oauth/access_token",
-	"Nmqm7UthsfdjaDQ4HcxPw",
-	"PIFvIPSXlTIbqnnnjBIqoWs0VIxpQivNrIJuWxtkLI",
-	"1.0",
-	//"http://localhost:1337/auth/twitter/callback",
-	"http://stoutapp.com/auth/twitter/callback",
-	//"http://ps79519.dreamhostps.com:1337/auth/twitter/callback",
-	"HMAC-SHA1"
-);
-
-function dateToString(date) {
-	//check that date is a date object
-	if (date && date.getFullYear()){ 
-		return date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate() + ' ' + date.getHours() + '-' + date.getMinutes() + '-' + date.getSeconds();
-	} 
-	return "";
-}
 
 app.get('/', function(req, res) {	
 	console.log(req.session.user_name);
@@ -412,6 +354,206 @@ app.get('/add-to-drink-list', checkAuth, function(req, res) {
 	}
 });
 
+app.get('/share-beer', checkAuth, function(req, res) {
+	var time = new Date();
+	var current = dateToString(time);
+	
+	client.query(
+		'INSERT INTO comments ' +
+		'SET feed_id = ?, owner_id = ?, partner_id = ?, beer_id = ?, rating = ?, comment = ?, created_date = ?',
+		[req.query.feed_id, req.session.user_id, req.session.user_id, req.query.beer_id, req.query.rating, req.query.comment, current],
+		function(err, results, fields) {
+			if (err) throw err;
+			console.log(results);
+			client.query(
+				'UPDATE feed SET comment = "' + req.query.comment + '", comment_count = 1 WHERE feed.id = ' + req.query.feed_id + ';',
+				function(err, results, fields) {
+					if (err) throw err;
+					res.json({"status":"success"});
+				});
+		});
+		
+	// Tweet
+	if (req.query.send_tweet) {
+		client.query(
+			'SELECT access_token, access_token_secret, name AS beer_name FROM users, beers WHERE beers.id = ' + req.query.beer_id + ' AND user_id = ' + req.session.user_id,
+			function(err, results, fields) {
+				if (err) throw err;
+				console.log(results);
+				
+				var share = '';
+				console.log(req.query.rating);
+				
+				switch(req.query.rating) {
+					case "1":
+						share = 'I\'m loving this ' + results[0].beer_name + ' - ';
+						break;
+					case "2":
+						share = 'Just liked a ' + results[0].beer_name + ' - ';
+						break;
+					case "3":
+						share = 'This '  + results[0].beer_name + ' is meh - ';
+						break;
+					case "4":
+						share = 'This '  + results[0].beer_name + ' is gross - ';
+						break;
+				}
+				
+				var msg = share + req.query.comment;
+				var tweet = msg.substring(0,90);
+				console.log(tweet + " - http://www.stoutapp.com/detail/" + req.query.feed_id + " (via @StoutApp)");
+				
+				oa.post(
+					"http://api.twitter.com/1/statuses/update.json",
+					results[0].access_token, 
+				    results[0].access_token_secret,
+					// {"status": tweet + " - http://www.stoutapp.com/detail/" + req.query.feed_id + " (via @StoutApp)"},
+					{"status": tweet + " (via @StoutApp)"},
+					function(error, data) {
+						if (error) {
+							console.log(require('sys').inspect(error));
+						} else {
+							console.log(data);
+						}
+				});
+		});
+	}
+});
+
+app.get('/add-comment', checkAuth, function(req, res) {
+	var time = new Date();
+	var current = dateToString(time);
+	
+	client.query(
+		'INSERT INTO comments ' +
+		'SET feed_id = ?, owner_id = ?, partner_id = ?, beer_id = ?, rating = ?, comment = ?, created_date = ?',
+		[req.query.feed_id, req.query.owner_id, req.session.user_id, req.query.beer_id, req.query.rating, req.query.comment, current],
+		function(err, sql_results, fields) {
+			if (err) throw err;
+			console.log(sql_results);
+			client.query('UPDATE feed SET feed.comment_count = feed.comment_count + 1 WHERE feed.id = ' + req.query.feed_id,
+				function(err, results, fields) {
+					if (err) throw err;
+					console.log(results);
+					// Add notification
+					if (req.query.owner_id != req.session.user_id) { // makes sure owner and current user aren't the same
+						client.query(
+							'INSERT INTO notifications ' +
+							'SET owner_id = ?, partner_id = ?, type = ?, feed_id = ?, created_date = ?',
+							[req.query.owner_id, req.session.user_id, "COMMENT", req.query.feed_id, current],
+							function(err, sql_results, fields) {
+								if (err) throw err;
+						});
+					}
+					client.query( // grabs user info for comment
+						'SELECT users.user_id, users.first_name, users.last_name, users.avatar FROM users WHERE users.user_id = ' + req.session.user_id + ';', // change to store these in the session
+						function(err, results, fields) {
+							console.log(results);
+							res.send(results);
+					});
+			});
+		});
+});
+
+app.get('/get-twitter-friends', checkAuth, function(req, res) {
+	client.query(
+		'SELECT access_token, access_token_secret FROM users WHERE user_id = ' + req.session.user_id,
+		function(err, results, fields) {
+			if (err) throw err;
+			console.log(results);
+			
+			var access_token = results[0].access_token;
+			var access_token_secret = results[0].access_token_secret;
+			var twitter_friends = '', stout_friends = '';
+			
+			// Get follower ids
+			oa.getProtectedResource(
+				"https://api.twitter.com/1/friends/ids.json?cursor=-1&screen_name=" + req.session.user_name,
+				"GET",
+				access_token,
+				access_token_secret,
+				function(error, results) {
+					if (error) {
+						console.log(require('sys').inspect(error));
+					} else {
+						console.log(results);
+					}
+					var data = $.parseJSON(results);
+					
+					// Cut friends query down to 99
+					for(var i = 0; i < 100; i++) {
+						twitter_friends += data.ids[i] + ',';
+					}
+					console.log(twitter_friends);
+					
+					client.query(
+						'SELECT DISTINCT users.user_id, users.first_name, users.last_name, users.avatar, followers.created_date '
+						+ 'FROM users, followers '
+						+ 'WHERE user_id in (' + twitter_friends + '0) AND followers.owner_id in (' + twitter_friends + '0) AND followers.follower_id = ' + req.session.user_id,
+						function(err, results, fields) {
+							console.log(results);
+							stout_friends = results;
+					});
+					
+					var next = data.next_cursor;
+					oa.getProtectedResource(
+						"https://api.twitter.com/1/users/lookup.json?user_id=" + twitter_friends,
+						"GET",
+						access_token,
+						access_token_secret,
+						function(error, data) {
+							if (error) {
+								console.log(require('sys').inspect(error));
+							} else {
+								console.log(data);
+							}
+							twitter_friends = $.parseJSON(data);
+							res.json({"stout_friends":stout_friends,"twitter_friends":twitter_friends});
+					});
+			});
+	});	
+});
+
+app.get('/find-friend', checkAuth, function(req, res) {	
+	console.log('search term: ' + req.query.user_name);
+	client.query(
+		'SELECT DISTINCT users.user_name, users.first_name, users.last_name, users.user_id, users.avatar FROM users WHERE users.user_name LIKE "%' + req.query.user_name + '%" OR users.full_name LIKE "%' + req.query.user_name + '%" ORDER BY users.created_date DESC LIMIT 0,10;',
+		function(err, results, fields) {
+			if (err) throw err;			
+			console.log(results);
+			res.send(results);
+	});
+});
+
+app.get('/send-twitter-invite', checkAuth, function(req, res) {
+	
+	var text = $.makeArray();
+    text[0] = '@' + req.query.screen_name + ' Check out what beer I\'m drinking on #Stout - http://www.stoutapp.com/';
+    text[1] = '@' + req.query.screen_name + ' Have a beer with me on #Stout - http://www.stoutapp.com/';
+    
+    var i = Math.floor(2*Math.random());
+
+	client.query(
+		'SELECT access_token, access_token_secret FROM users WHERE user_id = ' + req.session.user_id,
+		function(err, results, fields) {
+			if (err) throw err;
+			console.log(results);
+	
+			oa.post(
+				"http://api.twitter.com/1/statuses/update.json",
+				results[0].access_token, 
+			    results[0].access_token_secret,
+				{"status":text[i]},
+				function(error, data) {
+					if (error) {
+						console.log(require('sys').inspect(error));
+					} else {
+						console.log(data);
+					}
+					res.json({"status" : "success"});
+			});
+	});
+});
 
 
 // --------------------------------------------------------------------------------------
@@ -588,7 +730,95 @@ app.get('/unfollow', checkAuth, function(req, res) {
 // OAUTH
 // --------------------------------------------------------------------------------------
 
+app.get('/auth/twitter', function(req, res){
+	oa.getOAuthRequestToken(function(error, oauth_token, oauth_token_secret, results) {
+		if (error) {
+			console.log(error);
+			res.send("yeah no. didn't work.");
+		} else {
+			req.session.oauth = {};
+			req.session.oauth.token = oauth_token;
+			console.log('oauth.token: ' + req.session.oauth.token);
+			req.session.oauth.token_secret = oauth_token_secret;
+			console.log('oauth.token_secret: ' + req.session.oauth.token_secret);
+			res.redirect('https://twitter.com/oauth/authenticate?oauth_token=' + oauth_token);
+		}
+	});
+});
 
+app.get('/auth/twitter/callback', function(req, res, next) {
+	if (req.session.oauth) {
+		req.session.oauth.verifier = req.query.oauth_verifier;
+		var oauth = req.session.oauth;
+		var has_user = false;
+		
+		oa.getOAuthAccessToken(oauth.token,oauth.token_secret,oauth.verifier, 
+		function(error, oauth_access_token, oauth_access_token_secret, results) {
+			if (error) {
+				console.log(error);
+				// res.send("yeah something broke.");
+				res.send(error[0].data);
+			} else {
+				req.session.oauth.access_token = oauth_access_token;
+				req.session.oauth.access_token_secret = oauth_access_token_secret;
+				
+				// Check database for user
+				client.query(
+					'SELECT user_name FROM ' + user_table + ' WHERE user_name = "' + results.screen_name + '";',
+					function(err, sql_results, fields) {
+						if (err) throw err;
+						for(var i = 0; i < sql_results.length; i++) {
+							if (results.screen_name == sql_results[i].user_name) {
+								has_user = true;
+								console.log(results.screen_name + '==' + sql_results[i].user_name);
+							}
+						}
+						console.log('does user exist already? ' + has_user);
+						
+						// Get user creation datetime
+						var time = new Date();
+						var current = dateToString(time);
+						
+						// Checks if user is already in database
+						if (has_user) {
+							// session storage
+							req.session.user_name = results.screen_name;
+							req.session.user_id = results.user_id;
+						
+							console.log(current);
+							res.redirect('/dashboard');
+						} else {
+							console.log(current);
+							var user_name = results.screen_name;
+							// session storage
+							req.session.user_name = user_name;
+							req.session.user_id = results.user_id;
+							
+							$.ajax({
+								cache: false,
+								url: 'https://api.twitter.com/1/users/show.json',
+								data: { screen_name: results.screen_name, user_id: results.user_id },
+								dataType: 'jsonp',
+								success: function(data) {
+											req.session.avatar = data.profile_image_url; // add avatar to session
+											var full_name = data.name;
+											var name = full_name.split(' ');
+											client.query(
+												'INSERT INTO ' + user_table + ' ' +
+												'SET user_id = ?, user_name = ?, full_name = ?, first_name = ?, last_name = ?, avatar = ?, access_token = ?, access_token_secret = ?, created_date = ?',
+												[results.user_id, results.screen_name, full_name, name[0], name[1], req.session.avatar, oauth_access_token, oauth_access_token_secret, current]
+											);
+											res.redirect('/dashboard');
+										}
+							});
+						}
+					});
+			}
+		});
+	} else {
+		next(new Error("you're not supposed to be here."));
+	}
+});
 
 <<<<<<< HEAD
 app.get('/logout', function(req, res) {
