@@ -7,3 +7,7 @@ body(onload="storeCheck();")
 			Rate and track the greatest beverage in the world!
 		a(href="/auth/twitter", target="_webapp").btn.twitter Sign in with Twitter
 			span.left
+
+	script(type='text/javascript')
+		if (!window.navigator.standalone)
+			addToHome.show(true);

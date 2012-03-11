@@ -72,7 +72,7 @@ body > .toolbar {
 }
 
 .toolbar > h1 {
-	font: bold 20px "Helvetica Neue", "Helvetica", sans-serif;
+	font: normal 20px "Futura", "Helvetica Neue", "Helvetica", sans-serif;
     color: #ffffff;
     text-shadow: -1px -1px 1px rgba(0, 0, 0, 0.8);
     text-align: center;
