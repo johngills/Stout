@@ -3,7 +3,6 @@ var express = require('express');
 var static = require('node-static');
 var jade = require('jade');
 var OAuth = require('oauth').OAuth;
-var OOAuth = require('node-oauth');
 var url = require('url');
 var fs = require('fs');
 var http = require('http');
