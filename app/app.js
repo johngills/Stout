@@ -514,64 +514,64 @@ app.get('/add-comment', checkAuth, function(req, res) {
 		});
 });
 
-app.get('/get-twitter-friends', checkAuth, function(req, res) {
-	client.query(
-		'SELECT access_token, access_token_secret FROM users WHERE user_id = ' + req.session.user_id,
-		function(err, results, fields) {
-			if (err) throw err;
-			console.log(results);
-			
-			var access_token = results[0].access_token;
-			var access_token_secret = results[0].access_token_secret;
-			var twitter_friends = '', stout_friends = '';
-			
-			// Get follower ids
-			oa.getProtectedResource(
-				"https://api.twitter.com/1/friends/ids.json?cursor=-1&screen_name=" + req.session.user_name,
-				"GET",
-				access_token,
-				access_token_secret,
-				function(error, results) {
-					if (error) {
-						console.log(require('sys').inspect(error));
-					} else {
-						console.log(results);
-					}
-					var data = $.parseJSON(results);
-					
-					// Cut friends query down to 99
-					for(var i = 0; i < 100; i++) {
-						twitter_friends += data.ids[i] + ',';
-					}
-					console.log(twitter_friends);
-					
-					client.query(
-						'SELECT DISTINCT users.user_id, users.first_name, users.last_name, users.avatar, followers.created_date '
-						+ 'FROM users, followers '
-						+ 'WHERE user_id in (' + twitter_friends + '0) AND followers.owner_id in (' + twitter_friends + '0) AND followers.follower_id = ' + req.session.user_id,
-						function(err, results, fields) {
-							console.log(results);
-							stout_friends = results;
-					});
-					
-					var next = data.next_cursor;
-					oa.getProtectedResource(
-						"https://api.twitter.com/1/users/lookup.json?user_id=" + twitter_friends,
-						"GET",
-						access_token,
-						access_token_secret,
-						function(error, data) {
-							if (error) {
-								console.log(require('sys').inspect(error));
-							} else {
-								console.log(data);
-							}
-							twitter_friends = $.parseJSON(data);
-							res.json({"stout_friends":stout_friends,"twitter_friends":twitter_friends});
-					});
-			});
-	});	
-});
+// app.get('/get-twitter-friends', checkAuth, function(req, res) {
+// 	client.query(
+// 		'SELECT access_token, access_token_secret FROM users WHERE user_id = ' + req.session.user_id,
+// 		function(err, results, fields) {
+// 			if (err) throw err;
+// 			console.log(results);
+// 			
+// 			var access_token = results[0].access_token;
+// 			var access_token_secret = results[0].access_token_secret;
+// 			var twitter_friends = '', stout_friends = '';
+// 			
+// 			// Get follower ids
+// 			oa.getProtectedResource(
+// 				"https://api.twitter.com/1/friends/ids.json?cursor=-1&screen_name=" + req.session.user_name,
+// 				"GET",
+// 				access_token,
+// 				access_token_secret,
+// 				function(error, results) {
+// 					if (error) {
+// 						console.log(require('sys').inspect(error));
+// 					} else {
+// 						console.log(results);
+// 					}
+// 					var data = $.parseJSON(results);
+// 					
+// 					// Cut friends query down to 99
+// 					for(var i = 0; i < 100; i++) {
+// 						twitter_friends += data.ids[i] + ',';
+// 					}
+// 					console.log(twitter_friends);
+// 					
+// 					client.query(
+// 						'SELECT DISTINCT users.user_id, users.first_name, users.last_name, users.avatar, followers.created_date '
+// 						+ 'FROM users, followers '
+// 						+ 'WHERE user_id in (' + twitter_friends + '0) AND followers.owner_id in (' + twitter_friends + '0) AND followers.follower_id = ' + req.session.user_id,
+// 						function(err, results, fields) {
+// 							console.log(results);
+// 							stout_friends = results;
+// 					});
+// 					
+// 					var next = data.next_cursor;
+// 					oa.getProtectedResource(
+// 						"https://api.twitter.com/1/users/lookup.json?user_id=" + twitter_friends,
+// 						"GET",
+// 						access_token,
+// 						access_token_secret,
+// 						function(error, data) {
+// 							if (error) {
+// 								console.log(require('sys').inspect(error));
+// 							} else {
+// 								console.log(data);
+// 							}
+// 							twitter_friends = $.parseJSON(data);
+// 							res.json({"stout_friends":stout_friends,"twitter_friends":twitter_friends});
+// 					});
+// 			});
+// 	});	
+// });
 
 app.get('/find-friend', checkAuth, function(req, res) {	
 	console.log('search term: ' + req.query.user_name);
