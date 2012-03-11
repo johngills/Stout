@@ -36,6 +36,7 @@ process.on('uncaughtException', function(err) {
 
 
 
+<<<<<<< HEAD
 app.get('/', function(req, res) {	
 	console.log(req.session.user_name);
 	console.log(req.session.user_id);
@@ -831,3 +832,6 @@ console.log('Connected...');
 =======
 console.log('Connected...');
 >>>>>>> 6615ddee1722fcb3f62dc35efb6564ede0fdb3a0
+=======
+console.log('Connected...');
+>>>>>>> 149155ee920ea4d307145cb839c1605d69921b90
