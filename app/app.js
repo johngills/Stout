@@ -8,7 +8,7 @@ var fs = require('fs');
 var http = require('http');
 var $ = require('jquery');
 var request = require('request');
-var crypto = require("crypto");
+var crypto = require('crypto');
 var base64 = require('base64');
 
 // CSS ---------------------------------------------------
@@ -100,7 +100,6 @@ app.get('/', function(req, res) {
 	
 	// then checks if there's anything in them
 	if (req.session.user_name == undefined) {
-		console.log('got here');
 		res.render('index', { layout: 'home', user_name: '', user_id: '', title: 'Stout' });
 	} else {
 		res.redirect('/dashboard');
@@ -415,7 +414,6 @@ app.get('/add-to-drink-list', checkAuth, function(req, res) {
 
 
 
-
 // --------------------------------------------------------------------------------------
 // PROFILE
 // --------------------------------------------------------------------------------------
@@ -590,95 +588,7 @@ app.get('/unfollow', checkAuth, function(req, res) {
 // OAUTH
 // --------------------------------------------------------------------------------------
 
-app.get('/auth/twitter', function(req, res){
-	oa.getOAuthRequestToken(function(error, oauth_token, oauth_token_secret, results) {
-		if (error) {
-			console.log(error);
-			res.send("yeah no. didn't work.");
-		} else {
-			req.session.oauth = {};
-			req.session.oauth.token = oauth_token;
-			console.log('oauth.token: ' + req.session.oauth.token);
-			req.session.oauth.token_secret = oauth_token_secret;
-			console.log('oauth.token_secret: ' + req.session.oauth.token_secret);
-			res.redirect('https://twitter.com/oauth/authenticate?oauth_token=' + oauth_token);
-		}
-	});
-});
 
-app.get('/auth/twitter/callback', function(req, res, next) {
-	if (req.session.oauth) {
-		req.session.oauth.verifier = req.query.oauth_verifier;
-		var oauth = req.session.oauth;
-		var has_user = false;
-		
-		oa.getOAuthAccessToken(oauth.token,oauth.token_secret,oauth.verifier, 
-		function(error, oauth_access_token, oauth_access_token_secret, results) {
-			if (error) {
-				console.log(error);
-				// res.send("yeah something broke.");
-				res.send(error[0].data);
-			} else {
-				req.session.oauth.access_token = oauth_access_token;
-				req.session.oauth.access_token_secret = oauth_access_token_secret;
-				
-				// Check database for user
-				client.query(
-					'SELECT user_name FROM ' + user_table + ' WHERE user_name = "' + results.screen_name + '";',
-					function(err, sql_results, fields) {
-						if (err) throw err;
-						for(var i = 0; i < sql_results.length; i++) {
-							if (results.screen_name == sql_results[i].user_name) {
-								has_user = true;
-								console.log(results.screen_name + '==' + sql_results[i].user_name);
-							}
-						}
-						console.log('does user exist already? ' + has_user);
-						
-						// Get user creation datetime
-						var time = new Date();
-						var current = dateToString(time);
-						
-						// Checks if user is already in database
-						if (has_user) {
-							// session storage
-							req.session.user_name = results.screen_name;
-							req.session.user_id = results.user_id;
-						
-							console.log(current);
-							res.redirect('/dashboard');
-						} else {
-							console.log(current);
-							var user_name = results.screen_name;
-							// session storage
-							req.session.user_name = user_name;
-							req.session.user_id = results.user_id;
-							
-							$.ajax({
-								cache: false,
-								url: 'https://api.twitter.com/1/users/show.json',
-								data: { screen_name: results.screen_name, user_id: results.user_id },
-								dataType: 'jsonp',
-								success: function(data) {
-											req.session.avatar = data.profile_image_url; // add avatar to session
-											var full_name = data.name;
-											var name = full_name.split(' ');
-											client.query(
-												'INSERT INTO ' + user_table + ' ' +
-												'SET user_id = ?, user_name = ?, full_name = ?, first_name = ?, last_name = ?, avatar = ?, access_token = ?, access_token_secret = ?, created_date = ?',
-												[results.user_id, results.screen_name, full_name, name[0], name[1], req.session.avatar, oauth_access_token, oauth_access_token_secret, current]
-											);
-											res.redirect('/dashboard');
-										}
-							});
-						}
-					});
-			}
-		});
-	} else {
-		next(new Error("you're not supposed to be here."));
-	}
-});
 
 <<<<<<< HEAD
 app.get('/logout', function(req, res) {
