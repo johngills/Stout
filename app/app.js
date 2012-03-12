@@ -81,7 +81,7 @@ var oa = new OAuth(
 	"PIFvIPSXlTIbqnnnjBIqoWs0VIxpQivNrIJuWxtkLI",
 	"1.0",
 	//"http://localhost:1337/auth/twitter/callback",
-	"http://www.stoutapp.com:80/auth/twitter/callback",
+	"http://stoutapp.com/auth/twitter/callback",
 	//"http://ps79519.dreamhostps.com:1337/auth/twitter/callback",
 	"HMAC-SHA1"
 );
@@ -93,6 +93,14 @@ function dateToString(date) {
 	} 
 	return "";
 }
+
+app.get('/*', function(req, res, next) {
+  if (req.headers.host.match(/^www/) !== null ) {
+    res.redirect('http://' + req.headers.host.replace(/^www\./, '') + req.url);
+  } else {
+    next();     
+  }
+});
 
 app.get('/', function(req, res) {	
 	console.log(req.session.user_name);
