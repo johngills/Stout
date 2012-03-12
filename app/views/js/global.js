@@ -49,7 +49,7 @@ function storeCheck() {
 		localStorage['revision11'] = time;
 	}
 	if (localStorage['user_id'] != null) {
-		load('Logging in...');
+		load('Opening the tab...');
 		var user_name = localStorage['user_name'];
 		var user_id = localStorage['user_id'];
 		$.ajax({
