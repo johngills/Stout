@@ -216,7 +216,7 @@ function loadTab(limit,comment) {
 							$('#index').append('<li class="load_more">end of the line</li>');
 						}
 					} else {
-						$('#index').empty().append('<li class="load_more">Your tab is empty, start by adding a beer and following others!</li>');
+						$('#index').empty().append('<li class="load_more" style="height:85px;">Your tab is empty, start by adding a beer and following others!</li>');
 					}
 				},
 		error: function(results) {
@@ -370,6 +370,7 @@ function loadTwitterFriends() {
 						var stout_ids = [];
 						
 						// Stout Friends
+						if (results.stout_friends != undefined) {
 						for(var i = 0; i < results.stout_friends.length; i++) {
 							var first_name = (results.stout_friends[i].first_name == null) ? '' : results.stout_friends[i].first_name;
 							var last_name = (results.stout_friends[i].last_name == null) ? '' : results.stout_friends[i].last_name;
@@ -386,8 +387,10 @@ function loadTwitterFriends() {
 																+ '<h3 class="left">' + first_name + ' ' + last_name + '</h3>'
 							 									+ '</a></li>');
 						}
-						
+						}
+
 						// Twitter Friends
+						if (results.twitter_friends != undefined) {
 						for(var i = 0; i < results.twitter_friends.length; i++) {
 							var name = (results.twitter_friends[i].name == null) ? '' : '<h3 class="beer_name">' + results.twitter_friends[i].name + '</h3>';
 							var screen_name = (results.twitter_friends[i].screen_name == null) ? '' : '<p class="meta" style="margin-top:2px;">' + results.twitter_friends[i].screen_name + '</p>';
@@ -402,6 +405,7 @@ function loadTwitterFriends() {
 																	+ name
 																	+ '</li>');
 							}
+						}
 						}
 					} else {
 						load('Something went wrong!','error');
