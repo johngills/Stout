@@ -11,7 +11,10 @@ var request = require('request');
 var crypto = require('crypto');
 // var base64 = require('base64');
 
-// CSS ---------------------------------------------------
+// --------------------------------------------------------------------------------------
+// CSS/LESS
+// --------------------------------------------------------------------------------------
+
 var less = require('less');
 var parser = new (less.Parser)({
     paths: ['.', './views/css'], // Specify search paths for @import directives
@@ -22,13 +25,17 @@ parser.parse('.class { width: 1 + 1 }', function (e, tree) {
     tree.toCSS({ compress: true }); // Minify CSS output
 });
 
+// --------------------------------------------------------------------------------------
+// SERVER
+// --------------------------------------------------------------------------------------
+
 var app = express.createServer( 
 				express.static(__dirname + '/views'),
 				express.cookieParser(),
 				express.session({secret: 'FlurbleGurgleBurgle',
 				                store: new express.session.MemoryStore({ reapInterval: -1 }) }));
-//app.listen(1337);
-app.listen(80);
+app.listen(1337);
+//app.listen(80);
 
 process.on('uncaughtException', function(err) {
 	console.log('Caught exception: ' + err.stack);
@@ -40,7 +47,42 @@ app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
 app.enable('jsonp callback');
 
-// COMMON FUNCTIONS --------------------------------------
+// --------------------------------------------------------------------------------------
+// DATABASE
+// --------------------------------------------------------------------------------------
+
+// var mysql = require('mysql'),
+// 	database = 'stout',
+// 	user_table = 'users',
+// 	client = mysql.createClient({ user: 'sterlingrules', password: '@y&7~s45', host: 'mysql.mynameissterling.com', port: 3306 });
+// 	client.query('USE ' + database);
+// 	client.database = 'stout';
+
+var mysql = require('mysql'),
+	database = 'beer',
+	user_table = 'users',
+	client = mysql.createClient({ user: 'root', password: '' });
+	client.query('USE ' + database);
+	client.database = 'beer';
+
+// --------------------------------------------------------------------------------------
+// OAUTH SETUP
+// --------------------------------------------------------------------------------------
+
+var oa = new OAuth(
+	"https://api.twitter.com/oauth/request_token",
+	"https://api.twitter.com/oauth/access_token",
+	"Nmqm7UthsfdjaDQ4HcxPw",
+	"PIFvIPSXlTIbqnnnjBIqoWs0VIxpQivNrIJuWxtkLI",
+	"1.0",
+	"http://localhost:1337/auth/twitter/callback",
+	//"http://stoutapp.com/auth/twitter/callback",
+	"HMAC-SHA1"
+);
+
+// --------------------------------------------------------------------------------------
+// COMMON FUNCTIONS
+// --------------------------------------------------------------------------------------
 
 function checkAuth(req, res, next) {
 	if (req.session.user_name == undefined) {
@@ -58,34 +100,6 @@ function hasNumbers(t) {
 	return regex.test(t);
 }
 
-// DATABASE INFO -----------------------------------------
-var mysql = require('mysql'),
-	database = 'stout',
-	user_table = 'users',
-	client = mysql.createClient({ user: 'sterlingrules', password: '@y&7~s45', host: 'mysql.mynameissterling.com', port: 3306 });
-	client.query('USE ' + database);
-	client.database = 'stout';
-
-// var mysql = require('mysql'),
-// 	database = 'beer',
-// 	user_table = 'users',
-// 	client = mysql.createClient({ user: 'root', password: '' });
-// 	client.query('USE ' + database);
-// 	client.database = 'beer';
-
-// OAUTH SETUP --------------------------------------------
-var oa = new OAuth(
-	"https://api.twitter.com/oauth/request_token",
-	"https://api.twitter.com/oauth/access_token",
-	"Nmqm7UthsfdjaDQ4HcxPw",
-	"PIFvIPSXlTIbqnnnjBIqoWs0VIxpQivNrIJuWxtkLI",
-	"1.0",
-	//"http://localhost:1337/auth/twitter/callback",
-	"http://stoutapp.com/auth/twitter/callback",
-	//"http://ps79519.dreamhostps.com:1337/auth/twitter/callback",
-	"HMAC-SHA1"
-);
-
 function dateToString(date) {
 	//check that date is a date object
 	if (date && date.getFullYear()){ 
@@ -94,12 +108,16 @@ function dateToString(date) {
 	return "";
 }
 
+// --------------------------------------------------------------------------------------
+// APPLICATION
+// --------------------------------------------------------------------------------------
+
 app.get('/*', function(req, res, next) {
-  if (req.headers.host.match(/^www/) !== null ) {
-    res.redirect('http://' + req.headers.host.replace(/^www\./, '') + req.url);
-  } else {
-    next();     
-  }
+	if (req.headers.host.match(/^www/) !== null ) {
+		res.redirect('http://' + req.headers.host.replace(/^www\./, '') + req.url);
+	} else {
+		next();     
+	}
 });
 
 app.get('/', function(req, res) {	
@@ -424,21 +442,25 @@ app.get('/share-beer', checkAuth, function(req, res) {
 	var time = new Date();
 	var current = dateToString(time);
 	
-	client.query(
-		'INSERT INTO comments ' +
-		'SET feed_id = ?, owner_id = ?, partner_id = ?, beer_id = ?, rating = ?, comment = ?, created_date = ?',
-		[req.query.feed_id, req.session.user_id, req.session.user_id, req.query.beer_id, req.query.rating, req.query.comment, current],
-		function(err, results, fields) {
-			if (err) throw err;
-			console.log(results);
-			client.query(
-				'UPDATE feed SET comment = "' + req.query.comment + '", comment_count = 1 WHERE feed.id = ' + req.query.feed_id + ';',
-				function(err, results, fields) {
-					if (err) throw err;
-					res.json({"status":"success"});
-				});
-		});
-		
+	if (req.query.comment != '') {
+		client.query(
+			'INSERT INTO comments ' +
+			'SET feed_id = ?, owner_id = ?, partner_id = ?, beer_id = ?, rating = ?, comment = ?, created_date = ?',
+			[req.query.feed_id, req.session.user_id, req.session.user_id, req.query.beer_id, req.query.rating, req.query.comment, current],
+			function(err, results, fields) {
+				if (err) throw err;
+				console.log(results);
+				client.query(
+					'UPDATE feed SET comment = "' + req.query.comment + '", comment_count = 1 WHERE feed.id = ' + req.query.feed_id + ';',
+					function(err, results, fields) {
+						if (err) throw err;
+						res.json({"status":"success"});
+					});
+			});
+	} else {
+		res.json({"status":"success"});
+	}
+	
 	// Tweet
 	if (req.query.send_tweet) {
 		client.query(
@@ -545,12 +567,14 @@ app.get('/get-twitter-friends', checkAuth, function(req, res) {
 						console.log(results);
 					}
 					var data = $.parseJSON(results);
+					var count = (data.ids.length > 99) ? 100 : data.ids.length;
 					
 					// Cut friends query down to 99
-					for(var i = 0; i < 100; i++) {
+					for(var i = 0; i < count; i++) {
 						twitter_friends += data.ids[i] + ',';
 					}
 					console.log(twitter_friends);
+					console.log(data.ids.length);
 					
 					client.query(
 						'SELECT DISTINCT users.user_id, users.first_name, users.last_name, users.avatar '

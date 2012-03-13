@@ -216,7 +216,7 @@ function loadTab(limit,comment) {
 							$('#index').append('<li class="load_more">end of the line</li>');
 						}
 					} else {
-						$('#index').empty().append('<li class="load_more" style="height:85px;">Your tab is empty, start by adding a beer and following others!</li>');
+						$('#index').empty().append('<li class="load_more">Your tab is empty, start by adding a beer and following others!</li>');
 					}
 				},
 		error: function(results) {
@@ -369,43 +369,45 @@ function loadTwitterFriends() {
 						$('ul#find_friend span.results').empty();
 						var stout_ids = [];
 						
+						console.log(results.stout_friends);
+						
 						// Stout Friends
 						if (results.stout_friends != undefined) {
-						for(var i = 0; i < results.stout_friends.length; i++) {
-							var first_name = (results.stout_friends[i].first_name == null) ? '' : results.stout_friends[i].first_name;
-							var last_name = (results.stout_friends[i].last_name == null) ? '' : results.stout_friends[i].last_name;
-							var user_id = results.stout_friends[i].user_id;
-							var beer_name = '<h3>' + results.stout_friends[i].beer_name + '</h3>';
-							var avatar = results.stout_friends[i].avatar;
+							for(var i = 0; i < results.stout_friends.length; i++) {
+								var first_name = (results.stout_friends[i].first_name == null) ? '' : results.stout_friends[i].first_name;
+								var last_name = (results.stout_friends[i].last_name == null) ? '' : results.stout_friends[i].last_name;
+								var user_id = results.stout_friends[i].user_id;
+								var beer_name = '<h3>' + results.stout_friends[i].beer_name + '</h3>';
+								var avatar = results.stout_friends[i].avatar;
 							
-							stout_ids[i] = user_id;
+								stout_ids[i] = user_id;
 							
-							$('ul#find_friend span.results').append('<li style="height:55px;">'
-																+ '<a href="javascript:void(0);" onclick="follow(' + user_id + ')" class="btn orange ' + user_id + '" style="max-height:20px; float:right;">Follow</a>'
-																+ '<a href="#profile" id="' + user_id + '" onclick="javascript:loadProfile(' + user_id + ');">'
-							 									+ '<img src="' + avatar + '" width="32px" class="avatar left" />'
-																+ '<h3 class="left">' + first_name + ' ' + last_name + '</h3>'
-							 									+ '</a></li>');
-						}
+								$('ul#find_friend span.results').append('<li style="height:55px;">'
+																	+ '<a href="javascript:void(0);" onclick="follow(' + user_id + ')" class="btn orange ' + user_id + '" style="max-height:20px; float:right;">Follow</a>'
+																	+ '<a href="#profile" id="' + user_id + '" onclick="javascript:loadProfile(' + user_id + ');">'
+								 									+ '<img src="' + avatar + '" width="32px" class="avatar left" />'
+																	+ '<h3 class="left">' + first_name + ' ' + last_name + '</h3>'
+								 									+ '</a></li>');
+							}
 						}
 
 						// Twitter Friends
 						if (results.twitter_friends != undefined) {
-						for(var i = 0; i < results.twitter_friends.length; i++) {
-							var name = (results.twitter_friends[i].name == null) ? '' : '<h3 class="beer_name">' + results.twitter_friends[i].name + '</h3>';
-							var screen_name = (results.twitter_friends[i].screen_name == null) ? '' : '<p class="meta" style="margin-top:2px;">' + results.twitter_friends[i].screen_name + '</p>';
-							var twitter_id = results.twitter_friends[i].id;
-							var avatar = results.twitter_friends[i].profile_image_url;
+							for(var i = 0; i < results.twitter_friends.length; i++) {
+								var name = (results.twitter_friends[i].name == null) ? '' : '<h3 class="beer_name">' + results.twitter_friends[i].name + '</h3>';
+								var screen_name = (results.twitter_friends[i].screen_name == null) ? '' : '<p class="meta" style="margin-top:2px;">' + results.twitter_friends[i].screen_name + '</p>';
+								var twitter_id = results.twitter_friends[i].id;
+								var avatar = results.twitter_friends[i].profile_image_url;
 							
-							if ($.inArray(twitter_id,stout_ids) == -1) {
-								$('ul#find_friend span.results').append('<li style="height:55px;">'
-																	+ '<a href="javascript:void(0);" onclick="inviteTwitter(\'' + results.twitter_friends[i].screen_name + '\',' + twitter_id + ');" class="btn blue ' + twitter_id + '" style="max-height:20px; float:right;">Invite</a>'
-								 									+ '<img src="' + avatar + '" width="32px" class="avatar left" />'
-																	+ screen_name
-																	+ name
-																	+ '</li>');
+								if ($.inArray(twitter_id,stout_ids) == -1) {
+									$('ul#find_friend span.results').append('<li style="height:55px;">'
+																		+ '<a href="javascript:void(0);" onclick="inviteTwitter(\'' + results.twitter_friends[i].screen_name + '\',' + twitter_id + ');" class="btn blue ' + twitter_id + '" style="max-height:20px; float:right;">Invite</a>'
+									 									+ '<img src="' + avatar + '" width="32px" class="avatar left" />'
+																		+ screen_name
+																		+ name
+																		+ '</li>');
+								}
 							}
-						}
 						}
 					} else {
 						load('Something went wrong!','error');
@@ -1125,30 +1127,24 @@ function share(beer_id,rate,feed_id) {
 	load('Brewing...');
 	var comment = $('#share textarea.comment').val();
 	var send_tweet = ($('ul.rate_controls li.twitter').hasClass('active')) ? true : false;
-
-	if (comment == '') {
-		window.location='/dashboard#_index';
-		loadTab(0);
-		load('Success!','success');
-	} else {
-		$.ajax({
-			cache: false,
-			url: '/share-beer',
-			data: { feed_id: feed_id, beer_id: beer_id, rating: rate, comment: comment, send_tweet: send_tweet },
-			success: function(results) {
-						if (results.status == 'success') {
-							window.location='/dashboard#_index';
-							loadTab(0);
-							load('Success!','success');
-						} else {
-							load('Something went wrong!','error');
-						}
-					},
-			error: function(results) {
-						return false;
+	
+	$.ajax({
+		cache: false,
+		url: '/share-beer',
+		data: { feed_id: feed_id, beer_id: beer_id, rating: rate, comment: comment, send_tweet: send_tweet },
+		success: function(results) {
+					if (results.status == 'success') {
+						window.location='/dashboard#_index';
+						loadTab(0);
+						load('Success!','success');
+					} else {
+						load('Something went wrong!','error');
 					}
-		});
-	}
+				},
+		error: function(results) {
+					return false;
+				}
+	});
 }
 function addComment(beer_id,rate,feed_id,owner_id) {
 	
