@@ -121,6 +121,7 @@ function fixTime(time) {
 }
 
 function loadTab(limit,comment) {
+	load('Brewing...');
 	
 	// resets
 	if (comment == '') {
@@ -133,7 +134,7 @@ function loadTab(limit,comment) {
 		$('#index').empty();
 	}
 	$('.load_more').remove();
-	$('#index').append('<li class="loader"><p class="meta">Brewing...</p></li>');
+	// $('#index').append('<li class="loader"><p class="meta">Brewing...</p></li>');
 	tabSelect('the_tab');
 	
 	$.ajax({
@@ -218,6 +219,7 @@ function loadTab(limit,comment) {
 					} else {
 						$('#index').empty().append('<li class="load_more">Your tab is empty, start by adding a beer and following others!</li>');
 					}
+					load();
 				},
 		error: function(results) {
 					load('Something went wrong!','error');

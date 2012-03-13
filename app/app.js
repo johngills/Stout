@@ -155,7 +155,7 @@ app.get('/dashboard', checkAuth, function(req, res) {
 	console.log(req.session.user_name);
 	console.log(req.session.user_id);
 	if (req.session.user_name != undefined || req.session.user_name != null) {
-		res.render('dashboard', { user_name: req.session.user_name, user_id: req.session.user_id, title: 'Dashboard | Stout' });
+		res.render('dashboard', { user_name: req.session.user_name, user_id: req.session.user_id, title: 'Stout' });
 	} else {
 		delete req.session.user_name;
 		delete req.session.user_id;
