@@ -617,22 +617,26 @@ app.get('/find-friend', checkAuth, function(req, res) {
 app.get('/send-twitter-invite', checkAuth, function(req, res) {
 	
 	var text = $.makeArray();
-    text[0] = '@' + req.query.screen_name + ' Check out what beer I\'m drinking on #Stout - http://www.stoutapp.com/';
-    text[1] = '@' + req.query.screen_name + ' Have a beer with me on #Stout - http://www.stoutapp.com/';
+    	text[0] = '@' + req.query.screen_name + ' Check out what beer I\'m drinking on @StoutApp - http://www.stoutapp.com/';
+    	text[1] = '@' + req.query.screen_name + ' Have a beer with me on @StoutApp - http://www.stoutapp.com/';
     
-    var i = Math.floor(2*Math.random());
+    	var i = Math.floor(2*Math.random());
 
 	client.query(
 		'SELECT access_token, access_token_secret FROM users WHERE user_id = ' + req.session.user_id,
 		function(err, results, fields) {
 			if (err) throw err;
+
+			console.log(text[i]);
 			console.log(results);
+			console.log(req.session.user_id);
+			console.log(results[0].access_token);
+			console.log(results[0].access_token_secret);			
 	
-			oa.post(
-				"http://api.twitter.com/1/statuses/update.json",
+			oa.post("http://api.twitter.com/1/statuses/update.json",
 				results[0].access_token, 
-			    results[0].access_token_secret,
-				{"status":text[i]},
+				results[0].access_token_secret,
+				{"status" : text[i]},
 				function(error, data) {
 					if (error) {
 						console.log(require('sys').inspect(error));
