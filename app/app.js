@@ -491,6 +491,7 @@ app.get('/share-beer', checkAuth, function(req, res) {
 	
 	// Tweet
 	if (req.query.send_tweet == true) {
+		console.log('got into the tweet statement check');
 		client.query(
 			'SELECT access_token, access_token_secret, name AS beer_name FROM users, beers WHERE beers.id = ' + req.query.beer_id + ' AND user_id = ' + req.session.user_id,
 			function(err, results, fields) {
@@ -532,6 +533,8 @@ app.get('/share-beer', checkAuth, function(req, res) {
 						}
 				});
 		});
+	} else {
+		console.log('Did not work for some stupid reason');
 	}
 });
 
