@@ -34,8 +34,8 @@ var app = express.createServer(
 				express.cookieParser(),
 				express.session({secret: 'FlurbleGurgleBurgle',
 				                store: new express.session.MemoryStore({ reapInterval: -1 }) }));
-//app.listen(1337);
-app.listen(80);
+app.listen(1337);
+//app.listen(80);
 
 process.on('uncaughtException', function(err) {
 	console.log('Caught exception: ' + err.stack);
@@ -51,19 +51,19 @@ app.enable('jsonp callback');
 // DATABASE
 // --------------------------------------------------------------------------------------
 
-var mysql = require('mysql'),
-	database = 'stout',
-	user_table = 'users',
-	client = mysql.createClient({ user: 'sterlingrules', password: '@y&7~s45', host: 'mysql.mynameissterling.com', port: 3306 });
-	client.query('USE ' + database);
-	client.database = 'stout';
-
 // var mysql = require('mysql'),
-// 	database = 'beer',
+// 	database = 'stout',
 // 	user_table = 'users',
-// 	client = mysql.createClient({ user: 'root', password: '' });
+// 	client = mysql.createClient({ user: 'sterlingrules', password: '@y&7~s45', host: 'mysql.mynameissterling.com', port: 3306 });
 // 	client.query('USE ' + database);
-// 	client.database = 'beer';
+// 	client.database = 'stout';
+
+var mysql = require('mysql'),
+	database = 'beer',
+	user_table = 'users',
+	client = mysql.createClient({ user: 'root', password: '' });
+	client.query('USE ' + database);
+	client.database = 'beer';
 
 // --------------------------------------------------------------------------------------
 // OAUTH SETUP
@@ -75,8 +75,8 @@ var oa = new OAuth(
 	"Nmqm7UthsfdjaDQ4HcxPw",
 	"PIFvIPSXlTIbqnnnjBIqoWs0VIxpQivNrIJuWxtkLI",
 	"1.0",
-	//"http://localhost:1337/auth/twitter/callback",
-	"http://stoutapp.com/auth/twitter/callback",
+	"http://localhost:1337/auth/twitter/callback",
+	//"http://stoutapp.com/auth/twitter/callback",
 	"HMAC-SHA1"
 );
 
@@ -168,8 +168,9 @@ app.get('/get-feed', checkAuth, function(req, res) {
 	var current = dateToString(time);
 	
 	client.query(
-		'SELECT DISTINCT feed.id, feed.user_name, feed.user_id, feed.beer_id, feed.rating, feed.comment_count, feed.type, ROUND(TIMESTAMPDIFF(SECOND,feed.created_date,"' + current + '")/60) AS time, users.first_name, users.last_name, users.avatar, beers.name AS beer_name, comment '
-			+ 'FROM feed, beers, users, followers '
+		'SELECT DISTINCT feed.id, feed.user_name, feed.user_id, feed.beer_id, feed.rating, feed.rating_count, feed.comment_count, feed.type, ROUND(TIMESTAMPDIFF(SECOND,feed.created_date,"' + current + '")/60) AS time, users.first_name, users.last_name, users.avatar, beers.name AS beer_name, comment, beer_number.beer_count '
+			+ 'FROM feed, beers, users, followers, '
+			+ '(SELECT DISTINCT feed.user_id, COUNT(feed.beer_id) AS beer_count FROM feed, users WHERE feed.user_id = users.user_id) AS beer_number '
 			+ 'WHERE ((feed.user_id = users.user_id) AND (feed.beer_id = beers.id)) AND (((followers.owner_id = feed.user_id) AND (followers.follower_id = ' + req.session.user_id + ')) '
 			+ 'OR ((feed.user_id = ' + req.session.user_id + '))) '
 			+ 'ORDER BY feed.created_date DESC LIMIT ' + req.query.limit + ',10 ',
@@ -327,13 +328,38 @@ app.get('/new-beer', checkAuth, function(req, res) {
 app.get('/beer-checkin', checkAuth, function(req, res) {
 	var time = new Date();
 	var current = dateToString(time);
+	var unrate = '';
+	var rating_count = 1;
 	
 	console.log('beerid: ' + req.query.beer_id);
-	var unrate = '';
+	
+	// Check if user is re-rating a beer
 	if (req.query.unrate != '') {
 		var unrate = ', beers.' + req.query.unrate + ' = beers.' + req.query.unrate + ' - 1';
-		client.query('DELETE FROM feed WHERE (feed.user_id = ' + req.session.user_id + ') AND (feed.beer_id = ' + req.query.beer_id + ')');
+		client.query(
+			'DELETE FROM feed WHERE feed.id = ' + req.query.feed_id,
+			function(err, results, fields) {
+				console.log(results);
+		});
+		// Find the beer count to update the rating_count
+		client.query(
+			'SELECT COUNT(feed.beer_id) AS count FROM feed WHERE feed.user_id = ' + req.session.user_id + ' AND feed.beer_id = ' + req.query.beer_id,
+			function(err, results, fields) {
+				console.log(results);
+				console.log(results[0].count);
+				rating_count += results[0].count; // getting current number
+		});
+	} else {
+		// Find the beer count to update the rating_count
+		client.query(
+			'SELECT COUNT(feed.beer_id) AS count FROM feed WHERE feed.user_id = ' + req.session.user_id + ' AND feed.beer_id = ' + req.query.beer_id,
+			function(err, results, fields) {
+				console.log(results);
+				console.log(results[0].count);
+				rating_count += results[0].count; // getting current number + 1
+		});
 	}
+	
 	client.query(
 		'UPDATE beers SET beers.' + req.query.rate + ' = beers.' + req.query.rate + ' + 1' + unrate + ', last_mod = "' + current + '" WHERE id = ' + req.query.beer_id + ';',
 		function(err, sql_results, fields) {
@@ -357,12 +383,12 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 				}
 				client.query(
 					'INSERT INTO feed ' +
-					'SET user_id = ?, user_name = ?, beer_id = ?, type = ?, rating = ?, latitude = ?, longitude = ?, created_date = ? ',
-					[req.session.user_id, req.session.user_name, req.query.beer_id, "RATE", rate, req.query.latitude, req.query.longitude, current],
+					'SET user_id = ?, user_name = ?, beer_id = ?, type = ?, rating = ?, rating_count = ?, latitude = ?, longitude = ?, created_date = ? ',
+					[req.session.user_id, req.session.user_name, req.query.beer_id, "RATE", rate, rating_count, req.query.latitude, req.query.longitude, current],
 					function(err, results, fields) {
 						if (err) throw err;
 						console.log(results);
-						res.json({"status":"success", "feed_id": results.insertId, "beer_id": req.query.beer_id, "rate":rate });
+						res.json({"status": "success", "feed_id": results.insertId, "beer_id": req.query.beer_id, "rate": rate });
 						// Add notification
 						if (req.query.partner_id != req.session.user_id) { // makes sure owner and current user aren't the same
 							client.query(
@@ -451,7 +477,7 @@ app.get('/share-beer', checkAuth, function(req, res) {
 				if (err) throw err;
 				console.log(results);
 				client.query(
-					'UPDATE feed SET comment = "' + req.query.comment + '", comment_count = 1 WHERE feed.id = ' + req.query.feed_id + ';',
+					'UPDATE feed SET comment = "' + req.query.comment + '" WHERE feed.id = ' + req.query.feed_id + ';',
 					function(err, results, fields) {
 						if (err) throw err;
 						res.json({"status":"success"});
@@ -461,8 +487,10 @@ app.get('/share-beer', checkAuth, function(req, res) {
 		res.json({"status":"success"});
 	}
 	
+	console.log(req.query.send_tweet);
+	
 	// Tweet
-	if (req.query.send_tweet) {
+	if (req.query.send_tweet == true) {
 		client.query(
 			'SELECT access_token, access_token_secret, name AS beer_name FROM users, beers WHERE beers.id = ' + req.query.beer_id + ' AND user_id = ' + req.session.user_id,
 			function(err, results, fields) {
@@ -489,13 +517,13 @@ app.get('/share-beer', checkAuth, function(req, res) {
 				
 				var msg = share + req.query.comment;
 				var tweet = msg.substring(0,90);
+				if (tweet != '') { tweet = tweet + '...'; }
 				console.log(tweet + " - http://www.stoutapp.com/detail/" + req.query.feed_id + " (via @StoutApp)");
 				
 				oa.post(
 					"http://api.twitter.com/1/statuses/update.json",
 					results[0].access_token, 
 				    results[0].access_token_secret,
-					// {"status": tweet + " - http://www.stoutapp.com/detail/" + req.query.feed_id + " (via @StoutApp)"},
 					{"status": tweet + " (via @StoutApp)"},
 					function(error, data) {
 						if (error) {
@@ -617,10 +645,14 @@ app.get('/find-friend', checkAuth, function(req, res) {
 app.get('/send-twitter-invite', checkAuth, function(req, res) {
 	
 	var text = $.makeArray();
-    	text[0] = '@' + req.query.screen_name + ' Check out what beer I\'m drinking on @StoutApp - http://www.stoutapp.com/';
-    	text[1] = '@' + req.query.screen_name + ' Have a beer with me on @StoutApp - http://www.stoutapp.com/';
-    
-    	var i = Math.floor(2*Math.random());
+	var i = Math.floor(6*Math.random());
+	
+   	text[0] = '@' + req.query.screen_name + ' Check out what beer I\'m drinking on @StoutApp - http://www.stoutapp.com/';
+   	text[1] = '@' + req.query.screen_name + ' Have a beer with me on @StoutApp - http://www.stoutapp.com/';
+	text[2] = '@' + req.query.screen_name + ' The problem with the world is that everyone is a few drinks behind. Join me on @StoutApp - http://www.stoutapp.com/';
+	text[3] = '@' + req.query.screen_name + ' The sum of the matter is, the people drink because they wish to drink. Drink with me on @StoutApp - http://www.stoutapp.com/';
+	text[4] = '@' + req.query.screen_name + ' Everybody has to believe in something... I believe I\'ll have another drink. Drink with me on @StoutApp - http://www.stoutapp.com/';
+	text[5] = '@' + req.query.screen_name + ' I drink to make other people interesting. Drink with me on @StoutApp - http://www.stoutapp.com/';
 
 	client.query(
 		'SELECT access_token, access_token_secret FROM users WHERE user_id = ' + req.session.user_id,
@@ -850,7 +882,7 @@ app.get('/auth/twitter/callback', function(req, res, next) {
 			if (error) {
 				console.log(error);
 				// res.send("yeah something broke.");
-				res.send(error[0].data);
+				res.send(error.data);
 			} else {
 				req.session.oauth.access_token = oauth_access_token;
 				req.session.oauth.access_token_secret = oauth_access_token_secret;
