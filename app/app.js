@@ -517,7 +517,6 @@ app.get('/share-beer', checkAuth, function(req, res) {
 				
 				var msg = share + req.query.comment;
 				var tweet = msg.substring(0,90);
-				if (tweet != '') { tweet = tweet + '...'; }
 				console.log(tweet + " - http://www.stoutapp.com/detail/" + req.query.feed_id + " (via @StoutApp)");
 				
 				oa.post(
