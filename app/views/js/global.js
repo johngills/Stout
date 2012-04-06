@@ -185,7 +185,7 @@ function loadTab(limit,comment) {
 							// COMMENT ------------------------
 							var comment = '';
 							if (results[i].comment != null) {
-								comment = '<blockquote>' + results[i].comment + '</blockquote>';
+								comment = '<blockquote>' + decodeURIComponent(results[i].comment) + '</blockquote>';
 							}
 							
 							var comment_count = '', rating_count = '';
@@ -303,7 +303,7 @@ function feedDetail(id,notification) {
 						
 						// COMMENT ------------------------
 						if (results[0].comment != null) {
-							comment = '<blockquote>' + results[0].comment + '</blockquote>';
+							comment = '<blockquote>' + decodeURIComponent(results[0].comment) + '</blockquote>';
 						}
 						
 						if (results[0].comment_count != 0) {
@@ -359,7 +359,7 @@ function feedDetail(id,notification) {
 												+ '<img src="' + results[i].partner_avatar + '" width="32px" class="avatar left" />'
 												+ time
 												+ '<p class="meta">' + user_name + '</p>'
-												+ '<p class="comment">' + results[i].comment + '</p>'
+												+ '<p class="comment">' + decodeURIComponent(results[i].comment) + '</p>'
 												+ '</a></li>');
 						}
 						
@@ -687,7 +687,7 @@ function twitterToggle() {
 
 function share(beer_id,rate,feed_id) {
 	load('Brewing...');
-	var comment = $('#share textarea.comment').val();
+	var comment = encodeURIComponent($('#share textarea.comment').val());
 	var send_tweet = ($('ul.rate_controls li.twitter').hasClass('active')) ? 'true' : 'false';
 	
 	$.ajax({
