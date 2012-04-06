@@ -274,7 +274,6 @@ function feedDetail(id,notification) {
 						var time = (results[0].time == undefined) ? '' : fixTime(results[0].time);
 						var comment = '';
 						var comment_count = '', rating_count = '';
-						var item_heading = '<p class="meta">' + results[0].owner_first_name + ' ' + action + '</p>';
 						var beer_name = '<h3 id="' + results[0].beer_id + '" class="beer_name">' + results[0].beer_name + '</h3>';
 						var owner_id = (results[0].owner_id == null) ? results[0].user_id : results[0].owner_id;
 						var avatar = '<img src="' + results[0].owner_avatar + '" width="32px" class="left avatar" onclick="loadProfile(' + owner_id + ');" />';
@@ -319,6 +318,8 @@ function feedDetail(id,notification) {
 						}
 						
 						$('#add_comment_text').attr('onblur','addComment(' + results[0].beer_id + ',' + results[0].rating + ',' + id + ',' + owner_id + ');');
+						
+						var item_heading = '<p class="meta">' + results[0].owner_first_name + ' ' + action + '</p>';
 						
 						// sets up feed owner info
 						$('ul#feed_detail').attr('title',title);
