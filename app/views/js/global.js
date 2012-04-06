@@ -49,9 +49,9 @@ function store() {
 }
 
 function storeCheck() {
-	if (localStorage['revision11'] == null) {
+	if (localStorage['revision12'] == null) {
 		localStorage.clear();
-		localStorage['revision11'] = time;
+		localStorage['revision12'] = time;
 	}
 	if (localStorage['user_id'] != null) {
 		load('Opening the tab...');
