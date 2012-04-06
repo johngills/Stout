@@ -1,9 +1,14 @@
 body(onload="store();")
 
 	ul#index(title="The Tab", selected="true")
-		li
-			p Welcome 
-				a(href='#')= user_name
+		li.tab_heading
+			ul
+				li#following.active Following
+				li#public Public
+		span.results
+			li
+				p Welcome 
+					a(href='#')= user_name
 	
 	ul#feed_detail(title="Details")
 		input#feed-item-id(type="hidden")
@@ -53,6 +58,8 @@ body(onload="store();")
 
 	ul#profile_settings(title="Settings")
 		li
+			if user_name == 'sterlingrules'
+				a.btn.orange(href="/admin", target="_webapp") Admin
 			a.btn.orange(href="http://stoutapp.uservoice.com/", target="_blank") Feedback
 			a.btn.blue(href="javascript:void(0);", onclick="logout();") Logout
 

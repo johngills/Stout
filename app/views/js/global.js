@@ -32,7 +32,8 @@ function store() {
 			success: function(results) {
 						if (results.status == 'success') {
 							loadTab(0);
-							setTimeout('getNotifications()',3000);
+							setTimeout('getNotifications()',1000);
+							setInterval('getNotifications()',10000);
 						} else {
 							load();
 						}
@@ -126,6 +127,9 @@ function fixTime(time) {
 
 function loadTab(limit,comment) {
 	load('Brewing...');
+	var sort = $('#index li.tab_heading ul li.active').attr('id');
+	var top = limit;
+	console.log(sort);
 	
 	// resets
 	if (comment == '') {
@@ -135,7 +139,7 @@ function loadTab(limit,comment) {
 	
 	if (limit == 0) {
 		$('html, body').animate({scrollTop: '0px'}, 0);
-		$('#index').empty();
+		$('#index span.results').empty();
 	}
 	$('.load_more').remove();
 	tabSelect('the_tab');
@@ -144,11 +148,11 @@ function loadTab(limit,comment) {
 		cache: false,
 		timeout: timeout,
 		url: '/get-feed',
-		data: { limit: limit },
+		data: { limit: limit, sort: sort },
 		success: function(results) {
 					if (results != '') {
 						if (limit == 0) {
-							$('#index').empty();
+							$('#index span.results').empty();
 						}
 						$('li.loader').remove();
 						for (var i = 0; i < results.length; i++) {
@@ -199,7 +203,7 @@ function loadTab(limit,comment) {
 							var avatar = '<img src="' + results[i].avatar + '" width="32px" class="left avatar" onclick="loadProfile(' + results[i].user_id + ');" />'
 							var item_heading = '<p class="meta">' + results[i].first_name + ' ' + action + '</p>';
 							var beer_name = '<h3 id="' + results[i].beer_id + '" class="beer_name">' + results[i].beer_name + '</h3>';
-							$('#index').append('<li id="feed-item-' + results[i].id + '" class="feed-item">'
+							$('#index span.results').append('<li id="feed-item-' + results[i].id + '" class="feed-item">'
 												+ avatar
 												+ '<a href="javascript:void(0);" onclick="feedDetail(' + results[i].id + ');">'
 												+ '<section class="icon arrow right"></section>'
@@ -215,17 +219,21 @@ function loadTab(limit,comment) {
 												+ '</a></li>');
 						}
 						
-						var obj = $('#index li');
+						var obj = $('#index span.results li');
 						var feed = $.makeArray(obj);
 						
 						if (feed.length > 5 && results.length >= 10) {
 							limit += 10;
-							$('#index').append('<li class="load_more" onclick="loadTab(' + limit + ');">Tap to View More</li>');
+							$('#index span.results').append('<li class="load_more" onclick="loadTab(' + limit + ');">Tap to View More</li>');
 						} else {
-							$('#index').append('<li class="load_more">end of the line</li>');
+							$('#index span.results').append('<li class="load_more">end of the line</li>');
 						}
 					} else {
-						$('#index').empty().append('<li class="load_more">Your tab is empty, start by adding a beer and following others!</li>');
+						$('#index span.results').empty().append('<li class="load_more">Your tab is empty, start by adding a beer and following others!</li>');
+					}
+					console.log(limit);
+					if (top == 0) {
+						setTimeout("$('html, body').animate({scrollTop: '53px'}, 500)",500);
 					}
 					load();
 				},
@@ -567,11 +575,11 @@ function updateBeerCount(id,unrate) {
 	// remove again option when rating changes
 	$('.arrow-up').removeClass('active');
 	$('.info-list').remove();
-	
-	if (uncount <= 0) {
-		$('ul.' + id + ' li.' + unrate + ' p.rate_count').empty();
-	} else {
+	console.log(uncount);
+	if (uncount > 0) {
 		$('ul.' + id + ' li.' + unrate + ' p.rate_count').empty().append(uncount);
+	} else {
+		$('ul.' + id + ' li.' + unrate + ' p.rate_count').empty();
 	}
 }
 
@@ -680,7 +688,7 @@ function twitterToggle() {
 function share(beer_id,rate,feed_id) {
 	load('Brewing...');
 	var comment = $('#share textarea.comment').val();
-	var send_tweet = ($('ul.rate_controls li.twitter').hasClass('active')) ? true : false;
+	var send_tweet = ($('ul.rate_controls li.twitter').hasClass('active')) ? 'true' : 'false';
 	
 	$.ajax({
 		cache: false,
@@ -1756,6 +1764,54 @@ function getLocation() {
 	}
 }
 
+// --------------------------------------------------------------------------------------
+// REGISTRATION
+// --------------------------------------------------------------------------------------
+
+function finishRegistration() {
+	load('Brewing...');
+	var first_name = $('input#first_name').val();
+	var last_name = $('input#last_name').val();
+	var email = $('input#email').val();
+	var location = $('input#location').val();
+	
+	$.ajax({
+		cache: false,
+		url: '/new-user',
+		data: { first_name: first_name, last_name: last_name, email: email, location: location },
+		success: function(results) {
+					if (results.status == 'success') {
+						window.location='/dashboard#registration';
+					} else {
+						load('Something went wrong!','error');
+						return false;
+					}
+				},
+		error: function() {
+					load('Something went wrong!','error');
+					return false;
+				}
+	});
+}
+
+function followStout() {
+	load('Brewing...');
+	$.ajax({
+		cache: false,
+		url: '/follow-stoutapp',
+		success: function(results) {
+				if (results.status == 'success') {
+					$('#follow_stout a').replaceWith('<a href="javascript:void(0);" class="btn light right">Followed!</a>');
+					load();
+				}
+			},
+		error: function(results) {
+				load('Something went wrong!','error');
+				return false;
+			}
+	});
+}
+
 // jQuery selector functions -------------------------------------------------------
 
 $(document).ready(function() {
@@ -1801,6 +1857,17 @@ $(document).ready(function() {
 	$('#user_name').blur(function() {
 		if ($(this).val() != '') {
 			findFriend();
+		}
+	});
+	
+	$('#index li.tab_heading ul li').click(function() {
+		var type = $(this).attr('id');
+		if ($(this).hasClass('active')) {
+			loadTab(0);
+		} else {
+			$('#index li.tab_heading ul li').removeClass('active');
+			$(this).addClass('active');
+			loadTab(0);
 		}
 	});
 	

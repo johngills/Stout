@@ -1,9 +1,42 @@
-<style>
 /*
    Copyright (c) 2007-11, iUI Project Members
    See LICENSE.txt for licensing terms
    Version 0.40-alpha1
  */
+
+@font-face {
+    font-family: 'OpenSansCondensedLight';
+    src: url('../font/OpenSans-CondLight-webfont.eot');
+    src: url('../font/OpenSans-CondLight-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../font/OpenSans-CondLight-webfont.woff') format('woff'),
+         url('../font/OpenSans-CondLight-webfont.ttf') format('truetype'),
+         url('../font/OpenSans-CondLight-webfont.svg#OpenSansCondensedLight') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'OpenSansCondensedLightItalic';
+    src: url('../font/OpenSans-CondLightItalic-webfont.eot');
+    src: url('../font/OpenSans-CondLightItalic-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../font/OpenSans-CondLightItalic-webfont.woff') format('woff'),
+         url('../font/OpenSans-CondLightItalic-webfont.ttf') format('truetype'),
+         url('../font/OpenSans-CondLightItalic-webfont.svg#OpenSansCondensedLightItalic') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'OpenSansCondensedBold';
+    src: url('../font/OpenSans-CondBold-webfont.eot');
+    src: url('../font/OpenSans-CondBold-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../font/OpenSans-CondBold-webfont.woff') format('woff'),
+         url('../font/OpenSans-CondBold-webfont.ttf') format('truetype'),
+         url('../font/OpenSans-CondBold-webfont.svg#OpenSansCondensedBold') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
 body {
     margin: 0;
     font-family: Helvetica;
@@ -72,7 +105,7 @@ body > .toolbar {
 }
 
 .toolbar > h1 {
-	font: normal 20px "Futura", "Helvetica Neue", "Helvetica", sans-serif;
+	font: normal 24px "OpenSansCondensedBold", "Futura", "Helvetica Neue", "Helvetica", sans-serif;
     color: #ffffff;
     text-shadow: -1px -1px 1px rgba(0, 0, 0, 0.8);
     text-align: center;
@@ -90,6 +123,11 @@ body > .toolbar {
 body.landscape > .toolbar > h1 {
     margin-left: -125px;
     width: 250px;
+}
+
+.toolbar .btn.blue {
+	margin: 5px;
+	padding: 5px 10px;
 }
 
 .button {

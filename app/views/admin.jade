@@ -1,0 +1,22 @@
+body(style="background:url('img/dark_wood.png');")
+
+	input(type="hidden", id="user_name", value="#{user_name}")
+	input(type="hidden", id="user_id", value="#{user_id}")
+	input#latitude(type="hidden")
+	input#longitude(type="hidden")
+
+	section#index(title="Stout Admin", selected="true").ac
+		
+		ul#admin
+			li
+				h3 Total Drinkers
+				p.
+					#{total_drinkers}
+			li
+				h3 Todays Signups
+				p.
+					#{todays_signups}
+			li
+				h3 Yesterdays Signups
+				p.
+					#{yesterdays_signups}

@@ -1,6 +1,6 @@
 CACHE MANIFEST
 
-# Version 1
+# Version 2
 
 CACHE:
 /img/app-startup.hd.png
@@ -14,8 +14,9 @@ CACHE:
 /img/sprite.png
 /img/sprites.png
 /img/stout-app-icon-hd.png
-/img/wood-mahogany.jpg
 /img/wood-mahogany.png
+/img/dark_wood.png
+/img/tab_head-bg.jpg
 /js/iui.js
 /js/jquery.autoSuggest.packed.js
 /js/less-1.2.1.min.js

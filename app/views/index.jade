@@ -1,9 +1,26 @@
-body(onload="storeCheck();")
+body
 
+	input(type="hidden", id="user_name", value="#{user_name}")
+	input(type="hidden", id="user_id", value="#{user_id}")
+	input#latitude(type="hidden")
+	input#longitude(type="hidden")
+	
+	
 	section#index(title="Stout", selected="true").ac.home
-		section#index_beer
-		b STOUT
-		p Rate and track the greatest beverage in the world!
-		p.info Visit Stout from your SmartPhone for the best experience.
-		a(href="/auth/twitter", target="_webapp").btn.twitter Sign in with Twitter
-			span.left
+		section#wrap
+			section#main
+				section.wrapper
+					article.col
+					article.col
+						section#index_beer
+						h1 Stout Beta
+						p Rate and track the greatest beverage in the world!
+						p.info Visit <b>Stout</b> from your <b>SmartPhone</b><br /><br />
+						p.info
+							img(src="/img/stoutapp-qr.png")
+						a(href="/auth/twitter", target="_webapp").btn.twitter Sign in with Twitter
+							span.left
+			
+		footer
+			p
+			| Designed by <a href="http://www.mynameissterling.com/" target="_blank">MyNIS Labs</a> | <a href="http://stoutapp.uservoice.com/" target="_blank">Feedback</a> | <a href="mailto:hello@stoutapp.com">Contact</a>

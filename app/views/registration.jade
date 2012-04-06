@@ -1,0 +1,32 @@
+body
+	section.toolbar
+		a.btn.blue.right(href="javascript:void(0);", onclick="finishRegistration();") Finish
+		h1#pageTitle
+
+	div#registration(title="Registration", selected="true")
+		form
+			fieldset
+				img.avatar(src="#{avatar}")
+				p.
+				| Thanks for joining <br />
+				| <b>#{user_name}</b>! <br />
+				| Please confirm your info
+
+			fieldset.full_name
+				section.col
+					input#first_name(type="text", value="#{first_name}", placeholder="First name")
+				section.col
+					input#last_name(type="text", value="#{last_name}", placeholder="Last name")
+			
+			fieldset
+				section.col_full
+					input#email(type="email", value="", placeholder="Email Address (Optional)")
+
+			fieldset
+				section.col_full
+					input#location(type="text", value="#{location}", placeholder="Location")
+
+		section#follow_stout
+			a.btn.blue.right(href="javascript:void(0);", onclick="followStout();") Follow
+			img(src="/img/stout-app-icon-hd.png")
+			p Follow <b>@StoutApp</b> on Twitter

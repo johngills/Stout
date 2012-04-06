@@ -151,6 +151,56 @@ app.get('/logout', function(req, res) {
 	res.json({'status':'success'});
 });
 
+// --------------------------------------------------------------------------------------
+// REGISTRATION
+// --------------------------------------------------------------------------------------
+
+app.get('/registration', checkAuth, function(req, res) {
+	res.render('registration', {
+		layout: 'home',
+		user_name: req.session.user_name,
+		first_name: req.session.first_name,
+		last_name: req.session.last_name,
+		avatar: req.session.avatar,
+		location: req.session.location,
+		user_id: req.session.user_id,
+		title: 'Stout' });
+});
+
+app.get('/new-user', checkAuth, function(req, res) {
+	// Get user creation datetime
+	var time = new Date();
+	var current = dateToString(time);
+	client.query(
+		'INSERT INTO ' + user_table + ' ' +
+		'SET user_id = ?, user_name = ?, full_name = ?, first_name = ?, last_name = ?, avatar = ?, location = ?, email = ?, access_token = ?, access_token_secret = ?, created_date = ?',
+		[req.session.user_id, req.session.user_name, req.query.first_name + ' ' + req.query.last_name, req.query.first_name, req.query.last_name, req.session.avatar, req.query.location, req.query.email, req.session.oauth.access_token, req.session.oauth.access_token_secret, current],
+		function (err, results, field) {
+			if (err) throw err;
+			if (results != undefined) {
+				console.log(results);
+				res.json({"status":"success"});
+			}
+	});
+});
+
+app.get('/follow-stoutapp', checkAuth, function(req, res) {
+	oa.post(
+		"https://api.twitter.com/1/friendships/create.json",
+		req.session.oauth.access_token, 
+	    req.session.oauth.access_token_secret,
+		{ user_id: 474616790 },
+		function(error, data) {
+			if (error) {
+				console.log(require('sys').inspect(error));
+				res.json({'status':'error'});
+			} else {
+				console.log(data);
+				res.json({'status':'success'});
+			}
+	});
+});
+
 app.get('/dashboard', checkAuth, function(req, res) {	
 	console.log(req.session.user_name);
 	console.log(req.session.user_id);
@@ -163,24 +213,72 @@ app.get('/dashboard', checkAuth, function(req, res) {
 	}
 });
 
+app.get('/admin', function(req, res) {
+	if (req.session.user_name == 'sterlingrules') {
+		var total_drinkers,
+			todays_signups,
+			yesterdays_signups;
+		client.query(
+			'SELECT COUNT(*) AS total_drinkers, today.signups AS todays_signups, yesterday.signups AS yesterdays_signups FROM users, ' +
+			'(SELECT COUNT(*) AS signups FROM users WHERE date(users.created_date) = date(now())) AS today, ' +
+			'(SELECT COUNT(*) AS signups FROM users WHERE date(users.created_date) = date(date_sub(now(),interval 1 day))) AS yesterday',
+			function(err, results, field) {
+				if (err) throw err;
+				if (results != undefined) {
+					console.log(results);
+					total_drinkers = results[0].total_drinkers;
+					todays_signups = results[0].todays_signups;
+					yesterdays_signups = results[0].yesterdays_signups;
+					
+					res.render('admin', {
+						user_name: req.session.user_name,
+						user_id: req.session.user_id,
+						total_drinkers: total_drinkers,
+						todays_signups: todays_signups,
+						yesterdays_signups: yesterdays_signups,
+						title: 'Stout Admin' });
+				}
+		});
+	} else {
+		res.redirect('/');
+	}
+});
+
 app.get('/get-feed', checkAuth, function(req, res) {
 	var time = new Date();
 	var current = dateToString(time);
 	
-	client.query(
-		'SELECT DISTINCT feed.id, feed.user_name, feed.user_id, feed.beer_id, feed.rating, feed.rating_count, feed.comment_count, feed.type, ROUND(TIMESTAMPDIFF(SECOND,feed.created_date,"' + current + '")/60) AS time, users.first_name, users.last_name, users.avatar, beers.name AS beer_name, comment, beer_number.beer_count '
-			+ 'FROM feed, beers, users, followers, '
-			+ '(SELECT DISTINCT feed.user_id, COUNT(feed.beer_id) AS beer_count FROM feed, users WHERE feed.user_id = users.user_id) AS beer_number '
-			+ 'WHERE ((feed.user_id = users.user_id) AND (feed.beer_id = beers.id)) AND (((followers.owner_id = feed.user_id) AND (followers.follower_id = ' + req.session.user_id + ')) '
-			+ 'OR ((feed.user_id = ' + req.session.user_id + '))) '
-			+ 'ORDER BY feed.created_date DESC LIMIT ' + req.query.limit + ',10 ',
-		function(err, results, field) {
-			if (err) throw err;
-			if (results != undefined) {
-				console.log(results);
-				res.send(results);
-			}
-		});
+	console.log(req.query.sort);
+	if (req.query.sort == 'following') {	
+		client.query(
+			'SELECT DISTINCT feed.id, feed.user_name, feed.user_id, feed.beer_id, feed.rating, feed.rating_count, feed.comment_count, feed.type, ROUND(TIMESTAMPDIFF(SECOND,feed.created_date,"' + current + '")/60) AS time, users.first_name, users.last_name, users.avatar, beers.name AS beer_name, comment, beer_number.beer_count '
+				+ 'FROM feed, beers, users, followers, '
+				+ '(SELECT DISTINCT feed.user_id, COUNT(feed.beer_id) AS beer_count FROM feed, users WHERE feed.user_id = users.user_id) AS beer_number '
+				+ 'WHERE ((feed.user_id = users.user_id) AND (feed.beer_id = beers.id)) AND (((followers.owner_id = feed.user_id) AND (followers.follower_id = ' + req.session.user_id + ')) '
+				+ 'OR ((feed.user_id = ' + req.session.user_id + '))) '
+				+ 'ORDER BY feed.created_date DESC LIMIT ' + req.query.limit + ',10 ',
+			function(err, results, field) {
+				if (err) throw err;
+				if (results != undefined) {
+					console.log(results);
+					res.send(results);
+				}
+			});
+	} else {
+		client.query(
+			'SELECT DISTINCT feed.id, feed.user_name, feed.user_id, feed.beer_id, feed.rating, feed.rating_count, feed.comment_count, feed.type, ROUND(TIMESTAMPDIFF(SECOND,feed.created_date,"' + current + '")/60) AS time, users.first_name, users.last_name, users.avatar, beers.name AS beer_name, comment, beer_number.beer_count '
+				+ 'FROM feed, beers, users, followers, '
+				+ '(SELECT DISTINCT feed.user_id, COUNT(feed.beer_id) AS beer_count FROM feed, users WHERE feed.user_id = users.user_id) AS beer_number '
+				+ 'WHERE ((feed.user_id = users.user_id) AND (feed.beer_id = beers.id)) '
+				+ 'ORDER BY feed.created_date DESC LIMIT ' + req.query.limit + ',10 ',
+			function(err, results, field) {
+				if (err) throw err;
+				if (results != undefined) {
+					console.log(results);
+					res.send(results);
+				}
+			});
+	}
 });
 
 // Feed Detail
@@ -243,7 +341,7 @@ app.get('/beer-detail', checkAuth, function(req, res) {
 		+ 'LEFT OUTER JOIN todrink ON (todrink.user_id = ' + req.session.user_id + ' AND todrink.beer_id = ' + req.query.beer_id + ') '
 		+ 'LEFT OUTER JOIN feed ON (feed.user_id = ' + req.session.user_id + ' AND feed.beer_id = ' + req.query.beer_id + ') '
 		+ 'WHERE (beers.id = ' + req.query.beer_id + ') AND (beers.brewery_id = breweries.id) AND (beers.cat_id = categories.id) AND (beers.style_id = styles.id) '
-		+ 'ORDER BY beers.last_mod DESC',
+		+ 'ORDER BY feed.created_date DESC',
 		function(err, results, field) {
 			if (err) throw err;
 			console.log(results);
@@ -332,6 +430,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 	var rating_count = 1;
 	
 	console.log('beerid: ' + req.query.beer_id);
+	console.log(req.query.unrate);
 	
 	// Check if user is re-rating a beer
 	if (req.query.unrate != '') {
@@ -340,14 +439,128 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 			'DELETE FROM feed WHERE feed.id = ' + req.query.feed_id,
 			function(err, results, fields) {
 				console.log(results);
-		});
-		// Find the beer count to update the rating_count
-		client.query(
-			'SELECT COUNT(feed.beer_id) AS count FROM feed WHERE feed.user_id = ' + req.session.user_id + ' AND feed.beer_id = ' + req.query.beer_id,
-			function(err, results, fields) {
-				console.log(results);
-				console.log(results[0].count);
-				rating_count += results[0].count; // getting current number
+				
+				if (results == undefined) {
+					// If no feed_id then delete latest item
+					client.query(
+						'SELECT beers.name, feed.beer_id, feed.id, feed.created_date FROM feed, beers WHERE feed.user_id = ' + req.session.user_id + ' AND feed.beer_id = beers.id AND feed.created_date = (SELECT MAX(feed.created_date) FROM feed)',
+						function(err, results, fields) {
+							console.log(results);
+							client.query('DELETE FROM feed WHERE feed.id = ' + results[0].id,
+								function(err, results, fields) {
+									console.log(results);
+									// Find the beer count to update the rating_count
+									client.query(
+										'SELECT COUNT(feed.beer_id) AS count FROM feed WHERE feed.user_id = ' + req.session.user_id + ' AND feed.beer_id = ' + req.query.beer_id,
+										function(err, results, fields) {
+											console.log(results);
+											console.log(results[0].count);
+											rating_count += results[0].count; // getting current number
+											
+											client.query(
+												'UPDATE beers SET beers.' + req.query.rate + ' = beers.' + req.query.rate + ' + 1' + unrate + ', last_mod = "' + current + '" WHERE id = ' + req.query.beer_id + ';',
+												function(err, results, fields) {
+													if (err) throw err;
+													if (results != undefined) {
+														console.log(results);
+														var rate = '';
+														switch(req.query.rate) {
+															case 'love':
+																rate = 1;
+																break;
+															case 'like':
+																rate = 2;
+																break;
+															case 'meh':
+																rate = 3;
+																break;
+															case 'dislike':
+																rate = 4;
+																break;
+														}
+														client.query(
+															'INSERT INTO feed ' +
+															'SET user_id = ?, user_name = ?, beer_id = ?, type = ?, rating = ?, rating_count = ?, latitude = ?, longitude = ?, created_date = ? ',
+															[req.session.user_id, req.session.user_name, req.query.beer_id, "RATE", rate, rating_count, req.query.latitude, req.query.longitude, current],
+															function(err, results, fields) {
+																if (err) throw err;
+																console.log(results);
+																res.json({"status": "success", "feed_id": results.insertId, "beer_id": req.query.beer_id, "rate": rate });
+																// Add notification
+																if (req.query.partner_id != req.session.user_id) { // makes sure owner and current user aren't the same
+																	client.query(
+																		'INSERT INTO notifications ' +
+																		'SET owner_id = ?, partner_id = ?, type = ?, feed_id = ?, created_date = ?',
+																		[req.query.partner_id, req.session.user_id, "RATE", results.insertId, current],
+																		function(err, sql_results, fields) {
+																			if (err) throw err;
+																	});
+																}
+															}
+														);
+													} else {
+														res.json({"status":"failure"});
+													}
+												});
+									});
+							});
+					});
+				} else {
+					// Find the beer count to update the rating_count
+					client.query(
+						'SELECT COUNT(feed.beer_id) AS count FROM feed WHERE feed.user_id = ' + req.session.user_id + ' AND feed.beer_id = ' + req.query.beer_id,
+						function(err, results, fields) {
+							console.log(results);
+							console.log(results[0].count);
+							rating_count += results[0].count; // getting current number
+							
+							client.query(
+								'UPDATE beers SET beers.' + req.query.rate + ' = beers.' + req.query.rate + ' + 1' + unrate + ', last_mod = "' + current + '" WHERE id = ' + req.query.beer_id + ';',
+								function(err, results, fields) {
+									if (err) throw err;
+									if (results != undefined) {
+										console.log(results);
+										var rate = '';
+										switch(req.query.rate) {
+											case 'love':
+												rate = 1;
+												break;
+											case 'like':
+												rate = 2;
+												break;
+											case 'meh':
+												rate = 3;
+												break;
+											case 'dislike':
+												rate = 4;
+												break;
+										}
+										client.query(
+											'INSERT INTO feed ' +
+											'SET user_id = ?, user_name = ?, beer_id = ?, type = ?, rating = ?, rating_count = ?, latitude = ?, longitude = ?, created_date = ? ',
+											[req.session.user_id, req.session.user_name, req.query.beer_id, "RATE", rate, rating_count, req.query.latitude, req.query.longitude, current],
+											function(err, results, fields) {
+												if (err) throw err;
+												console.log(results);
+												res.json({"status": "success", "feed_id": results.insertId, "beer_id": req.query.beer_id, "rate": rate });
+												// Add notification
+												if (req.query.partner_id != req.session.user_id) { // makes sure owner and current user aren't the same
+													client.query(
+														'INSERT INTO notifications ' +
+														'SET owner_id = ?, partner_id = ?, type = ?, feed_id = ?, created_date = ?',
+														[req.query.partner_id, req.session.user_id, "RATE", results.insertId, current],
+														function(err, sql_results, fields) {
+															if (err) throw err;
+													});
+												}
+											}
+										);
+									} else {
+										res.json({"status":"failure"});
+									}
+								});
+					});
+				}
 		});
 	} else {
 		// Find the beer count to update the rating_count
@@ -357,54 +570,54 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 				console.log(results);
 				console.log(results[0].count);
 				rating_count += results[0].count; // getting current number + 1
-		});
-	}
-	
-	client.query(
-		'UPDATE beers SET beers.' + req.query.rate + ' = beers.' + req.query.rate + ' + 1' + unrate + ', last_mod = "' + current + '" WHERE id = ' + req.query.beer_id + ';',
-		function(err, sql_results, fields) {
-			if (err) throw err;
-			if (sql_results != undefined) {
-				console.log(sql_results);
-				var rate = '';
-				switch(req.query.rate) {
-					case 'love':
-						rate = 1;
-						break;
-					case 'like':
-						rate = 2;
-						break;
-					case 'meh':
-						rate = 3;
-						break;
-					case 'dislike':
-						rate = 4;
-						break;
-				}
+				
 				client.query(
-					'INSERT INTO feed ' +
-					'SET user_id = ?, user_name = ?, beer_id = ?, type = ?, rating = ?, rating_count = ?, latitude = ?, longitude = ?, created_date = ? ',
-					[req.session.user_id, req.session.user_name, req.query.beer_id, "RATE", rate, rating_count, req.query.latitude, req.query.longitude, current],
+					'UPDATE beers SET beers.' + req.query.rate + ' = beers.' + req.query.rate + ' + 1' + unrate + ', last_mod = "' + current + '" WHERE id = ' + req.query.beer_id + ';',
 					function(err, results, fields) {
 						if (err) throw err;
-						console.log(results);
-						res.json({"status": "success", "feed_id": results.insertId, "beer_id": req.query.beer_id, "rate": rate });
-						// Add notification
-						if (req.query.partner_id != req.session.user_id) { // makes sure owner and current user aren't the same
+						if (results != undefined) {
+							console.log(results);
+							var rate = '';
+							switch(req.query.rate) {
+								case 'love':
+									rate = 1;
+									break;
+								case 'like':
+									rate = 2;
+									break;
+								case 'meh':
+									rate = 3;
+									break;
+								case 'dislike':
+									rate = 4;
+									break;
+							}
 							client.query(
-								'INSERT INTO notifications ' +
-								'SET owner_id = ?, partner_id = ?, type = ?, feed_id = ?, created_date = ?',
-								[req.query.partner_id, req.session.user_id, "RATE", results.insertId, current],
-								function(err, sql_results, fields) {
+								'INSERT INTO feed ' +
+								'SET user_id = ?, user_name = ?, beer_id = ?, type = ?, rating = ?, rating_count = ?, latitude = ?, longitude = ?, created_date = ? ',
+								[req.session.user_id, req.session.user_name, req.query.beer_id, "RATE", rate, rating_count, req.query.latitude, req.query.longitude, current],
+								function(err, results, fields) {
 									if (err) throw err;
-							});
+									console.log(results);
+									res.json({"status": "success", "feed_id": results.insertId, "beer_id": req.query.beer_id, "rate": rate });
+									// Add notification
+									if (req.query.partner_id != req.session.user_id) { // makes sure owner and current user aren't the same
+										client.query(
+											'INSERT INTO notifications ' +
+											'SET owner_id = ?, partner_id = ?, type = ?, feed_id = ?, created_date = ?',
+											[req.query.partner_id, req.session.user_id, "RATE", results.insertId, current],
+											function(err, sql_results, fields) {
+												if (err) throw err;
+										});
+									}
+								}
+							);
+						} else {
+							res.json({"status":"failure"});
 						}
-					}
-				);
-			} else {
-				res.json({"status":"failure"});
-			}
+					});
 		});
+	}
 });
 
 app.get('/add-to-drink-list', checkAuth, function(req, res) {
@@ -487,10 +700,10 @@ app.get('/share-beer', checkAuth, function(req, res) {
 		res.json({"status":"success"});
 	}
 	
-	console.log(req.query.send_tweet);
+	console.log('send tweet? ' + req.query.send_tweet);
 	
 	// Tweet
-	if (req.query.send_tweet) {
+	if (req.query.send_tweet == 'true') {
 		console.log('got into the tweet statement check');
 		client.query(
 			'SELECT access_token, access_token_secret, name AS beer_name FROM users, beers WHERE beers.id = ' + req.query.beer_id + ' AND user_id = ' + req.session.user_id,
@@ -645,7 +858,7 @@ app.get('/find-friend', checkAuth, function(req, res) {
 app.get('/send-twitter-invite', checkAuth, function(req, res) {
 	
 	var text = $.makeArray();
-	var i = Math.floor(6*Math.random());
+	var i = Math.floor(7*Math.random());
 	
    	text[0] = '@' + req.query.screen_name + ' Check out what beer I\'m drinking on @StoutApp - http://www.stoutapp.com/';
    	text[1] = '@' + req.query.screen_name + ' Have a beer with me on @StoutApp - http://www.stoutapp.com/';
@@ -653,6 +866,7 @@ app.get('/send-twitter-invite', checkAuth, function(req, res) {
 	text[3] = '@' + req.query.screen_name + ' The sum of the matter is, the people drink because they wish to drink. Drink with me on @StoutApp - http://www.stoutapp.com/';
 	text[4] = '@' + req.query.screen_name + ' Everybody has to believe in something... I believe I\'ll have another drink. Drink with me on @StoutApp - http://www.stoutapp.com/';
 	text[5] = '@' + req.query.screen_name + ' I drink to make other people interesting. Drink with me on @StoutApp - http://www.stoutapp.com/';
+	text[6] = '@' + req.query.screen_name + ' Time is never wasted when you\'re wasted all the time. Get wasted with me on @StoutApp - http://www.stoutapp.com/';
 
 	client.query(
 		'SELECT access_token, access_token_secret FROM users WHERE user_id = ' + req.session.user_id,
@@ -915,26 +1129,43 @@ app.get('/auth/twitter/callback', function(req, res, next) {
 						} else {
 							console.log(current);
 							var user_name = results.screen_name;
+							
 							// session storage
 							req.session.user_name = user_name;
 							req.session.user_id = results.user_id;
 							
-							$.ajax({
-								cache: false,
-								url: 'https://api.twitter.com/1/users/show.json',
-								data: { screen_name: results.screen_name, user_id: results.user_id },
-								dataType: 'jsonp',
-								success: function(data) {
-											req.session.avatar = data.profile_image_url; // add avatar to session
-											var full_name = data.name;
-											var name = full_name.split(' ');
-											client.query(
-												'INSERT INTO ' + user_table + ' ' +
-												'SET user_id = ?, user_name = ?, full_name = ?, first_name = ?, last_name = ?, avatar = ?, access_token = ?, access_token_secret = ?, created_date = ?',
-												[results.user_id, results.screen_name, full_name, name[0], name[1], req.session.avatar, oauth_access_token, oauth_access_token_secret, current]
-											);
-											res.redirect('/dashboard');
-										}
+							// Get user creation datetime
+							var time = new Date();
+							var current = dateToString(time);
+
+							oa.getProtectedResource(
+								"https://api.twitter.com/1/users/lookup.json?user_id=" + req.session.user_id,
+								"GET",
+								req.session.oauth.access_token,
+								req.session.oauth.access_token_secret,
+								function(error, results) {
+									if (error) {
+										console.log(require('sys').inspect(error));
+									} else {
+										console.log(results);
+										var data = $.parseJSON(results);
+
+										var full_name = data[0].name;
+										var name = full_name.split(' ');				
+										req.session.avatar = data[0].profile_image_url; // add avatar to session
+										req.session.first_name = (name[0] == undefined) ? '' : name[0];
+										req.session.last_name = (name[1] == undefined) ? '' : name[1];
+										req.session.location = data[0].location;
+
+										console.log(req.session.user_name);
+										console.log(req.session.first_name);
+										console.log(req.session.last_name);
+										console.log(req.session.avatar);
+										console.log(req.session.user_id);
+										
+										res.redirect('/registration');
+										
+									}
 							});
 						}
 					});
