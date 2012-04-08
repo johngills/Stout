@@ -729,7 +729,7 @@ app.get('/share-beer', checkAuth, function(req, res) {
 						break;
 				}
 				
-				var msg = share + req.query.comment;
+				var msg = share + decodeURIComponent(req.query.comment);
 				var tweet = msg.substring(0,90);
 				console.log(tweet + " - http://www.stoutapp.com/detail/" + req.query.feed_id + " (via @StoutApp)");
 				
