@@ -34,7 +34,7 @@ var app = express.createServer(
 				express.cookieParser(),
 				express.session({secret: 'FlurbleGurgleBurgle',
 				                store: new express.session.MemoryStore({ reapInterval: -1 }) }));
-app.listen(1337);
+app.listen(8989);
 //app.listen(80);
 
 process.on('uncaughtException', function(err) {
@@ -51,19 +51,19 @@ app.enable('jsonp callback');
 // DATABASE
 // --------------------------------------------------------------------------------------
 
-// var mysql = require('mysql'),
-// 	database = 'stout',
-// 	user_table = 'users',
-// 	client = mysql.createClient({ user: 'sterlingrules', password: '@y&7~s45', host: 'mysql.mynameissterling.com', port: 3306 });
-// 	client.query('USE ' + database);
-// 	client.database = 'stout';
-
 var mysql = require('mysql'),
-	database = 'beer',
+	database = 'stout',
 	user_table = 'users',
-	client = mysql.createClient({ user: 'root', password: '' });
+	client = mysql.createClient({ user: 'sterlingrules', password: '@y&7~s45', host: 'mysql.mynameissterling.com', port: 3306 });
 	client.query('USE ' + database);
-	client.database = 'beer';
+	client.database = 'stout';
+
+// var mysql = require('mysql'),
+// 	database = 'beer',
+// 	user_table = 'users',
+// 	client = mysql.createClient({ user: 'root', password: '' });
+// 	client.query('USE ' + database);
+// 	client.database = 'beer';
 
 // --------------------------------------------------------------------------------------
 // OAUTH SETUP
@@ -75,8 +75,8 @@ var oa = new OAuth(
 	"Nmqm7UthsfdjaDQ4HcxPw",
 	"PIFvIPSXlTIbqnnnjBIqoWs0VIxpQivNrIJuWxtkLI",
 	"1.0",
-	"http://localhost:1337/auth/twitter/callback",
-	//"http://stoutapp.com/auth/twitter/callback",
+	"http://stoutapp.com:8989/auth/twitter/callback",
+	//"http://localhost:1337/auth/twitter/callback",
 	"HMAC-SHA1"
 );
 
@@ -84,15 +84,19 @@ var oa = new OAuth(
 // COMMON FUNCTIONS
 // --------------------------------------------------------------------------------------
 
+// function checkAuth(req, res, next) {
+// 	if (req.session.user_name == undefined) {
+// 		delete req.session.user_name;
+// 		delete req.session.user_id;
+// 		console.log('attempted to redirect to index...');
+// 		res.redirect('/');
+// 	} else {
+// 		next();
+// 	}
+// }
+
 function checkAuth(req, res, next) {
-	if (req.session.user_name == undefined) {
-		delete req.session.user_name;
-		delete req.session.user_id;
-		console.log('attempted to redirect to index...');
-		res.redirect('/');
-	} else {
-		next();
-	}
+	next();
 }
 
 function hasNumbers(t) {
@@ -249,13 +253,14 @@ app.get('/get-feed', checkAuth, function(req, res) {
 	var current = dateToString(time);
 	
 	console.log(req.query.sort);
+	console.log('got here');
 	if (req.query.sort == 'following') {	
 		client.query(
 			'SELECT DISTINCT feed.id, feed.user_name, feed.user_id, feed.beer_id, feed.rating, feed.rating_count, feed.comment_count, feed.type, ROUND(TIMESTAMPDIFF(SECOND,feed.created_date,"' + current + '")/60) AS time, users.first_name, users.last_name, users.avatar, beers.name AS beer_name, comment, beer_number.beer_count '
 				+ 'FROM feed, beers, users, followers, '
 				+ '(SELECT DISTINCT feed.user_id, COUNT(feed.beer_id) AS beer_count FROM feed, users WHERE feed.user_id = users.user_id) AS beer_number '
-				+ 'WHERE ((feed.user_id = users.user_id) AND (feed.beer_id = beers.id)) AND (((followers.owner_id = feed.user_id) AND (followers.follower_id = ' + req.session.user_id + ')) '
-				+ 'OR ((feed.user_id = ' + req.session.user_id + '))) '
+				+ 'WHERE ((feed.user_id = users.user_id) AND (feed.beer_id = beers.id)) AND (((followers.owner_id = feed.user_id) AND (followers.follower_id = ' + req.query.user_id + ')) '
+				+ 'OR ((feed.user_id = ' + req.query.user_id + '))) '
 				+ 'ORDER BY feed.created_date DESC LIMIT ' + req.query.limit + ',10 ',
 			function(err, results, field) {
 				if (err) throw err;
@@ -338,8 +343,8 @@ app.get('/beer-detail', checkAuth, function(req, res) {
 	client.query(
 		'SELECT beers.name, beers.description, beers.abv, beers.love, beers.like, beers.meh, beers.dislike, beers.last_mod, breweries.name AS brewery, categories.cat_name, styles.style_name, feed.rating, todrink.id AS addtodrink '
 		+ 'FROM beers, breweries, categories, styles '
-		+ 'LEFT OUTER JOIN todrink ON (todrink.user_id = ' + req.session.user_id + ' AND todrink.beer_id = ' + req.query.beer_id + ') '
-		+ 'LEFT OUTER JOIN feed ON (feed.user_id = ' + req.session.user_id + ' AND feed.beer_id = ' + req.query.beer_id + ') '
+		+ 'LEFT OUTER JOIN todrink ON (todrink.user_id = ' + req.query.user_id + ' AND todrink.beer_id = ' + req.query.beer_id + ') '
+		+ 'LEFT OUTER JOIN feed ON (feed.user_id = ' + req.query.user_id + ' AND feed.beer_id = ' + req.query.beer_id + ') '
 		+ 'WHERE (beers.id = ' + req.query.beer_id + ') AND (beers.brewery_id = breweries.id) AND (beers.cat_id = categories.id) AND (beers.style_id = styles.id) '
 		+ 'ORDER BY feed.created_date DESC',
 		function(err, results, field) {
@@ -406,7 +411,7 @@ app.get('/new-beer', checkAuth, function(req, res) {
 				client.query( // add new brewery with id to new beer
 					'INSERT INTO beers ' +
 					'SET name = ?, brewery_id = ?, description = ?, cat_id = ?, style_id = ?, abv = ?, last_mod = ?, creator_id = ?, creator_name = ?',
-					[name, brewery, description, category, style, abv, current, req.session.user_id, req.session.user_name],
+					[name, brewery, description, category, style, abv, current, req.query.user_id, req.query.user_name],
 					function(err, results, fields) {
 						if (err) throw err;
 						console.log(results.insertId);
@@ -452,7 +457,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 				if (results == undefined) {
 					// If no feed_id then delete latest item
 					client.query(
-						'SELECT beers.name, feed.beer_id, feed.id, feed.created_date FROM feed, beers WHERE feed.user_id = ' + req.session.user_id + ' AND feed.beer_id = beers.id AND feed.created_date = (SELECT MAX(feed.created_date) FROM feed)',
+						'SELECT beers.name, feed.beer_id, feed.id, feed.created_date FROM feed, beers WHERE feed.user_id = ' + req.query.user_id + ' AND feed.beer_id = beers.id AND feed.created_date = (SELECT MAX(feed.created_date) FROM feed)',
 						function(err, results, fields) {
 							console.log(results);
 							client.query('DELETE FROM feed WHERE feed.id = ' + results[0].id,
@@ -460,7 +465,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 									console.log(results);
 									// Find the beer count to update the rating_count
 									client.query(
-										'SELECT COUNT(feed.beer_id) AS count FROM feed WHERE feed.user_id = ' + req.session.user_id + ' AND feed.beer_id = ' + req.query.beer_id,
+										'SELECT COUNT(feed.beer_id) AS count FROM feed WHERE feed.user_id = ' + req.query.user_id + ' AND feed.beer_id = ' + req.query.beer_id,
 										function(err, results, fields) {
 											console.log(results);
 											console.log(results[0].count);
@@ -490,17 +495,17 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 														client.query(
 															'INSERT INTO feed ' +
 															'SET user_id = ?, user_name = ?, beer_id = ?, type = ?, rating = ?, rating_count = ?, latitude = ?, longitude = ?, created_date = ? ',
-															[req.session.user_id, req.session.user_name, req.query.beer_id, "RATE", rate, rating_count, req.query.latitude, req.query.longitude, current],
+															[req.query.user_id, req.query.user_name, req.query.beer_id, "RATE", rate, rating_count, req.query.latitude, req.query.longitude, current],
 															function(err, results, fields) {
 																if (err) throw err;
 																console.log(results);
 																res.json({"status": "success", "feed_id": results.insertId, "beer_id": req.query.beer_id, "rate": rate });
 																// Add notification
-																if (req.query.partner_id != req.session.user_id) { // makes sure owner and current user aren't the same
+																if (req.query.partner_id != req.query.user_id) { // makes sure owner and current user aren't the same
 																	client.query(
 																		'INSERT INTO notifications ' +
 																		'SET owner_id = ?, partner_id = ?, type = ?, feed_id = ?, created_date = ?',
-																		[req.query.partner_id, req.session.user_id, "RATE", results.insertId, current],
+																		[req.query.partner_id, req.query.user_id, "RATE", results.insertId, current],
 																		function(err, sql_results, fields) {
 																			if (err) throw err;
 																	});
@@ -517,7 +522,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 				} else {
 					// Find the beer count to update the rating_count
 					client.query(
-						'SELECT COUNT(feed.beer_id) AS count FROM feed WHERE feed.user_id = ' + req.session.user_id + ' AND feed.beer_id = ' + req.query.beer_id,
+						'SELECT COUNT(feed.beer_id) AS count FROM feed WHERE feed.user_id = ' + req.query.user_id + ' AND feed.beer_id = ' + req.query.beer_id,
 						function(err, results, fields) {
 							console.log(results);
 							console.log(results[0].count);
@@ -547,17 +552,17 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 										client.query(
 											'INSERT INTO feed ' +
 											'SET user_id = ?, user_name = ?, beer_id = ?, type = ?, rating = ?, rating_count = ?, latitude = ?, longitude = ?, created_date = ? ',
-											[req.session.user_id, req.session.user_name, req.query.beer_id, "RATE", rate, rating_count, req.query.latitude, req.query.longitude, current],
+											[req.query.user_id, req.query.user_name, req.query.beer_id, "RATE", rate, rating_count, req.query.latitude, req.query.longitude, current],
 											function(err, results, fields) {
 												if (err) throw err;
 												console.log(results);
 												res.json({"status": "success", "feed_id": results.insertId, "beer_id": req.query.beer_id, "rate": rate });
 												// Add notification
-												if (req.query.partner_id != req.session.user_id) { // makes sure owner and current user aren't the same
+												if (req.query.partner_id != req.query.user_id) { // makes sure owner and current user aren't the same
 													client.query(
 														'INSERT INTO notifications ' +
 														'SET owner_id = ?, partner_id = ?, type = ?, feed_id = ?, created_date = ?',
-														[req.query.partner_id, req.session.user_id, "RATE", results.insertId, current],
+														[req.query.partner_id, req.query.user_id, "RATE", results.insertId, current],
 														function(err, sql_results, fields) {
 															if (err) throw err;
 													});
@@ -574,7 +579,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 	} else {
 		// Find the beer count to update the rating_count
 		client.query(
-			'SELECT COUNT(feed.beer_id) AS count FROM feed WHERE feed.user_id = ' + req.session.user_id + ' AND feed.beer_id = ' + req.query.beer_id,
+			'SELECT COUNT(feed.beer_id) AS count FROM feed WHERE feed.user_id = ' + req.query.user_id + ' AND feed.beer_id = ' + req.query.beer_id,
 			function(err, results, fields) {
 				console.log(results);
 				console.log(results[0].count);
@@ -604,17 +609,17 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 							client.query(
 								'INSERT INTO feed ' +
 								'SET user_id = ?, user_name = ?, beer_id = ?, type = ?, rating = ?, rating_count = ?, latitude = ?, longitude = ?, created_date = ? ',
-								[req.session.user_id, req.session.user_name, req.query.beer_id, "RATE", rate, rating_count, req.query.latitude, req.query.longitude, current],
+								[req.query.user_id, req.query.user_name, req.query.beer_id, "RATE", rate, rating_count, req.query.latitude, req.query.longitude, current],
 								function(err, results, fields) {
 									if (err) throw err;
 									console.log(results);
 									res.json({"status": "success", "feed_id": results.insertId, "beer_id": req.query.beer_id, "rate": rate });
 									// Add notification
-									if (req.query.partner_id != req.session.user_id) { // makes sure owner and current user aren't the same
+									if (req.query.partner_id != req.query.user_id) { // makes sure owner and current user aren't the same
 										client.query(
 											'INSERT INTO notifications ' +
 											'SET owner_id = ?, partner_id = ?, type = ?, feed_id = ?, created_date = ?',
-											[req.query.partner_id, req.session.user_id, "RATE", results.insertId, current],
+											[req.query.partner_id, req.query.user_id, "RATE", results.insertId, current],
 											function(err, sql_results, fields) {
 												if (err) throw err;
 										});
@@ -635,19 +640,19 @@ app.get('/add-to-drink-list', checkAuth, function(req, res) {
 	if (!req.query.removeList) {
 		console.log(req.query.removeList);
 		client.query( // Removes record from ToDrink table
-			'DELETE FROM todrink WHERE beer_id = ' + req.query.beer_id + ' AND user_id = ' + req.session.user_id,
+			'DELETE FROM todrink WHERE beer_id = ' + req.query.beer_id + ' AND user_id = ' + req.query.user_id,
 			function(err, results, fields) {
 				if (err) throw err;
 				console.log(results);
 				client.query( // Removes record from Feed table
-					'DELETE FROM feed WHERE beer_id = ' + req.query.beer_id + ' AND user_id = ' + req.session.user_id + ' AND type = "LIST"',
+					'DELETE FROM feed WHERE beer_id = ' + req.query.beer_id + ' AND user_id = ' + req.query.user_id + ' AND type = "LIST"',
 					function(err, results, fields) {
 						if (err) throw err;
 						console.log(results);
 						res.json({"status":"success"});
 						// Delete notification
 						client.query(
-							'DELETE FROM notifications WHERE beer_id = ' + req.query.beer_id + ' AND partner_id = ' + req.session.user_id + ' AND type = "LIST";',
+							'DELETE FROM notifications WHERE beer_id = ' + req.query.beer_id + ' AND partner_id = ' + req.query.user_id + ' AND type = "LIST";',
 							function(err, sql_results, fields) {
 								if (err) throw err;
 						});
@@ -658,24 +663,24 @@ app.get('/add-to-drink-list', checkAuth, function(req, res) {
 		client.query(
 			'INSERT INTO todrink ' +
 			'SET beer_id = ?, user_id = ?, user_name = ?, created_date = ?',
-			[req.query.beer_id, req.session.user_id, req.session.user_name, current],
+			[req.query.beer_id, req.query.user_id, req.query.user_name, current],
 			function(err, results, fields) {
 				if (err) throw err;
 				console.log(results);
 				client.query(
 					'INSERT INTO feed ' +
 					'SET user_id = ?, user_name = ?, beer_id = ?, type = ?, created_date = ? ',
-					[req.session.user_id, req.session.user_name, req.query.beer_id, "LIST", current],
+					[req.query.user_id, req.query.user_name, req.query.beer_id, "LIST", current],
 					function(err, results, fields) {
 						if (err) throw err;
 						console.log(results);
 						res.json({"status":"success"});
 						// Add notification
-						if (req.query.partner_id != req.session.user_id) { // makes sure owner and current user aren't the same
+						if (req.query.partner_id != req.query.user_id) { // makes sure owner and current user aren't the same
 							client.query(
 								'INSERT INTO notifications ' +
 								'SET owner_id = ?, partner_id = ?, type = ?, feed_id = ?, beer_id = ?, created_date = ?',
-								[req.query.partner_id, req.session.user_id, "LIST", results.insertId, req.query.beer_id, current],
+								[req.query.partner_id, req.query.user_id, "LIST", results.insertId, req.query.beer_id, current],
 								function(err, sql_results, fields) {
 									if (err) throw err;
 							});
@@ -694,7 +699,7 @@ app.get('/share-beer', checkAuth, function(req, res) {
 		client.query(
 			'INSERT INTO comments ' +
 			'SET feed_id = ?, owner_id = ?, partner_id = ?, beer_id = ?, rating = ?, comment = ?, created_date = ?',
-			[req.query.feed_id, req.session.user_id, req.session.user_id, req.query.beer_id, req.query.rating, req.query.comment, current],
+			[req.query.feed_id, req.query.user_id, req.query.user_id, req.query.beer_id, req.query.rating, req.query.comment, current],
 			function(err, results, fields) {
 				if (err) throw err;
 				console.log(results);
@@ -715,7 +720,7 @@ app.get('/share-beer', checkAuth, function(req, res) {
 	if (req.query.send_tweet == 'true') {
 		console.log('got into the tweet statement check');
 		client.query(
-			'SELECT access_token, access_token_secret, name AS beer_name FROM users, beers WHERE beers.id = ' + req.query.beer_id + ' AND user_id = ' + req.session.user_id,
+			'SELECT access_token, access_token_secret, name AS beer_name FROM users, beers WHERE beers.id = ' + req.query.beer_id + ' AND user_id = ' + req.query.user_id,
 			function(err, results, fields) {
 				if (err) throw err;
 				console.log(results);
@@ -765,7 +770,7 @@ app.get('/add-comment', checkAuth, function(req, res) {
 	client.query(
 		'INSERT INTO comments ' +
 		'SET feed_id = ?, owner_id = ?, partner_id = ?, beer_id = ?, rating = ?, comment = ?, created_date = ?',
-		[req.query.feed_id, req.query.owner_id, req.session.user_id, req.query.beer_id, req.query.rating, req.query.comment, current],
+		[req.query.feed_id, req.query.owner_id, req.query.user_id, req.query.beer_id, req.query.rating, req.query.comment, current],
 		function(err, sql_results, fields) {
 			if (err) throw err;
 			console.log(sql_results);
@@ -774,17 +779,17 @@ app.get('/add-comment', checkAuth, function(req, res) {
 					if (err) throw err;
 					console.log(results);
 					// Add notification
-					if (req.query.owner_id != req.session.user_id) { // makes sure owner and current user aren't the same
+					if (req.query.owner_id != req.query.user_id) { // makes sure owner and current user aren't the same
 						client.query(
 							'INSERT INTO notifications ' +
 							'SET owner_id = ?, partner_id = ?, type = ?, feed_id = ?, created_date = ?',
-							[req.query.owner_id, req.session.user_id, "COMMENT", req.query.feed_id, current],
+							[req.query.owner_id, req.query.user_id, "COMMENT", req.query.feed_id, current],
 							function(err, sql_results, fields) {
 								if (err) throw err;
 						});
 					}
 					client.query( // grabs user info for comment
-						'SELECT users.user_id, users.first_name, users.last_name, users.avatar FROM users WHERE users.user_id = ' + req.session.user_id + ';', // change to store these in the session
+						'SELECT users.user_id, users.first_name, users.last_name, users.avatar FROM users WHERE users.user_id = ' + req.query.user_id + ';', // change to store these in the session
 						function(err, results, fields) {
 							console.log(results);
 							res.send(results);
@@ -795,7 +800,7 @@ app.get('/add-comment', checkAuth, function(req, res) {
 
 app.get('/get-twitter-friends', checkAuth, function(req, res) {
 	client.query(
-		'SELECT access_token, access_token_secret FROM users WHERE user_id = ' + req.session.user_id,
+		'SELECT access_token, access_token_secret FROM users WHERE user_id = ' + req.query.user_id,
 		function(err, results, fields) {
 			if (err) throw err;
 			console.log(results);
@@ -806,7 +811,7 @@ app.get('/get-twitter-friends', checkAuth, function(req, res) {
 			
 			// Get follower ids
 			oa.getProtectedResource(
-				"https://api.twitter.com/1/friends/ids.json?cursor=-1&screen_name=" + req.session.user_name,
+				"https://api.twitter.com/1/friends/ids.json?cursor=-1&screen_name=" + req.query.user_name,
 				"GET",
 				access_token,
 				access_token_secret,
@@ -878,13 +883,13 @@ app.get('/send-twitter-invite', checkAuth, function(req, res) {
 	text[6] = '@' + req.query.screen_name + ' Time is never wasted when you\'re wasted all the time. Get wasted with me on @StoutApp - http://www.stoutapp.com/';
 
 	client.query(
-		'SELECT access_token, access_token_secret FROM users WHERE user_id = ' + req.session.user_id,
+		'SELECT access_token, access_token_secret FROM users WHERE user_id = ' + req.query.user_id,
 		function(err, results, fields) {
 			if (err) throw err;
 
 			console.log(text[i]);
 			console.log(results);
-			console.log(req.session.user_id);
+			console.log(req.query.user_id);
 			console.log(results[0].access_token);
 			console.log(results[0].access_token_secret);			
 	
@@ -910,8 +915,10 @@ app.get('/send-twitter-invite', checkAuth, function(req, res) {
 // --------------------------------------------------------------------------------------
 
 app.get('/get-profile', checkAuth, function(req, res) {
-	var user_id = req.query.user_id;
-	console.log('profile for user id: ' + user_id);
+	// var user_id = req.query.user_id;
+	console.log('profile for user id: ' + req.query.user_id);
+	console.log('profile for user userd: ' + req.query.current_user_id);
+	console.log('profile for userd username: ' + req.query.user_name);
 	client.query(
 		'SELECT users.user_name, users.first_name, users.last_name, users.avatar, users.user_id, feed.beer_id, feed.rating, beers.name AS beer_name, beer_number.beer_count, follows.follower_count, following.following_count, todrink_number.todrink_count, followers.created_date '
 		+ 'FROM users, feed, beers, '
@@ -919,8 +926,8 @@ app.get('/get-profile', checkAuth, function(req, res) {
 		+ '(SELECT COUNT(feed.beer_id) AS beer_count FROM feed WHERE user_id = ' + req.query.user_id + ' AND feed.type = "RATE") AS beer_number, '
 		+ '(SELECT COUNT(owner_id) AS follower_count FROM followers WHERE owner_id = ' + req.query.user_id + ') AS follows, '
 		+ '(SELECT COUNT(follower_id) AS following_count FROM followers WHERE follower_id = ' + req.query.user_id + ') AS following '
-		+ 'LEFT OUTER JOIN followers ON (follower_id = ' + req.session.user_id + ') AND (owner_id = ' + req.query.user_id + ') '
-		+ 'WHERE (users.user_id = ' + user_id + ') AND (feed.user_id = ' + user_id + ') AND (feed.beer_id = beers.id) AND (feed.type = "RATE") ORDER BY feed.created_date DESC;',
+		+ 'LEFT OUTER JOIN followers ON (follower_id = ' + req.query.current_user_id + ') AND (owner_id = ' + req.query.user_id + ') '
+		+ 'WHERE (users.user_id = ' + req.query.user_id + ') AND (feed.user_id = ' + req.query.user_id + ') AND (feed.beer_id = beers.id) AND (feed.type = "RATE") ORDER BY feed.created_date DESC;',
 		function(err, results, fields) {
 			if (err) throw err;
 			console.log(results);
@@ -933,8 +940,8 @@ app.get('/get-profile', checkAuth, function(req, res) {
 					+ '(SELECT COUNT(feed.beer_id) AS beer_count FROM feed WHERE user_id = ' + req.query.user_id + ' AND feed.type = "RATE") AS beer_number, '
 					+ '(SELECT COUNT(owner_id) AS follower_count FROM followers WHERE owner_id = ' + req.query.user_id + ') AS follows, '
 					+ '(SELECT COUNT(follower_id) AS following_count FROM followers WHERE follower_id = ' + req.query.user_id + ') AS following '
-					+ 'LEFT OUTER JOIN followers ON (follower_id = ' + req.session.user_id + ') AND (owner_id = ' + req.query.user_id + ') '
-					+ 'WHERE users.user_id = ' + user_id,
+					+ 'LEFT OUTER JOIN followers ON (follower_id = ' + req.query.current_user_id + ') AND (owner_id = ' + req.query.user_id + ') '
+					+ 'WHERE users.user_id = ' + req.query.user_id,
 					function(err, results, fields) {
 						if (err) throw err;
 						console.log(results);
@@ -1004,7 +1011,7 @@ app.get('/get-following', checkAuth, function(req, res) {
 
 app.get('/get-notifications', checkAuth, function(req, res) {
 	client.query(
-		'SELECT owner_id, partner_id, type, feed_id FROM notifications WHERE notifications.read = 0 AND notifications.owner_id = ' + req.session.user_id,
+		'SELECT owner_id, partner_id, type, feed_id FROM notifications WHERE notifications.read = 0 AND notifications.owner_id = ' + req.query.user_id,
 		function(err, results, fields) {
 			if (err) throw err;
 			console.log(results);
@@ -1019,7 +1026,7 @@ app.get('/get-notifications-list', checkAuth, function(req, res) {
 	client.query(
 		'SELECT notifications.owner_id, notifications.partner_id, notifications.type, notifications.read, notifications.feed_id, ROUND(TIMESTAMPDIFF(SECOND,notifications.created_date,"' + current + '")/60) AS time, notifications.created_date, users.first_name, users.last_name, users.avatar '
 		+ 'FROM notifications, users '
-		+ 'WHERE notifications.owner_id = ' + req.session.user_id + ' AND users.user_id = notifications.partner_id ORDER BY notifications.created_date DESC;',
+		+ 'WHERE notifications.owner_id = ' + req.query.user_id + ' AND users.user_id = notifications.partner_id ORDER BY notifications.created_date DESC;',
 		function(err, results, fields) {
 			if (err) throw err;
 			console.log(results);
@@ -1041,16 +1048,16 @@ app.get('/follow', checkAuth, function(req, res) {
 	client.query(
 		'INSERT INTO followers ' +
 		'SET owner_id = ?, follower_id = ?, created_date = ?',
-		[req.query.owner_id, req.session.user_id, current],
+		[req.query.owner_id, req.query.user_id, current],
 		function(err, sql_results, fields) {
 			if (err) throw err;
 			console.log(sql_results);
-			if (req.query.owner_id != req.session.user_id) {
+			if (req.query.owner_id != req.query.user_id) {
 				// Add notification
 				client.query(
 					'INSERT INTO notifications ' +
 					'SET owner_id = ?, partner_id = ?, type = ?, created_date = ?',
-					[req.query.owner_id, req.session.user_id, "FOLLOW", current],
+					[req.query.owner_id, req.query.user_id, "FOLLOW", current],
 					function(err, sql_results, fields) {
 						if (err) throw err;
 				});
@@ -1064,7 +1071,7 @@ app.get('/unfollow', checkAuth, function(req, res) {
 	var current = dateToString(time);
 	
 	client.query(
-		'DELETE FROM followers WHERE (owner_id = ' + req.query.owner_id + ') AND (follower_id = ' + req.session.user_id + ')',
+		'DELETE FROM followers WHERE (owner_id = ' + req.query.owner_id + ') AND (follower_id = ' + req.query.user_id + ')',
 		function(err, results, fields) {
 			if (err) throw err;
 			if (results != undefined) {
@@ -1187,7 +1194,7 @@ app.get('/auth/twitter/callback', function(req, res, next) {
 						
 							console.log(current);
 							if (req.session.source == 'app') {
-								res.redirect('stout://');
+								res.redirect('stout://dashboard.html?' + results.screen_name + '?' + results.user_id);
 							} else {
 								res.redirect('/dashboard');
 							}
@@ -1228,7 +1235,7 @@ app.get('/auth/twitter/callback', function(req, res, next) {
 										console.log(req.session.avatar);
 										console.log(req.session.user_id);
 										
-										res.redirect('/registration');
+										res.redirect('stout://registration.html');
 										
 									}
 							});
