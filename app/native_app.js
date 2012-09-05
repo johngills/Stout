@@ -35,7 +35,6 @@ var app = express.createServer(
 				express.session({secret: 'FlurbleGurgleBurgle',
 				                store: new express.session.MemoryStore({ reapInterval: -1 }) }));
 app.listen(8989);
-//app.listen(80);
 
 process.on('uncaughtException', function(err) {
 	console.log('Caught exception: ' + err.stack);
@@ -75,8 +74,8 @@ var oa = new OAuth(
 	"Nmqm7UthsfdjaDQ4HcxPw",
 	"PIFvIPSXlTIbqnnnjBIqoWs0VIxpQivNrIJuWxtkLI",
 	"1.0",
-	"http://stoutapp.com:8989/auth/twitter/callback",
-	//"http://localhost:1337/auth/twitter/callback",
+	//"http://stoutapp.com:8989/auth/twitter/callback",
+	"http://localhost:8989/auth/twitter/callback",
 	"HMAC-SHA1"
 );
 
@@ -159,6 +158,18 @@ app.get('/logout', function(req, res) {
 // REGISTRATION
 // --------------------------------------------------------------------------------------
 
+app.get('/get-user-info', checkAuth, function(req, res) {
+	client.query(
+		'SELECT full_name, first_name, last_name, avatar, location FROM users WHERE user_id = ' + req.query.user_id + ';',
+		function (err, results, field) {
+			if (err) throw err;
+			if (results != undefined) {
+				console.log(results);
+				res.json(results);
+			}
+	});
+});
+
 app.get('/registration', checkAuth, function(req, res) {
 	res.render('registration', {
 		layout: 'home',
@@ -171,14 +182,25 @@ app.get('/registration', checkAuth, function(req, res) {
 		title: 'Stout' });
 });
 
-app.get('/new-user', checkAuth, function(req, res) {
+app.get('/update-user', checkAuth, function(req, res) {
 	// Get user creation datetime
 	var time = new Date();
 	var current = dateToString(time);
+	// client.query(
+	// 	'INSERT INTO ' + user_table + ' ' +
+	// 	'SET user_id = ?, user_name = ?, full_name = ?, first_name = ?, last_name = ?, avatar = ?, location = ?, email = ?, access_token = ?, access_token_secret = ?, created_date = ?',
+	// 	[req.session.user_id, req.session.user_name, req.query.first_name + ' ' + req.query.last_name, req.query.first_name, req.query.last_name, req.session.avatar, req.query.location, req.query.email, req.session.oauth.access_token, req.session.oauth.access_token_secret, current],
+	// 	function (err, results, field) {
+	// 		if (err) throw err;
+	// 		if (results != undefined) {
+	// 			console.log(results);
+	// 			res.json({"status":"success"});
+	// 		}
+	// });
 	client.query(
-		'INSERT INTO ' + user_table + ' ' +
-		'SET user_id = ?, user_name = ?, full_name = ?, first_name = ?, last_name = ?, avatar = ?, location = ?, email = ?, access_token = ?, access_token_secret = ?, created_date = ?',
-		[req.session.user_id, req.session.user_name, req.query.first_name + ' ' + req.query.last_name, req.query.first_name, req.query.last_name, req.session.avatar, req.query.location, req.query.email, req.session.oauth.access_token, req.session.oauth.access_token_secret, current],
+		'UPDATE ' + user_table + ' '
+		+ 'SET first_name = "' + req.query.first_name + '", last_name = "' + req.query.last_name + '", location = "' + req.query.location + '", email = "' + req.query.email + '" '
+		+ 'WHERE user_id = ' + req.query.user_id,
 		function (err, results, field) {
 			if (err) throw err;
 			if (results != undefined) {
@@ -189,18 +211,32 @@ app.get('/new-user', checkAuth, function(req, res) {
 });
 
 app.get('/follow-stoutapp', checkAuth, function(req, res) {
-	oa.post(
-		"https://api.twitter.com/1/friendships/create.json",
-		req.session.oauth.access_token, 
-	    req.session.oauth.access_token_secret,
-		{ user_id: 474616790 },
-		function(error, data) {
-			if (error) {
-				console.log(require('sys').inspect(error));
-				res.json({'status':'error'});
-			} else {
-				console.log(data);
-				res.json({'status':'success'});
+	
+	var access_token = null,
+		access_token_secret = null;
+		
+	client.query(
+		'SELECT access_token, access_token_secret FROM users WHERE user_id = ' + req.query.user_id,
+		function(err, results, field) {
+			if (err) throw err;
+			if (results != undefined) {
+				console.log(results);
+				
+				oa.post(
+					"https://api.twitter.com/1/friendships/create.json",
+					results[0].access_token, 
+				    results[0].access_token_secret,
+					{ user_id: 474616790 },
+					function(error, data) {
+						if (error) {
+							console.log(require('sys').inspect(error));
+							res.json({'status':'error'});
+						} else {
+							console.log(data);
+							res.json({'status':'success'});
+						}
+				});
+
 			}
 	});
 });
@@ -1235,8 +1271,42 @@ app.get('/auth/twitter/callback', function(req, res, next) {
 										console.log(req.session.avatar);
 										console.log(req.session.user_id);
 										
-										res.redirect('stout://registration.html');
+										// Get user creation datetime
+										var time = new Date();
+										var current = dateToString(time);
+										client.query(
+											'INSERT INTO ' + user_table + ' ' +
+											'SET user_id = ?, user_name = ?, full_name = ?, first_name = ?, last_name = ?, avatar = ?, location = ?, access_token = ?, access_token_secret = ?, created_date = ?',
+											[req.session.user_id, req.session.user_name, req.session.first_name + ' ' + req.session.last_name, req.session.first_name, req.session.last_name, req.session.avatar, req.session.location, req.session.oauth.access_token, req.session.oauth.access_token_secret, current],
+											function (err, results, field) {
+												if (err) throw err;
+												if (results != undefined) {
+													console.log(results);
+													res.redirect('stout://registration.html?' + req.session.user_name + '?' + req.session.user_id);
+												}
+										});
 										
+										// $.ajax({
+										// 	cache: false,
+										// 	url: '/new-user',
+										// 	data: { user_id: req.session.user_id, user_name: req.session.user_name, first_name: req.session.first_name, last_name: req.session.last_name, avatar: req.session.avatar, location: req.session.location, access_token: req.session.oauth.access_token, access_token_secret: req.session.oauth.access_token_secret },
+										// 	success: function(results) {
+										// 				if (results.status == 'success') {
+										// 					window.location='dashboard.html#registration';
+										// 				} else {
+										// 					load('Something went wrong!','error');
+										// 					return false;
+										// 				}
+										// 			},
+										// 	error: function() {
+										// 				load('Something went wrong!','error');
+										// 				return false;
+										// 			}
+										// });
+										
+										// if (req.session.source == 'app') {
+										// 	res.redirect('stout://registration.html');
+										// }
 									}
 							});
 						}
