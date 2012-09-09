@@ -576,7 +576,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 																			
 																			$.ajax({
 																				url: 'http://api.xtify.com/2.0/push',
-																				dataType: 'POST',
+																				type: 'POST',
 																				data: { apiKey: apiKey, 
 																						appKey: appKey, 
 																						xids: [ 
