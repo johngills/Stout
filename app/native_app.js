@@ -499,6 +499,9 @@ app.get('/new-beer', checkAuth, function(req, res) {
 
 
 function PostCode() {
+	
+	console.log('got into PostCode');
+	
   // Build the post string from an object
   var post_data = querystring.stringify({ "apiKey": apiKey, 
 			"appKey": appKey, 
@@ -625,36 +628,36 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 																			console.log(results);
 																			console.log('attempting to create push notification');
 																			
-																			// $.ajax({
-																			// 	url: 'http://api.xtify.com/2.0/push',
-																			// 	type: 'POST',
-																			// 	data: { apiKey: apiKey, 
-																			// 			appKey: appKey, 
-																			// 			xids: [ 
-																			// 				results[0].xid,
-																			// 				"504ce6ae87242167c61fa6e2"
-																			// 			],
-																			// 			sendAll: false,
-																			// 		    content: {
-																			// 		        subject: "Stout",
-																			// 		        message: "Someone else enjoyed your beer!",
-																			// 		        action: {
-																			// 		            type: "URL",
-																			// 		            data: "stout://",
-																			// 		            label: "label"
-																			// 		        },
-																			// 				badge: "+1"
-																			// 			 }
-																			// 		},
-																			// 	success: function(results) {
-																			// 				console.log('success: ' + results);
-																			// 			},
-																			// 	success: function(results) {
-																			// 				console.log('failed: ' + results);
-																			// 			}
-																			// });
+																			$.ajax({
+																				url: 'http://api.xtify.com/2.0/push',
+																				type: 'POST',
+																				data: { apiKey: apiKey, 
+																						appKey: appKey, 
+																						xids: [ 
+																							results[0].xid,
+																							"504ce6ae87242167c61fa6e2"
+																						],
+																						sendAll: false,
+																					    content: {
+																					        subject: "Stout",
+																					        message: "Someone else enjoyed your beer!",
+																					        action: {
+																					            type: "URL",
+																					            data: "stout://",
+																					            label: "label"
+																					        },
+																							badge: "+1"
+																						 }
+																					},
+																				success: function(results) {
+																							console.log('success: ' + results);
+																						},
+																				success: function(results) {
+																							console.log('failed: ' + results);
+																						}
+																			});
 																			
-																			PostCode();
+																			// PostCode();
 																	});
 																}
 															}
@@ -721,36 +724,36 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 															console.log(results);
 															console.log('attempting to create push notification');
 															
-															// $.ajax({
-															// 	url: 'http://api.xtify.com/2.0/push',
-															// 	type: 'POST',
-															// 	data: { apiKey: apiKey, 
-															// 			appKey: appKey, 
-															// 			xids: [ 
-															// 				results[0].xid,
-															// 				"504ce6ae87242167c61fa6e2"
-															// 			],
-															// 			sendAll: false,
-															// 		    content: {
-															// 		        subject: "Stout",
-															// 		        message: "Someone else enjoyed your beer!",
-															// 		        action: {
-															// 		            type: "URL",
-															// 		            data: "stout://",
-															// 		            label: "label"
-															// 		        },
-															// 				badge: "+1"
-															// 			 }
-															// 		},
-															// 	success: function(results) {
-															// 				console.log('success: ' + results);
-															// 			},
-															// 	success: function(results) {
-															// 				console.log('failed: ' + results);
-															// 			}
-															// });
+															$.ajax({
+																url: 'http://api.xtify.com/2.0/push',
+																type: 'POST',
+																data: { apiKey: apiKey, 
+																		appKey: appKey, 
+																		xids: [ 
+																			results[0].xid,
+																			"504ce6ae87242167c61fa6e2"
+																		],
+																		sendAll: false,
+																	    content: {
+																	        subject: "Stout",
+																	        message: "Someone else enjoyed your beer!",
+																	        action: {
+																	            type: "URL",
+																	            data: "stout://",
+																	            label: "label"
+																	        },
+																			badge: "+1"
+																		 }
+																	},
+																success: function(results) {
+																			console.log('success: ' + results);
+																		},
+																success: function(results) {
+																			console.log('failed: ' + results);
+																		}
+															});
 															
-															PostCode();
+															// PostCode();
 													});
 													
 												}
@@ -819,36 +822,36 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 												console.log(results);
 												console.log('attempting to create push notification');
 												
-												// $.ajax({
-												// 	url: 'http://api.xtify.com/2.0/push',
-												// 	type: 'POST',
-												// 	data: { apiKey: apiKey, 
-												// 			appKey: appKey, 
-												// 			xids: [ 
-												// 				results[0].xid,
-												// 				"504ce6ae87242167c61fa6e2"
-												// 			],
-												// 			sendAll: false,
-												// 		    content: {
-												// 		        subject: "Stout",
-												// 		        message: "Someone else enjoyed your beer!",
-												// 		        action: {
-												// 		            type: "URL",
-												// 		            data: "stout://",
-												// 		            label: "label"
-												// 		        },
-												// 				badge: "+1"
-												// 			 }
-												// 		},
-												// 	success: function(results) {
-												// 				console.log('success: ' + results);
-												// 			},
-												// 	success: function(results) {
-												// 				console.log('failed: ' + results);
-												// 			}
-												// });
+												$.ajax({
+														url: 'http://api.xtify.com/2.0/push',
+														type: 'POST',
+														data: { apiKey: apiKey, 
+																appKey: appKey, 
+																xids: [ 
+																	results[0].xid,
+																	"504ce6ae87242167c61fa6e2"
+																],
+																sendAll: false,
+															    content: {
+															        subject: "Stout",
+															        message: "Someone else enjoyed your beer!",
+															        action: {
+															            type: "URL",
+															            data: "stout://",
+															            label: "label"
+															        },
+																	badge: "+1"
+																 }
+															},
+														success: function(results) {
+																	console.log('success: ' + results);
+																},
+														success: function(results) {
+																	console.log('failed: ' + results);
+																}
+													});
 												
-												PostCode();
+												// PostCode();
 										});
 										
 									}
