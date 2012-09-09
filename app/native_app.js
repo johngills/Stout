@@ -79,6 +79,15 @@ var oa = new OAuth(
 	"HMAC-SHA1"
 );
 
+
+// --------------------------------------------------------------------------------------
+// PUSH NOTIFICATIONS (XTIFY)
+// --------------------------------------------------------------------------------------
+
+var apiKey = '7f7f5a35-1e9e-481e-9a84-c2aca6f20f6b';
+var appKey = 'dd93e42f-e7c3-42ec-bed7-d4ab32badc3e';
+
+
 // --------------------------------------------------------------------------------------
 // COMMON FUNCTIONS
 // --------------------------------------------------------------------------------------
@@ -550,7 +559,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 																if (err) throw err;
 																console.log(results);
 																res.json({"status": "success", "feed_id": results.insertId, "beer_id": req.query.beer_id, "rate": rate });
-																// Add notification
+																// Add notification if rating someone elses beer
 																if (req.query.partner_id != req.query.user_id) { // makes sure owner and current user aren't the same
 																	client.query(
 																		'INSERT INTO notifications ' +
@@ -558,6 +567,41 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 																		[req.query.partner_id, req.query.user_id, "RATE", results.insertId, current],
 																		function(err, sql_results, fields) {
 																			if (err) throw err;
+																	});
+																	client.query(
+																		'SELECT xid FROM users WHERE user_id = ' + req.query.partner_id,
+																		function(err, sql_results, fields) {
+																			if (err) throw err;
+																			console.log(results);
+																			
+																			$.ajax({
+																				url: 'http://api.xtify.com/2.0/push',
+																				dataType: 'POST',
+																				data: { apiKey: apiKey, 
+																						appKey: appKey, 
+																						xids: [ 
+																							results[0].xid,
+																							"504ce6ae87242167c61fa6e2"
+																						],
+																						sendAll: false,
+																					    content: {
+																					        subject: "Stout",
+																					        message: "Someone else enjoyed your beer!",
+																					        action: {
+																					            type: "URL",
+																					            data: "stout://",
+																					            label: "label"
+																					        },
+																							badge: "+1"
+																						 }
+																					},
+																				success: function(results) {
+																							console.log('success: ' + results);
+																						},
+																				success: function(results) {
+																							console.log('failed: ' + results);
+																						}
+																			});
 																	});
 																}
 															}
