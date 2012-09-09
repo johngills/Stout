@@ -50,19 +50,19 @@ app.enable('jsonp callback');
 // DATABASE
 // --------------------------------------------------------------------------------------
 
-var mysql = require('mysql'),
-	database = 'stout',
-	user_table = 'users',
-	client = mysql.createClient({ user: 'sterlingrules', password: '@y&7~s45', host: 'mysql.mynameissterling.com', port: 3306 });
-	client.query('USE ' + database);
-	client.database = 'stout';
-
 // var mysql = require('mysql'),
-// 	database = 'beer',
+// 	database = 'stout',
 // 	user_table = 'users',
-// 	client = mysql.createClient({ user: 'root', password: '' });
+// 	client = mysql.createClient({ user: 'sterlingrules', password: '@y&7~s45', host: 'mysql.mynameissterling.com', port: 3306 });
 // 	client.query('USE ' + database);
-// 	client.database = 'beer';
+// 	client.database = 'stout';
+
+var mysql = require('mysql'),
+	database = 'beer',
+	user_table = 'users',
+	client = mysql.createClient({ user: 'root', password: '' });
+	client.query('USE ' + database);
+	client.database = 'beer';
 
 // --------------------------------------------------------------------------------------
 // OAUTH SETUP
@@ -74,8 +74,8 @@ var oa = new OAuth(
 	"Nmqm7UthsfdjaDQ4HcxPw",
 	"PIFvIPSXlTIbqnnnjBIqoWs0VIxpQivNrIJuWxtkLI",
 	"1.0",
-	"http://stoutapp.com:8989/auth/twitter/callback",
-	//"http://localhost:8989/auth/twitter/callback",
+	//"http://stoutapp.com:8989/auth/twitter/callback",
+	"http://localhost:8989/auth/twitter/callback",
 	"HMAC-SHA1"
 );
 
@@ -157,6 +157,20 @@ app.get('/logout', function(req, res) {
 // --------------------------------------------------------------------------------------
 // REGISTRATION
 // --------------------------------------------------------------------------------------
+
+app.get('/store-xid', checkAuth, function(req, res) {
+	client.query(
+		'UPDATE ' + user_table + ' '
+		+ 'SET xid = ' + req.query.xid + ' '
+		+ 'WHERE user_id = ' + req.query.user_id,
+		function (err, results, field) {
+			if (err) throw err;
+			if (results != undefined) {
+				console.log(results);
+				res.json({"status":"success"});
+			}
+	});
+});
 
 app.get('/get-user-info', checkAuth, function(req, res) {
 	client.query(
