@@ -10,6 +10,7 @@ var $ = require('jquery');
 var request = require('request');
 var crypto = require('crypto');
 // var base64 = require('base64');
+var querystring = require('querystring');
 
 // --------------------------------------------------------------------------------------
 // CSS/LESS
@@ -573,35 +574,83 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 																		function(err, sql_results, fields) {
 																			if (err) throw err;
 																			console.log(results);
+																			console.log('attempting to create push notification');
 																			
-																			$.ajax({
-																				url: 'http://api.xtify.com/2.0/push',
-																				type: 'POST',
-																				data: { apiKey: apiKey, 
-																						appKey: appKey, 
-																						xids: [ 
+																			// $.ajax({
+																			// 	url: 'http://api.xtify.com/2.0/push',
+																			// 	type: 'POST',
+																			// 	data: { apiKey: apiKey, 
+																			// 			appKey: appKey, 
+																			// 			xids: [ 
+																			// 				results[0].xid,
+																			// 				"504ce6ae87242167c61fa6e2"
+																			// 			],
+																			// 			sendAll: false,
+																			// 		    content: {
+																			// 		        subject: "Stout",
+																			// 		        message: "Someone else enjoyed your beer!",
+																			// 		        action: {
+																			// 		            type: "URL",
+																			// 		            data: "stout://",
+																			// 		            label: "label"
+																			// 		        },
+																			// 				badge: "+1"
+																			// 			 }
+																			// 		},
+																			// 	success: function(results) {
+																			// 				console.log('success: ' + results);
+																			// 			},
+																			// 	success: function(results) {
+																			// 				console.log('failed: ' + results);
+																			// 			}
+																			// });
+																			
+																			//function PostCode(codestring) {
+																			  // Build the post string from an object
+																			  var post_data = querystring.stringify({ "apiKey": apiKey, 
+																						"appKey": appKey, 
+																						"xids": [ 
 																							results[0].xid,
 																							"504ce6ae87242167c61fa6e2"
 																						],
-																						sendAll: false,
-																					    content: {
-																					        subject: "Stout",
-																					        message: "Someone else enjoyed your beer!",
-																					        action: {
-																					            type: "URL",
-																					            data: "stout://",
-																					            label: "label"
+																						"sendAll": false,
+																					    "content": {
+																					        "subject": "Stout",
+																					        "message": "Someone else enjoyed your beer!",
+																					        "action": {
+																					            "type": "URL",
+																					            "data": "stout://",
+																					            "label": "label"
 																					        },
-																							badge: "+1"
+																							"badge": "+1"
 																						 }
-																					},
-																				success: function(results) {
-																							console.log('success: ' + results);
-																						},
-																				success: function(results) {
-																							console.log('failed: ' + results);
-																						}
-																			});
+																					});
+
+																			  // An object of options to indicate where to post to
+																			  var post_options = {
+																			      host: 'http://api.xtify.com',
+																			      port: '80',
+																			      path: '/2.0/push',
+																			      method: 'POST',
+																			      headers: {
+																			          'Content-Type': 'application/x-www-form-urlencoded',
+																			          'Content-Length': post_data.length
+																			      }
+																			  };
+
+																			  // Set up the request
+																			  var post_req = http.request(post_options, function(res) {
+																			      res.setEncoding('utf8');
+																			      res.on('data', function (chunk) {
+																			          console.log('Response: ' + chunk);
+																			      });
+																			  });
+
+																			  // post the data
+																			  post_req.write(post_data);
+																			  post_req.end();
+
+																			//}
 																	});
 																}
 															}
