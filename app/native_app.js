@@ -623,7 +623,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 																	});
 																	client.query(
 																		'SELECT xid FROM users WHERE user_id = ' + req.query.partner_id,
-																		function(err, sql_results, fields) {
+																		function(err, results, fields) {
 																			if (err) throw err;
 																			console.log(results);
 																			console.log('attempting to create push notification');
@@ -719,7 +719,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 													
 													client.query(
 														'SELECT xid FROM users WHERE user_id = ' + req.query.partner_id,
-														function(err, sql_results, fields) {
+														function(err, results, fields) {
 															if (err) throw err;
 															console.log(results);
 															console.log('attempting to create push notification');
@@ -817,7 +817,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 										
 										client.query(
 											'SELECT xid FROM users WHERE user_id = ' + req.query.partner_id,
-											function(err, sql_results, fields) {
+											function(err, results, fields) {
 												if (err) throw err;
 												console.log(results);
 												console.log('attempting to create push notification');
