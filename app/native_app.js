@@ -50,19 +50,19 @@ app.enable('jsonp callback');
 // DATABASE
 // --------------------------------------------------------------------------------------
 
-// var mysql = require('mysql'),
-// 	database = 'stout',
-// 	user_table = 'users',
-// 	client = mysql.createClient({ user: 'sterlingrules', password: '@y&7~s45', host: 'mysql.mynameissterling.com', port: 3306 });
-// 	client.query('USE ' + database);
-// 	client.database = 'stout';
-
 var mysql = require('mysql'),
-	database = 'beer',
+	database = 'stout',
 	user_table = 'users',
-	client = mysql.createClient({ user: 'root', password: '' });
+	client = mysql.createClient({ user: 'sterlingrules', password: '@y&7~s45', host: 'mysql.mynameissterling.com', port: 3306 });
 	client.query('USE ' + database);
-	client.database = 'beer';
+	client.database = 'stout';
+
+// var mysql = require('mysql'),
+// 	database = 'beer',
+// 	user_table = 'users',
+// 	client = mysql.createClient({ user: 'root', password: '' });
+// 	client.query('USE ' + database);
+// 	client.database = 'beer';
 
 // --------------------------------------------------------------------------------------
 // OAUTH SETUP
