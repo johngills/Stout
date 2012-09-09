@@ -74,8 +74,8 @@ var oa = new OAuth(
 	"Nmqm7UthsfdjaDQ4HcxPw",
 	"PIFvIPSXlTIbqnnnjBIqoWs0VIxpQivNrIJuWxtkLI",
 	"1.0",
-	//"http://stoutapp.com:8989/auth/twitter/callback",
-	"http://localhost:8989/auth/twitter/callback",
+	"http://stoutapp.com:8989/auth/twitter/callback",
+	//"http://localhost:8989/auth/twitter/callback",
 	"HMAC-SHA1"
 );
 
