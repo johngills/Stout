@@ -88,6 +88,51 @@ var oa = new OAuth(
 var apiKey = '7f7f5a35-1e9e-481e-9a84-c2aca6f20f6b';
 var appKey = 'dd93e42f-e7c3-42ec-bed7-d4ab32badc3e';
 
+function sendNotification(results) {
+	
+	console.log('got into postCode');
+	
+	var data = results,
+		dataString = JSON.stringify(data);
+		
+	var headers = {
+			        'Content-Type': 'application/json',
+			        'Content-Length': dataString.length
+			    };
+
+	// An object of options to indicate where to post to
+	var options = {
+	    host: 'api.xtify.com',
+	    port: '80',
+	    path: '/2.0/push',
+	    method: 'POST',
+	    headers: headers
+	};
+	
+	var req = http.request(options, function(res) {
+		res.setEncoding('utf-8');
+
+		var responseString = '';
+
+		res.on('data', function(data) {
+			responseString += data;
+		});
+
+		res.on('end', function() {
+			var resultObject = JSON.parse(responseString);
+		});
+	});
+	
+	req.on('error', function(e) {
+		console.log(e);
+	});
+
+	// post the data
+	req.write(dataString);
+	req.end();
+
+}
+
 
 // --------------------------------------------------------------------------------------
 // COMMON FUNCTIONS
@@ -498,147 +543,6 @@ app.get('/new-beer', checkAuth, function(req, res) {
 // --------------------------------------------------------------------------------------
 
 
-function postCode(results) {
-	
-	console.log('got into postCode');
-
-	// Build the post string from an object
-	// var post_data = querystring.stringify({ "apiKey": apiKey, 
-	// 	"appKey": appKey, 
-	// 	"xids": [ 
-	// 		// results[0].xid,
-	// 		"504ce6ae87242167c61fa6e2"
-	// 	],
-	// 	"sendAll": false,
-	//     "content": {
-	//         "subject": "Stout",
-	//         "message": "Someone else enjoyed your beer!",
-	//         "action": {
-	//             "type": "URL",
-	//             "data": "stout://",
-	//             "label": "label"
-	//         },
-	// 		"badge": "+1"
-	// 	 }
-	// });
-	
-	var data = { 
-					"apiKey": apiKey, 
-					"appKey": appKey,
-					"sendAll": true,
-				    "content": {
-				        "message": "Someone else enjoyed your beer!",
-						"badge": "+1"
-					 }
-				},
-		dataString = JSON.stringify(data);
-		
-	var headers = {
-			        'Content-Type': 'application/json',
-			        'Content-Length': dataString.length
-			    };
-
-	// An object of options to indicate where to post to
-	var options = {
-	    host: 'api.xtify.com',
-	    port: '80',
-	    path: '/2.0/push',
-	    method: 'POST',
-	    headers: headers
-	};
-
-	// Set up the request
-	// var post_req = http.request(post_options, function(res) {
-	//     res.setEncoding('utf8');
-	//     res.on('data', function (chunk) {
-	//         console.log('Response: ' + chunk);
-	//     });
-	// });
-	
-	var req = http.request(options, function(res) {
-		res.setEncoding('utf-8');
-
-		var responseString = '';
-
-		res.on('data', function(data) {
-			responseString += data;
-		});
-
-		res.on('end', function() {
-			var resultObject = JSON.parse(responseString);
-		});
-	});
-	
-	req.on('error', function(e) {
-		console.log(e);
-	});
-
-	// post the data
-	req.write(dataString);
-	req.end();
-
-}
-
-function ajaxCode() {
-	console.log('got into ajaxCode');
-	
-	var data = { 
-					"apiKey": apiKey, 
-					"appKey": appKey,
-					"sendAll": true,
-				    "content": {
-				        "message": "Someone else enjoyed your beer!",
-						"badge": "+1"
-					 }
-				},
-		dataString = JSON.stringify(data);
-			
-	
-	$.ajax({
-		url: 'http://api.xtify.com/2.0/push',
-		type: 'POST',
-		dataType: 'jsonp',
-		data: dataString,
-		success: function(results) {
-					var data = $.parseJSON(results);
-					console.log('success: ' + results[0]);
-					console.log(data);
-				},
-		error: function(results) {
-					var data = $.parseJSON(results);
-					console.log('failed: ' + results);
-					console.log(data);
-				}
-	});
-}
-
-function jsonCode() {
-	console.log('got into jsonCode');
-	
-	$.post('http://api.xtify.com/2.0/push', { apiKey: apiKey, 
-				appKey: appKey, 
-				xids: [ 
-					"504ce6ae87242167c61fa6e2"
-				],
-				sendAll: false,
-			    content: {
-			        subject: "Stout",
-			        message: "Someone else enjoyed your beer!",
-					badge: "+1"
-				 }
-			}, function(results) {
-					console.log('success: ' + results);
-		}, 'json');
-}
-
-app.get('/create-notification', checkAuth, function(req, res) {
-	//ajaxCode();
-	postCode();
-	//jsonCode();
-	res.send('Sent');
-});
-
-
 app.get('/beer-checkin', checkAuth, function(req, res) {
 	var time = new Date();
 	var current = dateToString(time);
@@ -716,38 +620,19 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 																		function(err, results, fields) {
 																			if (err) throw err;
 																			console.log(results);
-																			console.log('attempting to create push notification');
-																			
-																			// $.ajax({
-																			// 	url: 'http://api.xtify.com/2.0/push',
-																			// 	type: 'POST',
-																			// 	data: { apiKey: apiKey, 
-																			// 			appKey: appKey, 
-																			// 			xids: [ 
-																			// 				results[0].xid,
-																			// 				"504ce6ae87242167c61fa6e2"
-																			// 			],
-																			// 			sendAll: false,
-																			// 		    content: {
-																			// 		        subject: "Stout",
-																			// 		        message: "Someone else enjoyed your beer!",
-																			// 		        action: {
-																			// 		            type: "URL",
-																			// 		            data: "stout://",
-																			// 		            label: "label"
-																			// 		        },
-																			// 				badge: "+1"
-																			// 			 }
-																			// 		},
-																			// 	success: function(results) {
-																			// 				console.log('success: ' + results);
-																			// 			},
-																			// 	success: function(results) {
-																			// 				console.log('failed: ' + results);
-																			// 			}
-																			// });
-																			
-																			postCode(results);
+																			console.log('attempting to create push notification');																			
+																			sendNotification({ 
+																						"apiKey": apiKey, 
+																						"appKey": appKey,
+																						"xids" : [
+																							results[0].xid
+																						],
+																						"sendAll": false,
+																					    "content": {
+																					        "message": "Someone else enjoyed your beer!",
+																							"badge": "+1"
+																						 }
+																					});
 																	});
 																}
 															}
@@ -814,36 +699,18 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 															console.log(results);
 															console.log('attempting to create push notification');
 															
-															// $.ajax({
-															// 	url: 'http://api.xtify.com/2.0/push',
-															// 	type: 'POST',
-															// 	data: { apiKey: apiKey, 
-															// 			appKey: appKey, 
-															// 			xids: [ 
-															// 				results[0].xid,
-															// 				"504ce6ae87242167c61fa6e2"
-															// 			],
-															// 			sendAll: false,
-															// 		    content: {
-															// 		        subject: "Stout",
-															// 		        message: "Someone else enjoyed your beer!",
-															// 		        action: {
-															// 		            type: "URL",
-															// 		            data: "stout://",
-															// 		            label: "label"
-															// 		        },
-															// 				badge: "+1"
-															// 			 }
-															// 		},
-															// 	success: function(results) {
-															// 				console.log('success: ' + results);
-															// 			},
-															// 	success: function(results) {
-															// 				console.log('failed: ' + results);
-															// 			}
-															// });
-															
-															postCode(results);
+															sendNotification({ 
+																		"apiKey": apiKey, 
+																		"appKey": appKey,
+																		"xids" : [
+																			results[0].xid
+																		],
+																		"sendAll": false,
+																	    "content": {
+																	        "message": "Someone else enjoyed your beer!",
+																			"badge": "+1"
+																		 }
+																	});
 													});
 													
 												}
@@ -912,36 +779,18 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 												console.log(results);
 												console.log('attempting to create push notification');
 												
-												// $.ajax({
-												// 		url: 'http://api.xtify.com/2.0/push',
-												// 		type: 'POST',
-												// 		data: { apiKey: apiKey, 
-												// 				appKey: appKey, 
-												// 				xids: [ 
-												// 					results[0].xid,
-												// 					"504ce6ae87242167c61fa6e2"
-												// 				],
-												// 				sendAll: false,
-												// 			    content: {
-												// 			        subject: "Stout",
-												// 			        message: "Someone else enjoyed your beer!",
-												// 			        action: {
-												// 			            type: "URL",
-												// 			            data: "stout://",
-												// 			            label: "label"
-												// 			        },
-												// 					badge: "+1"
-												// 				 }
-												// 			},
-												// 		success: function(results) {
-												// 					console.log('success: ' + results);
-												// 				},
-												// 		success: function(results) {
-												// 					console.log('failed: ' + results);
-												// 				}
-												// 	});
-												
-												postCode(results);
+												sendNotification({ 
+															"apiKey": apiKey, 
+															"appKey": appKey,
+															"xids" : [
+																results[0].xid
+															],
+															"sendAll": false,
+														    "content": {
+														        "message": "Someone else enjoyed your beer!",
+																"badge": "+1"
+															 }
+														});
 										});
 										
 									}
@@ -1008,6 +857,26 @@ app.get('/add-to-drink-list', checkAuth, function(req, res) {
 								[req.query.partner_id, req.query.user_id, "LIST", results.insertId, req.query.beer_id, current],
 								function(err, sql_results, fields) {
 									if (err) throw err;
+							});
+							client.query(
+								'SELECT xid FROM users WHERE user_id = ' + req.query.partner_id,
+								function(err, results, fields) {
+									if (err) throw err;
+									console.log(results);
+									console.log('attempting to create push notification');
+									
+									sendNotification({ 
+												"apiKey": apiKey, 
+												"appKey": appKey,
+												"xids" : [
+													results[0].xid
+												],
+												"sendAll": false,
+											    "content": {
+											        "message": "Someone added your beer to drink later!",
+													"badge": "+1"
+												 }
+											});
 							});
 						}
 					}
@@ -1111,6 +980,26 @@ app.get('/add-comment', checkAuth, function(req, res) {
 							[req.query.owner_id, req.query.user_id, "COMMENT", req.query.feed_id, current],
 							function(err, sql_results, fields) {
 								if (err) throw err;
+						});
+						client.query(
+							'SELECT xid FROM users WHERE user_id = ' + req.query.partner_id,
+							function(err, results, fields) {
+								if (err) throw err;
+								console.log(results);
+								console.log('attempting to create push notification');
+								
+								sendNotification({ 
+											"apiKey": apiKey, 
+											"appKey": appKey,
+											"xids" : [
+												results[0].xid
+											],
+											"sendAll": false,
+										    "content": {
+										        "message": "Someone left you a comment!",
+												"badge": "+1"
+											 }
+										});
 						});
 					}
 					client.query( // grabs user info for comment
@@ -1385,6 +1274,26 @@ app.get('/follow', checkAuth, function(req, res) {
 					[req.query.owner_id, req.query.user_id, "FOLLOW", current],
 					function(err, sql_results, fields) {
 						if (err) throw err;
+				});
+				client.query(
+					'SELECT xid FROM users WHERE user_id = ' + req.query.owner_id,
+					function(err, results, fields) {
+						if (err) throw err;
+						console.log(results);
+						console.log('attempting to create push notification');
+						
+						sendNotification({ 
+									"apiKey": apiKey, 
+									"appKey": appKey,
+									"xids" : [
+										results[0].xid
+									],
+									"sendAll": false,
+								    "content": {
+								        "message": "Someone else enjoyed your beer!",
+										"badge": "+1"
+									 }
+								});
 				});
 			}
 			res.json({"status":"success"});
