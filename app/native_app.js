@@ -503,43 +503,43 @@ function postCode(results) {
 	console.log('got into postCode');
 
 	// Build the post string from an object
-	var post_data = querystring.stringify({ "apiKey": apiKey, 
-		"appKey": appKey, 
-		"xids": [ 
-			// results[0].xid,
-			"504ce6ae87242167c61fa6e2"
-		],
-		"sendAll": false,
-	    "content": {
-	        "subject": "Stout",
-	        "message": "Someone else enjoyed your beer!",
-	        "action": {
-	            "type": "URL",
-	            "data": "stout://",
-	            "label": "label"
-	        },
-			"badge": "+1"
-		 }
-	});
+	// var post_data = querystring.stringify({ "apiKey": apiKey, 
+	// 	"appKey": appKey, 
+	// 	"xids": [ 
+	// 		// results[0].xid,
+	// 		"504ce6ae87242167c61fa6e2"
+	// 	],
+	// 	"sendAll": false,
+	//     "content": {
+	//         "subject": "Stout",
+	//         "message": "Someone else enjoyed your beer!",
+	//         "action": {
+	//             "type": "URL",
+	//             "data": "stout://",
+	//             "label": "label"
+	//         },
+	// 		"badge": "+1"
+	// 	 }
+	// });
 	
-	// var data = { 
-	// 				"apiKey": apiKey, 
-	// 				"appKey": appKey,
-	// 				"sendAll": true,
-	// 			    "content": {
-	// 			        "message": "Someone else enjoyed your beer!",
-	// 					"badge": "+1"
-	// 				 }
-	// 			},
-	// 	dataString = JSON.stringify(data);
+	var data = { 
+					"apiKey": apiKey, 
+					"appKey": appKey,
+					"sendAll": true,
+				    "content": {
+				        "message": "Someone else enjoyed your beer!",
+						"badge": "+1"
+					 }
+				},
+		dataString = JSON.stringify(data);
 		
 	var headers = {
 			        'Content-Type': 'application/json',
-			        'Content-Length': post_data.length
+			        'Content-Length': dataString.length
 			    };
 
 	// An object of options to indicate where to post to
-	var post_options = {
+	var options = {
 	    host: 'api.xtify.com',
 	    port: '80',
 	    path: '/2.0/push',
@@ -548,16 +548,34 @@ function postCode(results) {
 	};
 
 	// Set up the request
-	var post_req = http.request(post_options, function(res) {
-	    res.setEncoding('utf8');
-	    res.on('data', function (chunk) {
-	        console.log('Response: ' + chunk);
-	    });
+	// var post_req = http.request(post_options, function(res) {
+	//     res.setEncoding('utf8');
+	//     res.on('data', function (chunk) {
+	//         console.log('Response: ' + chunk);
+	//     });
+	// });
+	
+	var req = http.request(options, function(res) {
+		res.setEncoding('utf-8');
+
+		var responseString = '';
+
+		res.on('data', function(data) {
+			responseString += data;
+		});
+
+		res.on('end', function() {
+			var resultObject = JSON.parse(responseString);
+		});
+	});
+	
+	req.on('error', function(e) {
+		console.log(e);
 	});
 
 	// post the data
-	post_req.write(post_data);
-	post_req.end();
+	req.write(dataString);
+	req.end();
 
 }
 
