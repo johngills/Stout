@@ -506,7 +506,7 @@ function postCode(results) {
 	var post_data = querystring.stringify({ "apiKey": apiKey, 
 		"appKey": appKey, 
 		"xids": [ 
-			results[0].xid,
+			// results[0].xid,
 			"504ce6ae87242167c61fa6e2"
 		],
 		"sendAll": false,
@@ -548,6 +548,9 @@ function postCode(results) {
 
 }
 
+app.get('/create-notification', checkAuth, function(req, res) {
+	postCode();
+});
 
 
 app.get('/beer-checkin', checkAuth, function(req, res) {
