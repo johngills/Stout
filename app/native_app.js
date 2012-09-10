@@ -521,17 +521,30 @@ function postCode(results) {
 			"badge": "+1"
 		 }
 	});
+	
+	// var data = { 
+	// 				"apiKey": apiKey, 
+	// 				"appKey": appKey,
+	// 				"sendAll": true,
+	// 			    "content": {
+	// 			        "message": "Someone else enjoyed your beer!",
+	// 					"badge": "+1"
+	// 				 }
+	// 			},
+	// 	dataString = JSON.stringify(data);
+		
+	var headers = {
+			        'Content-Type': 'application/json',
+			        'Content-Length': post_data.length
+			    };
 
 	// An object of options to indicate where to post to
 	var post_options = {
-	    host: 'http://api.xtify.com',
+	    host: 'api.xtify.com',
 	    port: '80',
 	    path: '/2.0/push',
 	    method: 'POST',
-	    headers: {
-	        'Content-Type': 'application/json',
-	        'Content-Length': post_data.length
-	    }
+	    headers: headers
 	};
 
 	// Set up the request
@@ -551,18 +564,23 @@ function postCode(results) {
 function ajaxCode() {
 	console.log('got into ajaxCode');
 	
+	var data = { 
+					"apiKey": apiKey, 
+					"appKey": appKey,
+					"sendAll": true,
+				    "content": {
+				        "message": "Someone else enjoyed your beer!",
+						"badge": "+1"
+					 }
+				},
+		dataString = JSON.stringify(data);
+			
+	
 	$.ajax({
 		url: 'http://api.xtify.com/2.0/push',
 		type: 'POST',
 		dataType: 'jsonp',
-		data: { "apiKey": apiKey, 
-				"appKey": appKey,
-				"sendAll": true,
-			    "content": {
-			        "message": "Someone else enjoyed your beer!",
-					"badge": "+1"
-				 }
-			},
+		data: dataString,
 		success: function(results) {
 					var data = $.parseJSON(results);
 					console.log('success: ' + results[0]);
