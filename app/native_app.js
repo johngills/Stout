@@ -1290,7 +1290,7 @@ app.get('/follow', checkAuth, function(req, res) {
 									],
 									"sendAll": false,
 								    "content": {
-								        "message": "Someone else enjoyed your beer!",
+								        "message": "You have a new follower!",
 										"badge": "+1"
 									 }
 								});
