@@ -550,6 +550,7 @@ function postCode(results) {
 
 app.get('/create-notification', checkAuth, function(req, res) {
 	postCode();
+	res.send('Sent');
 });
 
 
