@@ -1134,7 +1134,7 @@ app.get('/get-profile', checkAuth, function(req, res) {
 	console.log('profile for user userd: ' + req.query.current_user_id);
 	console.log('profile for userd username: ' + req.query.user_name);
 	client.query(
-		'SELECT users.user_name, users.first_name, users.last_name, users.avatar, users.user_id, feed.beer_id, feed.rating, beers.name AS beer_name, beer_number.beer_count, follows.follower_count, following.following_count, todrink_number.todrink_count, followers.created_date '
+		'SELECT users.user_name, users.first_name, users.last_name, users.avatar, users.user_id, users.location, feed.beer_id, feed.rating, beers.name AS beer_name, beer_number.beer_count, follows.follower_count, following.following_count, todrink_number.todrink_count, followers.created_date '
 		+ 'FROM users, feed, beers, '
 		+ '(SELECT COUNT(todrink.user_id) AS todrink_count FROM todrink WHERE todrink.user_id = ' + req.query.user_id + ') AS todrink_number, '
 		+ '(SELECT COUNT(feed.beer_id) AS beer_count FROM feed WHERE user_id = ' + req.query.user_id + ' AND feed.type = "RATE") AS beer_number, '
@@ -1148,7 +1148,7 @@ app.get('/get-profile', checkAuth, function(req, res) {
 			if (results == '') {
 				// New user profile
 				client.query(
-					'SELECT users.user_name, users.first_name, users.last_name, users.avatar, users.user_id, beer_number.beer_count, follows.follower_count, following.following_count, todrink_number.todrink_count, followers.created_date '
+					'SELECT users.user_name, users.first_name, users.last_name, users.avatar, users.user_id, users.location, beer_number.beer_count, follows.follower_count, following.following_count, todrink_number.todrink_count, followers.created_date '
 					+ 'FROM users, '
 					+ '(SELECT COUNT(todrink.user_id) AS todrink_count FROM todrink WHERE todrink.user_id = ' + req.query.user_id + ') AS todrink_number, '
 					+ '(SELECT COUNT(feed.beer_id) AS beer_count FROM feed WHERE user_id = ' + req.query.user_id + ' AND feed.type = "RATE") AS beer_number, '
