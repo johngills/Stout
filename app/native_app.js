@@ -498,7 +498,7 @@ app.get('/new-beer', checkAuth, function(req, res) {
 // --------------------------------------------------------------------------------------
 
 
-function postCode() {
+function postCode(results) {
 	
 	console.log('got into postCode');
 
@@ -658,7 +658,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 																			// 			}
 																			// });
 																			
-																			postCode();
+																			postCode(results);
 																	});
 																}
 															}
@@ -754,7 +754,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 															// 			}
 															// });
 															
-															postCode();
+															postCode(results);
 													});
 													
 												}
@@ -852,7 +852,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 												// 				}
 												// 	});
 												
-												postCode();
+												postCode(results);
 										});
 										
 									}
