@@ -550,9 +550,11 @@ function postCode(results) {
 
 function ajaxCode() {
 	console.log('got into ajaxCode');
+	
 	$.ajax({
 		url: 'http://api.xtify.com/2.0/push',
 		type: 'POST',
+		dataType: 'json',
 		data: { apiKey: apiKey, 
 				appKey: appKey, 
 				xids: [ 
@@ -566,21 +568,41 @@ function ajaxCode() {
 				 }
 			},
 		success: function(results) {
-					console.log('success: ' + results);
+					var data = $.parseJSON(results);
+					console.log('success: ' + results[0]);
+					console.log(data);
 				},
 		error: function(results) {
-					console.log('failed: ' + results);
+					var data = $.parseJSON(results);
+					console.log('failed: ' + results[0]);
+					console.log(data);
 				}
 	});
 }
 
-// app.get('/create-notification', checkAuth, function(req, res) {
-// 	postCode();
-// 	res.send('Sent');
-// });
+function jsonCode() {
+	console.log('got into jsonCode');
+	
+	$.post('http://api.xtify.com/2.0/push', { apiKey: apiKey, 
+				appKey: appKey, 
+				xids: [ 
+					"504ce6ae87242167c61fa6e2"
+				],
+				sendAll: false,
+			    content: {
+			        subject: "Stout",
+			        message: "Someone else enjoyed your beer!",
+					badge: "+1"
+				 }
+			}, function(results) {
+					console.log('success: ' + results);
+		}, 'json');
+}
 
 app.get('/create-notification', checkAuth, function(req, res) {
 	ajaxCode();
+	//postCode();
+	//jsonCode();
 	res.send('Sent');
 });
 
