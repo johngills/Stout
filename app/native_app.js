@@ -548,8 +548,39 @@ function postCode(results) {
 
 }
 
+function ajaxCode() {
+	console.log('got into ajaxCode');
+	$.ajax({
+		url: 'http://api.xtify.com/2.0/push',
+		type: 'POST',
+		data: { apiKey: apiKey, 
+				appKey: appKey, 
+				xids: [ 
+					"504ce6ae87242167c61fa6e2"
+				],
+				sendAll: false,
+			    content: {
+			        subject: "Stout",
+			        message: "Someone else enjoyed your beer!",
+					badge: "+1"
+				 }
+			},
+		success: function(results) {
+					console.log('success: ' + results);
+				},
+		success: function(results) {
+					console.log('failed: ' + results);
+				}
+	});
+}
+
+// app.get('/create-notification', checkAuth, function(req, res) {
+// 	postCode();
+// 	res.send('Sent');
+// });
+
 app.get('/create-notification', checkAuth, function(req, res) {
-	postCode();
+	ajaxCode();
 	res.send('Sent');
 });
 
