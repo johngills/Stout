@@ -568,7 +568,7 @@ function ajaxCode() {
 		success: function(results) {
 					console.log('success: ' + results);
 				},
-		success: function(results) {
+		error: function(results) {
 					console.log('failed: ' + results);
 				}
 	});
