@@ -555,16 +555,16 @@ function ajaxCode() {
 		url: 'http://api.xtify.com/2.0/push',
 		type: 'POST',
 		dataType: 'json',
-		data: { apiKey: apiKey, 
-				appKey: appKey, 
-				xids: [ 
+		data: { "apiKey": apiKey, 
+				"appKey": appKey, 
+				"xids": [ 
 					"504ce6ae87242167c61fa6e2"
 				],
-				sendAll: false,
-			    content: {
-			        subject: "Stout",
-			        message: "Someone else enjoyed your beer!",
-					badge: "+1"
+				"sendAll": false,
+			    "content": {
+			        "subject": "Stout",
+			        "message": "Someone else enjoyed your beer!",
+					"badge": "+1"
 				 }
 			},
 		success: function(results) {
