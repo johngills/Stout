@@ -529,7 +529,7 @@ function postCode(results) {
 	    path: '/2.0/push',
 	    method: 'POST',
 	    headers: {
-	        'Content-Type': 'application/x-www-form-urlencoded',
+	        'Content-Type': 'application/json',
 	        'Content-Length': post_data.length
 	    }
 	};
@@ -554,15 +554,11 @@ function ajaxCode() {
 	$.ajax({
 		url: 'http://api.xtify.com/2.0/push',
 		type: 'POST',
-		dataType: 'json',
+		dataType: 'jsonp',
 		data: { "apiKey": apiKey, 
-				"appKey": appKey, 
-				"xids": [ 
-					"504ce6ae87242167c61fa6e2"
-				],
-				"sendAll": false,
+				"appKey": appKey,
+				"sendAll": true,
 			    "content": {
-			        "subject": "Stout",
 			        "message": "Someone else enjoyed your beer!",
 					"badge": "+1"
 				 }
@@ -574,7 +570,7 @@ function ajaxCode() {
 				},
 		error: function(results) {
 					var data = $.parseJSON(results);
-					console.log('failed: ' + results[0]);
+					console.log('failed: ' + results);
 					console.log(data);
 				}
 	});
@@ -600,8 +596,8 @@ function jsonCode() {
 }
 
 app.get('/create-notification', checkAuth, function(req, res) {
-	ajaxCode();
-	//postCode();
+	//ajaxCode();
+	postCode();
 	//jsonCode();
 	res.send('Sent');
 });
