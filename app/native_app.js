@@ -596,8 +596,8 @@ function jsonCode() {
 }
 
 app.get('/create-notification', checkAuth, function(req, res) {
-	//ajaxCode();
-	postCode();
+	ajaxCode();
+	//postCode();
 	//jsonCode();
 	res.send('Sent');
 });
