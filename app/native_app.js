@@ -216,7 +216,7 @@ app.get('/logout', function(req, res) {
 app.get('/store-xid', checkAuth, function(req, res) {
 	client.query(
 		'UPDATE ' + user_table + ' '
-		+ 'SET xid = "' + req.query.xid + '" '
+		+ 'SET xid = "' + req.query.xid + '", latitude = ' + req.query.latitude + ', longitude = ' + req.query.longitude + ' '
 		+ 'WHERE user_id = ' + req.query.user_id,
 		function (err, results, field) {
 			if (err) throw err;
