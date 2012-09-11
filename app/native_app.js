@@ -556,7 +556,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 	if (req.query.unrate != '') {
 		var unrate = ', beers.' + req.query.unrate + ' = beers.' + req.query.unrate + ' - 1';
 		client.query(
-			'DELETE FROM feed WHERE feed.id = ' + req.query.feed_id,
+			'DELETE FROM feed WHERE feed.id = ' + req.query.feed_id + ' AND feed.user_id = ' + req.query.user_id,
 			function(err, results, fields) {
 				console.log(results);
 				
