@@ -1212,6 +1212,18 @@ app.get('/get-activity', checkAuth, function(req, res) {
 // 	});
 // });
 
+// app.get('/get-following', checkAuth, function(req, res) {
+// 	client.query(
+// 		'SELECT DISTINCT users.user_name, users.first_name, users.last_name, users.avatar, users.user_id, feed.beer_id, feed.rating, beers.name AS beer_name '
+// 		+ 'FROM users, feed, beers, followers '
+// 		+ 'WHERE (followers.follower_id = ' + req.query.user_id + ') AND (followers.owner_id = users.user_id) AND (feed.user_id = users.user_id) AND (feed.beer_id = beers.id) AND (feed.type = "RATE") GROUP BY users.user_name ORDER BY feed.created_date DESC;',
+// 		function(err, results, fields) {
+// 			if (err) throw err;
+// 			console.log(results);
+// 			res.send(results);
+// 	});
+// });
+
 app.get('/get-followers', checkAuth, function(req, res) {
 	client.query(
 		'SELECT DISTINCT users.user_name, users.first_name, users.last_name, users.avatar, users.user_id, users.location, users.created_date '
@@ -1226,9 +1238,9 @@ app.get('/get-followers', checkAuth, function(req, res) {
 
 app.get('/get-following', checkAuth, function(req, res) {
 	client.query(
-		'SELECT DISTINCT users.user_name, users.first_name, users.last_name, users.avatar, users.user_id, feed.beer_id, feed.rating, beers.name AS beer_name '
-		+ 'FROM users, feed, beers, followers '
-		+ 'WHERE (followers.follower_id = ' + req.query.user_id + ') AND (followers.owner_id = users.user_id) AND (feed.user_id = users.user_id) AND (feed.beer_id = beers.id) AND (feed.type = "RATE") GROUP BY users.user_name ORDER BY feed.created_date DESC;',
+		'SELECT DISTINCT users.user_name, users.first_name, users.last_name, users.avatar, users.user_id '
+		+ 'FROM users, followers '
+		+ 'WHERE (followers.follower_id = ' + req.query.user_id + ') AND (followers.owner_id = users.user_id) GROUP BY users.user_name ORDER BY users.created_date DESC;',
 		function(err, results, fields) {
 			if (err) throw err;
 			console.log(results);
