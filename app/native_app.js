@@ -1238,7 +1238,7 @@ app.get('/get-followers', checkAuth, function(req, res) {
 
 app.get('/get-following', checkAuth, function(req, res) {
 	client.query(
-		'SELECT DISTINCT users.user_name, users.first_name, users.last_name, users.avatar, users.user_id '
+		'SELECT DISTINCT users.user_name, users.first_name, users.last_name, users.avatar, users.user_id, users.location, users.created_date '
 		+ 'FROM users, followers '
 		+ 'WHERE (followers.follower_id = ' + req.query.user_id + ') AND (followers.owner_id = users.user_id) GROUP BY users.user_name ORDER BY users.created_date DESC;',
 		function(err, results, fields) {
