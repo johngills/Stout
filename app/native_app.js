@@ -1228,7 +1228,7 @@ app.get('/get-followers', checkAuth, function(req, res) {
 	client.query(
 		'SELECT DISTINCT users.user_name, users.first_name, users.last_name, users.avatar, users.user_id, users.location, users.created_date '
 		+ 'FROM users, followers '
-		+ 'WHERE (followers.owner_id = ' + req.query.user_id + ') AND (followers.follower_id = users.user_id) GROUP BY users.user_name ORDER BY users.created_date DESC;',
+		+ 'WHERE (followers.owner_id = ' + req.query.user_id + ') AND followers.follower_id = users.user_id AND users.location = users.user_id GROUP BY users.user_name ORDER BY users.created_date DESC;',
 		function(err, results, fields) {
 			if (err) throw err;
 			console.log(results);
@@ -1240,7 +1240,7 @@ app.get('/get-following', checkAuth, function(req, res) {
 	client.query(
 		'SELECT DISTINCT users.user_name, users.first_name, users.last_name, users.avatar, users.user_id, users.location, users.created_date '
 		+ 'FROM users, followers '
-		+ 'WHERE (followers.follower_id = ' + req.query.user_id + ') AND (followers.owner_id = users.user_id) GROUP BY users.user_name ORDER BY users.created_date DESC;',
+		+ 'WHERE (followers.follower_id = ' + req.query.user_id + ') AND followers.owner_id = users.user_id AND users.location = users.user_id GROUP BY users.user_name ORDER BY users.created_date DESC;',
 		function(err, results, fields) {
 			if (err) throw err;
 			console.log(results);
