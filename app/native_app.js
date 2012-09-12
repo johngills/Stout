@@ -811,6 +811,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 app.get('/add-to-drink-list', checkAuth, function(req, res) {
 	var time = new Date();
 	var current = dateToString(time);
+	
 	if (!req.query.removeList) {
 		console.log(req.query.removeList);
 		client.query( // Removes record from ToDrink table
@@ -850,7 +851,7 @@ app.get('/add-to-drink-list', checkAuth, function(req, res) {
 						console.log(results);
 						res.json({"status":"success"});
 						// Add notification
-						if (req.query.partner_id != req.query.user_id) { // makes sure owner and current user aren't the same
+						if (req.query.partner_id != req.query.user_id && req.query.partner_id != null) { // makes sure owner and current user aren't the same
 							client.query(
 								'INSERT INTO notifications ' +
 								'SET owner_id = ?, partner_id = ?, type = ?, feed_id = ?, beer_id = ?, created_date = ?',
@@ -1199,11 +1200,23 @@ app.get('/get-activity', checkAuth, function(req, res) {
 	});
 });
 
+// app.get('/get-followers', checkAuth, function(req, res) {
+// 	client.query(
+// 		'SELECT DISTINCT users.user_name, users.first_name, users.last_name, users.avatar, users.user_id, feed.beer_id, feed.rating, beers.name AS beer_name '
+// 		+ 'FROM users, feed, beers, followers '
+// 		+ 'WHERE (followers.owner_id = ' + req.query.user_id + ') AND (followers.follower_id = users.user_id) AND (feed.user_id = users.user_id) AND (feed.beer_id = beers.id) AND (feed.type = "RATE") GROUP BY users.user_name ORDER BY feed.created_date DESC;',
+// 		function(err, results, fields) {
+// 			if (err) throw err;
+// 			console.log(results);
+// 			res.send(results);
+// 	});
+// });
+
 app.get('/get-followers', checkAuth, function(req, res) {
 	client.query(
-		'SELECT DISTINCT users.user_name, users.first_name, users.last_name, users.avatar, users.user_id, feed.beer_id, feed.rating, beers.name AS beer_name '
-		+ 'FROM users, feed, beers, followers '
-		+ 'WHERE (followers.owner_id = ' + req.query.user_id + ') AND (followers.follower_id = users.user_id) AND (feed.user_id = users.user_id) AND (feed.beer_id = beers.id) AND (feed.type = "RATE") GROUP BY users.user_name ORDER BY feed.created_date DESC;',
+		'SELECT DISTINCT users.user_name, users.first_name, users.last_name, users.avatar, users.user_id, users.location, users.created_date '
+		+ 'FROM users, followers '
+		+ 'WHERE (followers.owner_id = ' + req.query.user_id + ') AND (followers.follower_id = users.user_id) GROUP BY users.user_name ORDER BY users.created_date DESC;',
 		function(err, results, fields) {
 			if (err) throw err;
 			console.log(results);
