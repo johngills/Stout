@@ -765,7 +765,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 									console.log(results);
 									res.json({"status": "success", "feed_id": results.insertId, "beer_id": req.query.beer_id, "rate": rate });
 									// Add notification
-									if (req.query.partner_id != req.query.user_id) { // makes sure owner and current user aren't the same
+									if (req.query.partner_id != req.query.user_id && req.query.partner_id != undefined) { // makes sure owner and current user aren't the same
 										client.query(
 											'INSERT INTO notifications ' +
 											'SET owner_id = ?, partner_id = ?, type = ?, feed_id = ?, created_date = ?',
