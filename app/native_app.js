@@ -558,6 +558,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 		client.query(
 			'DELETE FROM feed WHERE feed.id = ' + req.query.feed_id + ' AND feed.user_id = ' + req.query.user_id,
 			function(err, results, fields) {
+				console.log('Deleting a past beer due to unrating');
 				console.log(results);
 				
 				if (results == undefined) {
@@ -649,6 +650,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 					client.query(
 						'SELECT COUNT(feed.beer_id) AS count FROM feed WHERE feed.user_id = ' + req.query.user_id + ' AND feed.beer_id = ' + req.query.beer_id,
 						function(err, results, fields) {
+							console.log('Figuring out beer count 1');
 							console.log(results);
 							console.log(results[0].count);
 							rating_count += results[0].count; // getting current number
@@ -728,6 +730,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 		client.query(
 			'SELECT COUNT(feed.beer_id) AS count FROM feed WHERE feed.user_id = ' + req.query.user_id + ' AND feed.beer_id = ' + req.query.beer_id,
 			function(err, results, fields) {
+				console.log('Figuring out beer count 2');
 				console.log(results);
 				console.log(results[0].count);
 				rating_count += results[0].count; // getting current number + 1
