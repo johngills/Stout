@@ -653,7 +653,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 							console.log('Figuring out beer count 1');
 							console.log(results);
 							console.log(results[0].count);
-							rating_count += results[0].count; // getting current number
+							rating_count += results[0].count; // getting current number + 1
 							
 							client.query(
 								'UPDATE beers SET beers.' + req.query.rate + ' = beers.' + req.query.rate + ' + 1' + unrate + ', last_mod = "' + current + '" WHERE id = ' + req.query.beer_id + ';',
@@ -685,7 +685,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 												console.log(results);
 												res.json({"status": "success", "feed_id": results.insertId, "beer_id": req.query.beer_id, "rate": rate });
 												// Add notification
-												if (req.query.partner_id != req.query.user_id) { // makes sure owner and current user aren't the same
+												if (req.query.partner_id != req.query.user_id && req.query.partner_id != undefined) { // makes sure owner and current user aren't the same
 													client.query(
 														'INSERT INTO notifications ' +
 														'SET owner_id = ?, partner_id = ?, type = ?, feed_id = ?, created_date = ?',
@@ -773,7 +773,6 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 											function(err, sql_results, fields) {
 												if (err) throw err;
 										});
-										
 										
 										client.query(
 											'SELECT xid FROM users WHERE user_id = ' + req.query.partner_id,
@@ -918,26 +917,32 @@ app.get('/share-beer', checkAuth, function(req, res) {
 	if (req.query.send_tweet == 'true') {
 		console.log('got into the tweet statement check');
 		client.query(
-			'SELECT access_token, access_token_secret, name AS beer_name FROM users, beers WHERE beers.id = ' + req.query.beer_id + ' AND user_id = ' + req.query.user_id,
+			'SELECT COUNT(feed.beer_id) AS count, access_token, access_token_secret, name AS beer_name FROM users, beers, feed WHERE beers.id = ' + req.query.beer_id + ' AND users.user_id = ' + req.query.user_id + ' AND feed.user_id = ' + req.query.user_id + ' AND feed.beer_id = ' + req.query.beer_id,
 			function(err, results, fields) {
 				if (err) throw err;
 				console.log(results);
+				
+				var again = '';
+				
+				if (results[0].count > 1) {
+					again = ' again!';
+				}
 				
 				var share = '';
 				console.log(req.query.rating);
 				
 				switch(req.query.rating) {
 					case "1":
-						share = 'I\'m loving this ' + results[0].beer_name + ' - ';
+						share = 'I\'m loving this ' + results[0].beer_name + '' + again + ' - ';
 						break;
 					case "2":
-						share = 'Just liked a ' + results[0].beer_name + ' - ';
+						share = 'Just liked a ' + results[0].beer_name + '' + again + ' - ';
 						break;
 					case "3":
-						share = 'This '  + results[0].beer_name + ' is meh - ';
+						share = 'This '  + results[0].beer_name + ' is meh ' + again + ' - ';
 						break;
 					case "4":
-						share = 'This '  + results[0].beer_name + ' is gross - ';
+						share = 'This '  + results[0].beer_name + ' is gross ' + again + ' - ';
 						break;
 				}
 				
