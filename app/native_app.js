@@ -966,112 +966,112 @@ app.get('/share-beer', checkAuth, function(req, res) {
 	}
 });
 
-// app.get('/add-comment', checkAuth, function(req, res) {
-// 	var time = new Date();
-// 	var current = dateToString(time);
-// 	
-// 	client.query(
-// 		'INSERT INTO comments ' +
-// 		'SET feed_id = ?, owner_id = ?, partner_id = ?, beer_id = ?, rating = ?, comment = ?, created_date = ?',
-// 		[req.query.feed_id, req.query.owner_id, req.query.user_id, req.query.beer_id, req.query.rating, req.query.comment, current],
-// 		function(err, sql_results, fields) {
-// 			if (err) throw err;
-// 			console.log(sql_results);
-// 			client.query('UPDATE feed SET feed.comment_count = feed.comment_count + 1 WHERE feed.id = ' + req.query.feed_id,
-// 				function(err, results, fields) {
-// 					if (err) throw err;
-// 					console.log(results);
-// 					// Add notification
-// 					if (req.query.owner_id != req.query.user_id) { // makes sure owner and current user aren't the same
-// 						client.query(
-// 							'INSERT INTO notifications ' +
-// 							'SET owner_id = ?, partner_id = ?, type = ?, feed_id = ?, created_date = ?',
-// 							[req.query.owner_id, req.query.user_id, "COMMENT", req.query.feed_id, current],
-// 							function(err, sql_results, fields) {
-// 								if (err) throw err;
-// 						});
-// 						client.query(
-// 							'SELECT xid FROM users WHERE user_id = ' + req.query.partner_id,
-// 							function(err, results, fields) {
-// 								if (err) throw err;
-// 								console.log(results);
-// 								console.log('attempting to create push notification');
-// 								
-// 								sendNotification({ 
-// 											"apiKey": apiKey, 
-// 											"appKey": appKey,
-// 											"xids" : [
-// 												results[0].xid
-// 											],
-// 											"sendAll": false,
-// 										    "content": {
-// 										        "message": "Someone left you a comment!",
-// 												"badge": "+1"
-// 											 }
-// 										});
-// 						});
-// 					}
-// 					client.query( // grabs user info for comment
-// 						'SELECT users.user_id, users.first_name, users.last_name, users.avatar FROM users WHERE users.user_id = ' + req.query.user_id + ';', // change to store these in the session
-// 						function(err, results, fields) {
-// 							console.log(results);
-// 							res.send(results);
-// 					});
-// 			});
-// 		});
-// });
-
 app.get('/add-comment', checkAuth, function(req, res) {
 	var time = new Date();
 	var current = dateToString(time);
 	
 	client.query(
-		// 'BEGIN '
-		'INSERT INTO comments (feed_id, owner_id, partner_id, beer_id, rating, comment, created_date) '
-		+ 'VALUES (' + req.query.feed_id + ', ' + req.query.owner_id + ', ' + req.query.user_id + ', ' + req.query.beer_id + ', ' + req.query.rating + ', "' + req.query.comment + '", ' + current + ');',
-		//+ 'UPDATE feed SET feed.comment_count = feed.comment_count + 1 WHERE feed.id = ' + req.query.feed_id + ';'
-		//+ 'COMMIT;',
-		function(err, results, fields) {
+		'INSERT INTO comments ' +
+		'SET feed_id = ?, owner_id = ?, partner_id = ?, beer_id = ?, rating = ?, comment = ?, created_date = ?',
+		[req.query.feed_id, req.query.owner_id, req.query.user_id, req.query.beer_id, req.query.rating, req.query.comment, current],
+		function(err, sql_results, fields) {
 			if (err) throw err;
-			console.log(results);
-			// Add notification
-			if (req.query.owner_id != req.query.user_id) { // makes sure owner and current user aren't the same
-				client.query(
-					'INSERT INTO notifications ' +
-					'SET owner_id = ?, partner_id = ?, type = ?, feed_id = ?, created_date = ?',
-					[req.query.owner_id, req.query.user_id, "COMMENT", req.query.feed_id, current],
-					function(err, sql_results, fields) {
-						if (err) throw err;
-				});
-				client.query(
-					'SELECT xid FROM users WHERE user_id = ' + req.query.partner_id,
-					function(err, results, fields) {
-						if (err) throw err;
-						console.log(results);
-						console.log('attempting to create push notification');
-						
-						sendNotification({ 
-									"apiKey": apiKey, 
-									"appKey": appKey,
-									"xids" : [
-										results[0].xid
-									],
-									"sendAll": false,
-								    "content": {
-								        "message": "Someone left you a comment!",
-										"badge": "+1"
-									 }
-								});
-				});
-			}
-			client.query( // grabs user info for comment
-				'SELECT users.user_id, users.first_name, users.last_name, users.avatar FROM users WHERE users.user_id = ' + req.query.user_id + ';', // change to store these in the session
+			console.log(sql_results);
+			client.query('UPDATE feed SET feed.comment_count = feed.comment_count + 1 WHERE feed.id = ' + req.query.feed_id,
 				function(err, results, fields) {
+					if (err) throw err;
 					console.log(results);
-					res.send(results);
+					// Add notification
+					if (req.query.owner_id != req.query.user_id) { // makes sure owner and current user aren't the same
+						client.query(
+							'INSERT INTO notifications ' +
+							'SET owner_id = ?, partner_id = ?, type = ?, feed_id = ?, created_date = ?',
+							[req.query.owner_id, req.query.user_id, "COMMENT", req.query.feed_id, current],
+							function(err, sql_results, fields) {
+								if (err) throw err;
+						});
+						client.query(
+							'SELECT xid FROM users WHERE user_id = ' + req.query.partner_id,
+							function(err, results, fields) {
+								if (err) throw err;
+								console.log(results);
+								console.log('attempting to create push notification');
+								
+								sendNotification({ 
+											"apiKey": apiKey, 
+											"appKey": appKey,
+											"xids" : [
+												results[0].xid
+											],
+											"sendAll": false,
+										    "content": {
+										        "message": "Someone left you a comment!",
+												"badge": "+1"
+											 }
+										});
+						});
+					}
+					client.query( // grabs user info for comment
+						'SELECT users.user_id, users.first_name, users.last_name, users.avatar FROM users WHERE users.user_id = ' + req.query.user_id + ';', // change to store these in the session
+						function(err, results, fields) {
+							console.log(results);
+							res.send(results);
+					});
 			});
 		});
 });
+
+// app.get('/add-comment', checkAuth, function(req, res) {
+// 	var time = new Date();
+// 	var current = dateToString(time);
+// 	
+// 	client.query(
+// 		// 'BEGIN '
+// 		'INSERT INTO comments (feed_id, owner_id, partner_id, beer_id, rating, comment, created_date) '
+// 		+ 'VALUES (' + req.query.feed_id + ', ' + req.query.owner_id + ', ' + req.query.user_id + ', ' + req.query.beer_id + ', ' + req.query.rating + ', "' + req.query.comment + '", ' + current + ');',
+// 		//+ 'UPDATE feed SET feed.comment_count = feed.comment_count + 1 WHERE feed.id = ' + req.query.feed_id + ';'
+// 		//+ 'COMMIT;',
+// 		function(err, results, fields) {
+// 			if (err) throw err;
+// 			console.log(results);
+// 			// Add notification
+// 			if (req.query.owner_id != req.query.user_id) { // makes sure owner and current user aren't the same
+// 				client.query(
+// 					'INSERT INTO notifications ' +
+// 					'SET owner_id = ?, partner_id = ?, type = ?, feed_id = ?, created_date = ?',
+// 					[req.query.owner_id, req.query.user_id, "COMMENT", req.query.feed_id, current],
+// 					function(err, sql_results, fields) {
+// 						if (err) throw err;
+// 				});
+// 				client.query(
+// 					'SELECT xid FROM users WHERE user_id = ' + req.query.partner_id,
+// 					function(err, results, fields) {
+// 						if (err) throw err;
+// 						console.log(results);
+// 						console.log('attempting to create push notification');
+// 						
+// 						sendNotification({ 
+// 									"apiKey": apiKey, 
+// 									"appKey": appKey,
+// 									"xids" : [
+// 										results[0].xid
+// 									],
+// 									"sendAll": false,
+// 								    "content": {
+// 								        "message": "Someone left you a comment!",
+// 										"badge": "+1"
+// 									 }
+// 								});
+// 				});
+// 			}
+// 			client.query( // grabs user info for comment
+// 				'SELECT users.user_id, users.first_name, users.last_name, users.avatar FROM users WHERE users.user_id = ' + req.query.user_id + ';', // change to store these in the session
+// 				function(err, results, fields) {
+// 					console.log(results);
+// 					res.send(results);
+// 			});
+// 		});
+// });
 
 app.get('/get-twitter-friends', checkAuth, function(req, res) {
 	client.query(
