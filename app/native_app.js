@@ -448,7 +448,11 @@ app.get('/get-comments', checkAuth, function(req, res) {
 			console.log(results);
 			
 			// If comment table is not empty, send the results!
-			res.send(results);
+			if (results == '') {
+				res.send(results);
+			} else {
+				res.json({"status":"success"});
+			}
 			
 			if (req.query.notification) {
 				// Update notification table - mark as read
