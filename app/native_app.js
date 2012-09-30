@@ -448,7 +448,7 @@ app.get('/get-comments', checkAuth, function(req, res) {
 			console.log(results);
 			
 			// If comment table is not empty, send the results!
-			if (results == '') {
+			if (results != '') {
 				res.send(results);
 			} else {
 				res.json({"status":"success"});
