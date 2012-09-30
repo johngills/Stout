@@ -1026,11 +1026,11 @@ app.get('/add-comment', checkAuth, function(req, res) {
 	var current = dateToString(time);
 	
 	client.query(
-		'BEGIN '
-		+ 'INSERT INTO comments (feed_id, owner_id, partner_id, beer_id, rating, comment, created_date) '
-		+ 'VALUES (' + req.query.feed_id + ', ' + req.query.owner_id + ', ' + req.query.user_id + ', ' + req.query.beer_id + ', ' + req.query.rating + ', "' + req.query.comment + '", ' + current + ') '
-		+ 'UPDATE feed SET feed.comment_count = feed.comment_count + 1 WHERE feed.id = ' + req.query.feed_id + ';'
-		+ 'COMMIT;',
+		// 'BEGIN '
+		'INSERT INTO comments (feed_id, owner_id, partner_id, beer_id, rating, comment, created_date) '
+		+ 'VALUES (' + req.query.feed_id + ', ' + req.query.owner_id + ', ' + req.query.user_id + ', ' + req.query.beer_id + ', ' + req.query.rating + ', "' + req.query.comment + '", ' + current + ');',
+		//+ 'UPDATE feed SET feed.comment_count = feed.comment_count + 1 WHERE feed.id = ' + req.query.feed_id + ';'
+		//+ 'COMMIT;',
 		function(err, results, fields) {
 			if (err) throw err;
 			console.log(results);
