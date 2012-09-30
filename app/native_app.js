@@ -392,6 +392,45 @@ app.get('/get-feed', checkAuth, function(req, res) {
 });
 
 // Feed Detail
+// app.get('/get-comments', checkAuth, function(req, res) {
+// 	var time = new Date();
+// 	var current = dateToString(time);
+// 	
+// 	console.log(req.query.id);
+// 	
+// 	// Checks comments table
+// 	client.query(
+// 		'SELECT DISTINCT feed.type, comments.owner_id, comments.partner_id, comments.rating, comments.beer_id AS beer_id, beers.name AS beer_name, beers.description, comments.comment, comments.created_date, comment_number.comment_count, ROUND(TIMESTAMPDIFF(SECOND,comments.created_date,"' + current + '")/60) AS time, owner.avatar AS owner_avatar, owner.first_name AS owner_first_name, owner.last_name AS owner_last_name, partner.avatar AS partner_avatar, partner.first_name AS partner_first_name, partner.last_name AS partner_last_name '
+// 		+ 'FROM users AS owner, users AS partner, beers, feed, comments, '
+// 		+ '(SELECT COUNT(comments.comment) AS comment_count FROM comments WHERE comments.feed_id = ' + req.query.id + ') AS comment_number '
+// 		+ 'WHERE comments.feed_id = ' + req.query.id + ' AND feed.id = ' + req.query.id + ' AND comments.partner_id = partner.user_id AND comments.owner_id = owner.user_id AND comments.beer_id = beers.id ORDER BY comments.created_date',
+// 		function(err, results, field) {
+// 			if (err) throw err;
+// 			console.log(results);
+// 			if (results == '') {
+// 				// Checks feed for latest comment if comments table is empty
+// 				client.query(
+// 					'SELECT feed.user_id, feed.beer_id AS beer_id, feed.rating, feed.type, feed.comment, feed.comment_count, beers.name AS beer_name, beers.description, users.first_name AS owner_first_name, users.last_name AS owner_last_name, users.avatar AS owner_avatar, ROUND(TIMESTAMPDIFF(SECOND,feed.created_date,"' + current + '")/60) AS time, feed.created_date '
+// 					+ 'FROM feed, beers, users WHERE feed.id = ' + req.query.id + ' AND feed.beer_id = beers.id AND feed.user_id = users.user_id',
+// 					function(err, results, field) {
+// 						if (err) throw err;
+// 						console.log(results);
+// 						res.send(results);
+// 				});
+// 			} else {
+// 				// If comment table is not empty, send the results!
+// 				res.send(results);
+// 			}
+// 			// Update notification table - mark as read
+// 			client.query(
+// 				'UPDATE notifications SET notifications.read = 1 WHERE feed_id = ' + req.query.id + ' AND (type = "COMMENT" OR type = "RATE" OR type = "LIST");',
+// 				function(err, results, field) {
+// 					if (err) throw err;
+// 					console.log(results);
+// 			});
+// 	});
+// });
+
 app.get('/get-comments', checkAuth, function(req, res) {
 	var time = new Date();
 	var current = dateToString(time);
@@ -400,34 +439,26 @@ app.get('/get-comments', checkAuth, function(req, res) {
 	
 	// Checks comments table
 	client.query(
-		'SELECT DISTINCT feed.type, comments.owner_id, comments.partner_id, comments.rating, comments.beer_id AS beer_id, beers.name AS beer_name, beers.description, comments.comment, comments.created_date, comment_number.comment_count, ROUND(TIMESTAMPDIFF(SECOND,comments.created_date,"' + current + '")/60) AS time, owner.avatar AS owner_avatar, owner.first_name AS owner_first_name, owner.last_name AS owner_last_name, partner.avatar AS partner_avatar, partner.first_name AS partner_first_name, partner.last_name AS partner_last_name '
-		+ 'FROM users AS owner, users AS partner, beers, feed, comments, '
+		'SELECT DISTINCT comments.owner_id, comments.partner_id, comments.rating, comments.beer_id AS beer_id, comments.comment, comments.created_date, comment_number.comment_count, ROUND(TIMESTAMPDIFF(SECOND,comments.created_date,"' + current + '")/60) AS time, owner.avatar AS owner_avatar, owner.first_name AS owner_first_name, owner.last_name AS owner_last_name, partner.avatar AS partner_avatar, partner.first_name AS partner_first_name, partner.last_name AS partner_last_name '
+		+ 'FROM users AS owner, users AS partner, beers, comments, '
 		+ '(SELECT COUNT(comments.comment) AS comment_count FROM comments WHERE comments.feed_id = ' + req.query.id + ') AS comment_number '
-		+ 'WHERE comments.feed_id = ' + req.query.id + ' AND feed.id = ' + req.query.id + ' AND comments.partner_id = partner.user_id AND comments.owner_id = owner.user_id AND comments.beer_id = beers.id ORDER BY comments.created_date',
+		+ 'WHERE comments.feed_id = ' + req.query.id + ' AND comments.partner_id = partner.user_id AND comments.owner_id = owner.user_id AND comments.beer_id = beers.id ORDER BY comments.created_date',
 		function(err, results, field) {
 			if (err) throw err;
 			console.log(results);
-			if (results == '') {
-				// Checks feed for latest comment if comments table is empty
+			
+			// If comment table is not empty, send the results!
+			res.send(results);
+			
+			if (req.query.notification) {
+				// Update notification table - mark as read
 				client.query(
-					'SELECT feed.user_id, feed.beer_id AS beer_id, feed.rating, feed.type, feed.comment, feed.comment_count, beers.name AS beer_name, beers.description, users.first_name AS owner_first_name, users.last_name AS owner_last_name, users.avatar AS owner_avatar, ROUND(TIMESTAMPDIFF(SECOND,feed.created_date,"' + current + '")/60) AS time, feed.created_date '
-					+ 'FROM feed, beers, users WHERE feed.id = ' + req.query.id + ' AND feed.beer_id = beers.id AND feed.user_id = users.user_id',
+					'UPDATE notifications SET notifications.read = 1 WHERE feed_id = ' + req.query.id + ' AND (type = "COMMENT" OR type = "RATE" OR type = "LIST");',
 					function(err, results, field) {
 						if (err) throw err;
 						console.log(results);
-						res.send(results);
 				});
-			} else {
-				// If comment table is not empty, send the results!
-				res.send(results);
 			}
-			// Update notification table - mark as read
-			client.query(
-				'UPDATE notifications SET notifications.read = 1 WHERE feed_id = ' + req.query.id + ' AND (type = "COMMENT" OR type = "RATE" OR type = "LIST");',
-				function(err, results, field) {
-					if (err) throw err;
-					console.log(results);
-			});
 	});
 });
 
