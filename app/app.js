@@ -34,8 +34,8 @@ var app = express.createServer(
 				express.cookieParser(),
 				express.session({secret: 'FlurbleGurgleBurgle',
 				                store: new express.session.MemoryStore({ reapInterval: -1 }) }));
-app.listen(1337);
-//app.listen(80);
+//app.listen(1337);
+app.listen(80);
 
 process.on('uncaughtException', function(err) {
 	console.log('Caught exception: ' + err.stack);
@@ -51,19 +51,19 @@ app.enable('jsonp callback');
 // DATABASE
 // --------------------------------------------------------------------------------------
 
-// var mysql = require('mysql'),
-// 	database = 'stout',
-// 	user_table = 'users',
-// 	client = mysql.createClient({ user: 'sterlingrules', password: '@y&7~s45', host: 'mysql.mynameissterling.com', port: 3306 });
-// 	client.query('USE ' + database);
-// 	client.database = 'stout';
-
 var mysql = require('mysql'),
-	database = 'beer',
+	database = 'stout',
 	user_table = 'users',
-	client = mysql.createClient({ user: 'root', password: '' });
+	client = mysql.createClient({ user: 'sterlingrules', password: '@y&7~s45', host: 'mysql.mynameissterling.com', port: 3306 });
 	client.query('USE ' + database);
-	client.database = 'beer';
+	client.database = 'stout';
+
+// var mysql = require('mysql'),
+// 	database = 'beer',
+// 	user_table = 'users',
+// 	client = mysql.createClient({ user: 'root', password: '' });
+// 	client.query('USE ' + database);
+// 	client.database = 'beer';
 
 // --------------------------------------------------------------------------------------
 // OAUTH SETUP
@@ -75,8 +75,8 @@ var oa = new OAuth(
 	"Nmqm7UthsfdjaDQ4HcxPw",
 	"PIFvIPSXlTIbqnnnjBIqoWs0VIxpQivNrIJuWxtkLI",
 	"1.0",
-	"http://localhost:1337/auth/twitter/callback",
-	//"http://stoutapp.com/auth/twitter/callback",
+	//"http://localhost:1337/auth/twitter/callback",
+	"http://stoutapp.com/auth/twitter/callback",
 	"HMAC-SHA1"
 );
 
