@@ -451,7 +451,18 @@ app.get('/get-comments', checkAuth, function(req, res) {
 			if (results != '') {
 				res.send(results);
 			} else {
-				res.json({"status":"success"});
+				// Needs to do this, because even if there are no comments, the add a comment field requires
+				// beer_id, owner_id, and rating to add to this feed detail
+				// TODO: Try to make this into one SQL call above though
+				client.query(
+					'SELECT feed.user_id, feed.beer_id AS beer_id, feed.rating '
+					+ 'FROM feed, beers WHERE feed.id = ' + req.query.id + ' AND feed.beer_id = beers.id',
+					function(err, results, field) {
+						if (err) throw err;
+						console.log(results);
+						res.json({"status" : "success", "beer_id" : results[0].beer_id, "owner_id" : results[0].user_id, "rating" : results[0].rating });
+						// res.send(results);
+				});
 			}
 			
 			if (req.query.notification) {
