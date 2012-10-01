@@ -460,8 +460,8 @@ app.get('/get-comments', checkAuth, function(req, res) {
 					function(err, results, field) {
 						if (err) throw err;
 						console.log(results);
-						res.json({ "status" : "success", "beer_id" : results[0].beer_id, "user_id" : results[0].user_id, "rating" : results[0].rating });
-						// res.send(results);
+						//res.json({ "status" : "success", "beer_id" : results[0].beer_id, "user_id" : results[0].user_id, "rating" : results[0].rating });
+						res.send(results);
 				});
 			}
 			
