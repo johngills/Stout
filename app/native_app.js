@@ -455,8 +455,8 @@ app.get('/get-comments', checkAuth, function(req, res) {
 				// beer_id, owner_id, and rating to add to this feed detail
 				// TODO: Try to make this into one SQL call above though
 				client.query(
-					'SELECT feed.user_id, feed.beer_id AS beer_id, feed.rating '
-					+ 'FROM feed, beers WHERE feed.id = ' + req.query.id + ' AND feed.beer_id = beers.id',
+					'SELECT feed.user_id, feed.beer_id, feed.rating '
+					+ 'FROM feed WHERE feed.id = ' + req.query.id,
 					function(err, results, field) {
 						if (err) throw err;
 						console.log(results);
