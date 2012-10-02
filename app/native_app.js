@@ -1153,9 +1153,8 @@ app.get('/get-twitter-friends', checkAuth, function(req, res) {
 					console.log(data.ids.length);
 					
 					client.query(
-						'SELECT DISTINCT users.user_id, users.first_name, users.last_name, users.avatar, following.owner_id '
-						+ 'FROM users, followers, (SELECT followers.owner_id FROM followers WHERE followers.follower_id = ' + req.query.user_id + ') AS following '
-						+ 'WHERE users.user_id IN (' + twitter_friends + '0) AND following.owner_id NOT IN (' + twitter_friends + '0);',
+						'SELECT DISTINCT users.user_id, users.first_name, users.last_name, users.avatar '
+						+ 'FROM users, followers WHERE users.user_id IN (' + twitter_friends + '0);',
 						function(err, results, fields) {
 							if (err) throw err;
 							console.log(results);
