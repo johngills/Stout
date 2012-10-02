@@ -1154,7 +1154,9 @@ app.get('/get-twitter-friends', checkAuth, function(req, res) {
 					
 					client.query(
 						'SELECT DISTINCT users.user_id, users.first_name, users.last_name, users.avatar '
-						+ 'FROM users, followers WHERE followers.owner_id NOT IN (' + twitter_friends + '0);',
+						+ 'FROM users, followers, '
+						+ '(SELECT user_id WHERE users.user_id IN (' + twitter_friends + '0)) AS twitter_stout_users '
+						+ 'WHERE followers.owner_id NOT IN twitter_stout_users.user_id;',
 						function(err, results, fields) {
 							console.log(results);
 							stout_friends = results;
