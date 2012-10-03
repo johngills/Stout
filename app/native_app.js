@@ -1037,7 +1037,7 @@ app.get('/add-comment', checkAuth, function(req, res) {
 								if (err) throw err;
 						});
 						client.query(
-							'SELECT xid FROM users WHERE user_id = ' + req.query.partner_id,
+							'SELECT xid FROM users WHERE user_id = ' + req.query.owner_id,
 							function(err, results, fields) {
 								if (err) throw err;
 								console.log(results);
@@ -1154,7 +1154,7 @@ app.get('/get-twitter-friends', checkAuth, function(req, res) {
 					
 					client.query(
 						'SELECT DISTINCT users.user_id, users.first_name, users.last_name, users.avatar '
-						+ 'FROM users, followers WHERE users.user_id IN (' + twitter_friends + '0);',
+						+ 'FROM users, followers WHERE users.user_id IN (' + twitter_friends + '0) AND followers.owner_id NOT IN (' + twitter_friends + '0);',
 						function(err, results, fields) {
 							if (err) throw err;
 							console.log(results);
