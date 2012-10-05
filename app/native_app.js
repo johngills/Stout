@@ -514,15 +514,15 @@ app.get('/beer-detail', checkAuth, function(req, res) {
 // 			res.send(results);
 // 	});
 // });
-// app.get('/get-beer-categories', checkAuth, function(req, res) {
-// 	client.query(
-// 		'SELECT * FROM categories',
-// 		function(err, results, fields) {
-// 			if (err) throw err;
-// 			console.log(results);
-// 			res.send(results);
-// 	});
-// });
+app.get('/get-beer-categories', checkAuth, function(req, res) {
+	client.query(
+		'SELECT * FROM categories',
+		function(err, results, fields) {
+			if (err) throw err;
+			console.log(results);
+			res.send(results);
+	});
+});
 // app.get('/get-beer-styles', checkAuth, function(req, res) {
 // 	client.query(
 // 		'SELECT * FROM styles WHERE cat_id = ' + req.query.cat_id,
@@ -535,11 +535,30 @@ app.get('/beer-detail', checkAuth, function(req, res) {
 
 app.get('/get-add-beer', checkAuth, function(req, res) {
 	client.query(
-		'SELECT breweries.name AS brewery_name, breweries.id AS brewery_value, categories.cat_name, categories.id AS cat_id FROM breweries, categories',
-		function(err, results, fields) {
+		'SELECT breweries.name AS brewery_name, breweries.id AS brewery_value FROM breweries',
+		function(err, brewery_results, fields) {
 			if (err) throw err;
-			console.log(results);
-			res.send(results);
+			
+			client.query(
+				'SELECT * FROM categories',
+				function(err, category_results, fields) {
+					if (err) throw err;
+					
+					console.log(results);
+					console.log({
+						status : "success",
+						breweries : brewery_results,
+						categories : category_results
+					});
+					
+					res.json({
+						status : "success",
+						breweries : brewery_results,
+						categories : category_results
+					});
+					// res.send(results);
+					
+			});
 	});
 });
 
