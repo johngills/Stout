@@ -547,17 +547,16 @@ app.get('/get-add-beer', checkAuth, function(req, res) {
 					
 					console.log(category_results);
 					console.log({
-						status : "success",
-						breweries : brewery_results,
-						categories : category_results
+						"status" : "success",
+						"breweries" : brewery_results,
+						"categories" : category_results
 					});
 					
 					res.json({
-						status : "success",
-						breweries : brewery_results,
-						categories : category_results
+						"status" : "success",
+						"breweries" : brewery_results,
+						"categories" : category_results
 					});
-					// res.send(results);
 					
 			});
 	});
