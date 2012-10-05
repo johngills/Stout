@@ -538,13 +538,14 @@ app.get('/get-add-beer', checkAuth, function(req, res) {
 		'SELECT breweries.name AS brewery_name, breweries.id AS brewery_value FROM breweries',
 		function(err, brewery_results, fields) {
 			if (err) throw err;
+			console.log(brewery_results);
 			
 			client.query(
 				'SELECT * FROM categories',
 				function(err, category_results, fields) {
 					if (err) throw err;
 					
-					console.log(results);
+					console.log(category_results);
 					console.log({
 						status : "success",
 						breweries : brewery_results,
