@@ -535,7 +535,7 @@ app.get('/beer-detail', checkAuth, function(req, res) {
 
 app.get('/get-add-beer', checkAuth, function(req, res) {
 	client.query(
-		'SELECT breweries.name AS brewery_name, breweries.id AS brewery_value, categories.cat_name, categories.id AS cat_id FROM breweries',
+		'SELECT breweries.name AS brewery_name, breweries.id AS brewery_value, categories.cat_name, categories.id AS cat_id FROM breweries, categories',
 		function(err, results, fields) {
 			if (err) throw err;
 			console.log(results);
