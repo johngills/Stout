@@ -889,7 +889,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 	if (req.query.feed_id == undefined) {
 		query = 'DELETE FROM feed WHERE feed.created_date = (SELECT MAX(feed.created_date) FROM feed WHERE feed.beer_id = ' + req.query.beer_id + ') AND feed.beer_id = ' + req.query.beer_id + ' AND feed.user_id = ' + req.query.user_id;
 	} else {
-		query = 'DELETE FROM feed WHERE feed.created_date = (SELECT MAX(feed.created_date) FROM feed WHERE feed.beer_id = ' + req.query.beer_id + ') AND feed.id = ' + req.query.feed_id + ' AND feed.user_id = ' + req.query.user_id;
+		query = 'DELETE FROM feed WHERE feed.id = ' + req.query.feed_id + ' AND feed.user_id = ' + req.query.user_id;
 	}
 	
 	console.log('beer_id: ' + req.query.beer_id + ', feed_id: ' + req.query.feed_id + ', user_id: ' + req.query.user_id);
