@@ -614,198 +614,382 @@ app.get('/new-beer', checkAuth, function(req, res) {
 // --------------------------------------------------------------------------------------
 
 
+// app.get('/beer-checkin', checkAuth, function(req, res) {
+// 	var time = new Date();
+// 	var current = dateToString(time);
+// 	var unrate = '';
+// 	var rating_count = 1;
+// 	
+// 	console.log('beer_id: ' + req.query.beer_id + ', feed_id: ' + req.query.feed_id + ', user_id: ' + req.query.user_id);
+// 	console.log(req.query.unrate);
+// 	
+// 	// Check if user is re-rating a beer
+// 	if (req.query.unrate != '') {
+// 		var unrate = ', beers.' + req.query.unrate + ' = beers.' + req.query.unrate + ' - 1';
+// 		client.query(
+// 			'DELETE FROM feed WHERE feed.id = ' + req.query.feed_id + ' AND feed.user_id = ' + req.query.user_id,
+// 			function(err, results, fields) {
+// 				console.log('Deleting a past beer due to unrating');
+// 				console.log(results);
+// 				
+// 				if (results == undefined) {
+// 					// If no feed_id then delete latest item
+// 					client.query(
+// 						'SELECT beers.name, feed.beer_id, feed.id, feed.created_date FROM feed, beers WHERE feed.user_id = ' + req.query.user_id + ' AND feed.beer_id = beers.id AND feed.created_date = (SELECT MAX(feed.created_date) FROM feed)',
+// 						function(err, results, fields) {
+// 							console.log(results);
+// 							client.query('DELETE FROM feed WHERE feed.id = ' + results[0].id,
+// 								function(err, results, fields) {
+// 									console.log(results);
+// 									// Find the beer count to update the rating_count
+// 									client.query(
+// 										'SELECT COUNT(feed.beer_id) AS count FROM feed WHERE feed.user_id = ' + req.query.user_id + ' AND feed.beer_id = ' + req.query.beer_id,
+// 										function(err, results, fields) {
+// 											console.log(results);
+// 											console.log(results[0].count);
+// 											rating_count += results[0].count; // getting current number
+// 											
+// 											client.query(
+// 												'UPDATE beers SET beers.' + req.query.rate + ' = beers.' + req.query.rate + ' + 1' + unrate + ', last_mod = "' + current + '" WHERE id = ' + req.query.beer_id + ';',
+// 												function(err, results, fields) {
+// 													if (err) throw err;
+// 													if (results != undefined) {
+// 														console.log(results);
+// 														var rate = '';
+// 														switch(req.query.rate) {
+// 															case 'love':
+// 																rate = 1;
+// 																break;
+// 															case 'like':
+// 																rate = 2;
+// 																break;
+// 															case 'meh':
+// 																rate = 3;
+// 																break;
+// 															case 'dislike':
+// 																rate = 4;
+// 																break;
+// 														}
+// 														client.query(
+// 															'INSERT INTO feed ' +
+// 															'SET user_id = ?, user_name = ?, beer_id = ?, type = ?, rating = ?, rating_count = ?, latitude = ?, longitude = ?, created_date = ? ',
+// 															[req.query.user_id, req.query.user_name, req.query.beer_id, "RATE", rate, rating_count, req.query.latitude, req.query.longitude, current],
+// 															function(err, results, fields) {
+// 																if (err) throw err;
+// 																console.log(results);
+// 																res.json({"status": "success", "feed_id": results.insertId, "beer_id": req.query.beer_id, "rate": rate });
+// 																// Add notification if rating someone elses beer
+// 																if (req.query.partner_id != req.query.user_id) { // makes sure owner and current user aren't the same
+// 																	client.query(
+// 																		'INSERT INTO notifications ' +
+// 																		'SET owner_id = ?, partner_id = ?, type = ?, feed_id = ?, created_date = ?',
+// 																		[req.query.partner_id, req.query.user_id, "RATE", results.insertId, current],
+// 																		function(err, sql_results, fields) {
+// 																			if (err) throw err;
+// 																	});
+// 																	client.query(
+// 																		'SELECT xid FROM users WHERE user_id = ' + req.query.user_id,
+// 																		function(err, results, fields) {
+// 																			if (err) throw err;
+// 																			console.log(results);
+// 																			console.log('attempting to create push notification');																			
+// 																			sendNotification({ 
+// 																						"apiKey": apiKey, 
+// 																						"appKey": appKey,
+// 																						"xids" : [
+// 																							results[0].xid
+// 																						],
+// 																						"sendAll": false,
+// 																					    "content": {
+// 																					        "message": "Someone else enjoyed your beer!",
+// 																							"badge": "+1"
+// 																						 }
+// 																					});
+// 																	});
+// 																}
+// 															}
+// 														);
+// 													} else {
+// 														res.json({"status":"failure"});
+// 													}
+// 												});
+// 									});
+// 							});
+// 					});
+// 				} else {
+// 					// Find the beer count to update the rating_count
+// 					client.query(
+// 						'SELECT COUNT(feed.beer_id) AS count FROM feed WHERE feed.user_id = ' + req.query.user_id + ' AND feed.beer_id = ' + req.query.beer_id,
+// 						function(err, results, fields) {
+// 							console.log('Figuring out beer count 1');
+// 							console.log(results);
+// 							console.log(results[0].count);
+// 							rating_count += results[0].count; // getting current number + 1
+// 							
+// 							client.query(
+// 								'UPDATE beers SET beers.' + req.query.rate + ' = beers.' + req.query.rate + ' + 1' + unrate + ', last_mod = "' + current + '" WHERE id = ' + req.query.beer_id + ';',
+// 								function(err, results, fields) {
+// 									if (err) throw err;
+// 									if (results != undefined) {
+// 										console.log(results);
+// 										var rate = '';
+// 										switch(req.query.rate) {
+// 											case 'love':
+// 												rate = 1;
+// 												break;
+// 											case 'like':
+// 												rate = 2;
+// 												break;
+// 											case 'meh':
+// 												rate = 3;
+// 												break;
+// 											case 'dislike':
+// 												rate = 4;
+// 												break;
+// 										}
+// 										client.query(
+// 											'INSERT INTO feed ' +
+// 											'SET user_id = ?, user_name = ?, beer_id = ?, type = ?, rating = ?, rating_count = ?, latitude = ?, longitude = ?, created_date = ? ',
+// 											[req.query.user_id, req.query.user_name, req.query.beer_id, "RATE", rate, rating_count, req.query.latitude, req.query.longitude, current],
+// 											function(err, results, fields) {
+// 												if (err) throw err;
+// 												console.log(results);
+// 												res.json({"status": "success", "feed_id": results.insertId, "beer_id": req.query.beer_id, "rate": rate });
+// 												// Add notification
+// 												if (req.query.partner_id != req.query.user_id && req.query.partner_id != undefined) { // makes sure owner and current user aren't the same
+// 													client.query(
+// 														'INSERT INTO notifications ' +
+// 														'SET owner_id = ?, partner_id = ?, type = ?, feed_id = ?, created_date = ?',
+// 														[req.query.partner_id, req.query.user_id, "RATE", results.insertId, current],
+// 														function(err, sql_results, fields) {
+// 															if (err) throw err;
+// 													});
+// 													
+// 													client.query(
+// 														'SELECT xid FROM users WHERE user_id = ' + req.query.partner_id,
+// 														function(err, results, fields) {
+// 															if (err) throw err;
+// 															console.log(results);
+// 															console.log('attempting to create push notification');
+// 															
+// 															sendNotification({ 
+// 																		"apiKey": apiKey, 
+// 																		"appKey": appKey,
+// 																		"xids" : [
+// 																			results[0].xid
+// 																		],
+// 																		"sendAll": false,
+// 																	    "content": {
+// 																	        "message": "Someone else enjoyed your beer!",
+// 																			"badge": "+1"
+// 																		 }
+// 																	});
+// 													});
+// 													
+// 												}
+// 											}
+// 										);
+// 									} else {
+// 										res.json({"status":"failure"});
+// 									}
+// 								});
+// 					});
+// 				}
+// 		});
+// 	} else {
+// 		// Find the beer count to update the rating_count
+// 		client.query(
+// 			'SELECT COUNT(feed.beer_id) AS count FROM feed WHERE feed.user_id = ' + req.query.user_id + ' AND feed.beer_id = ' + req.query.beer_id,
+// 			function(err, results, fields) {
+// 				console.log('Figuring out beer count 2');
+// 				console.log(results);
+// 				console.log(results[0].count);
+// 				rating_count += results[0].count; // getting current number + 1
+// 				
+// 				client.query(
+// 					'UPDATE beers SET beers.' + req.query.rate + ' = beers.' + req.query.rate + ' + 1' + unrate + ', last_mod = "' + current + '" WHERE id = ' + req.query.beer_id + ';',
+// 					function(err, results, fields) {
+// 						if (err) throw err;
+// 						if (results != undefined) {
+// 							console.log(results);
+// 							var rate = '';
+// 							switch(req.query.rate) {
+// 								case 'love':
+// 									rate = 1;
+// 									break;
+// 								case 'like':
+// 									rate = 2;
+// 									break;
+// 								case 'meh':
+// 									rate = 3;
+// 									break;
+// 								case 'dislike':
+// 									rate = 4;
+// 									break;
+// 							}
+// 							client.query(
+// 								'INSERT INTO feed ' +
+// 								'SET user_id = ?, user_name = ?, beer_id = ?, type = ?, rating = ?, rating_count = ?, latitude = ?, longitude = ?, created_date = ? ',
+// 								[req.query.user_id, req.query.user_name, req.query.beer_id, "RATE", rate, rating_count, req.query.latitude, req.query.longitude, current],
+// 								function(err, results, fields) {
+// 									if (err) throw err;
+// 									console.log(results);
+// 									res.json({"status": "success", "feed_id": results.insertId, "beer_id": req.query.beer_id, "rate": rate });
+// 									// Add notification
+// 									if (req.query.partner_id != req.query.user_id && req.query.partner_id != undefined) { // makes sure owner and current user aren't the same
+// 										client.query(
+// 											'INSERT INTO notifications ' +
+// 											'SET owner_id = ?, partner_id = ?, type = ?, feed_id = ?, created_date = ?',
+// 											[req.query.partner_id, req.query.user_id, "RATE", results.insertId, current],
+// 											function(err, sql_results, fields) {
+// 												if (err) throw err;
+// 										});
+// 										
+// 										client.query(
+// 											'SELECT xid FROM users WHERE user_id = ' + req.query.partner_id,
+// 											function(err, results, fields) {
+// 												if (err) throw err;
+// 												console.log(results);
+// 												console.log('attempting to create push notification');
+// 												
+// 												sendNotification({ 
+// 															"apiKey": apiKey, 
+// 															"appKey": appKey,
+// 															"xids" : [
+// 																results[0].xid
+// 															],
+// 															"sendAll": false,
+// 														    "content": {
+// 														        "message": "Someone else enjoyed your beer!",
+// 																"badge": "+1"
+// 															 }
+// 														});
+// 										});
+// 										
+// 									}
+// 								}
+// 							);
+// 						} else {
+// 							res.json({"status":"failure"});
+// 						}
+// 					});
+// 		});
+// 	}
+// });
+
+
 app.get('/beer-checkin', checkAuth, function(req, res) {
-	var time = new Date();
-	var current = dateToString(time);
-	var unrate = '';
-	var rating_count = 1;
+	
+	var time = new Date(),
+		current = dateToString(time),
+		unrate = '',
+		query = null,
+		rating_count = 1;
+	
+	if (req.query.feed_id == undefined) {
+		query = 'DELETE FROM feed WHERE feed.created_date = (SELECT MAX(feed.created_date) FROM feed) AND feed.beer_id = ' + req.query.beer_id + ' AND feed.user_id = ' + req.query.user_id;
+	} else {
+		query = 'DELETE FROM feed WHERE feed.created_date = (SELECT MAX(feed.created_date) FROM feed) AND feed.id = ' + req.query.feed_id + ' AND feed.user_id = ' + req.query.user_id;
+	}
 	
 	console.log('beer_id: ' + req.query.beer_id + ', feed_id: ' + req.query.feed_id + ', user_id: ' + req.query.user_id);
 	console.log(req.query.unrate);
 	
 	// Check if user is re-rating a beer
 	if (req.query.unrate != '') {
+		
 		var unrate = ', beers.' + req.query.unrate + ' = beers.' + req.query.unrate + ' - 1';
-		client.query(
-			'DELETE FROM feed WHERE feed.id = ' + req.query.feed_id + ' AND feed.user_id = ' + req.query.user_id,
+		
+		client.query(query,
 			function(err, results, fields) {
 				console.log('Deleting a past beer due to unrating');
 				console.log(results);
-				
-				if (results == undefined) {
-					// If no feed_id then delete latest item
-					client.query(
-						'SELECT beers.name, feed.beer_id, feed.id, feed.created_date FROM feed, beers WHERE feed.user_id = ' + req.query.user_id + ' AND feed.beer_id = beers.id AND feed.created_date = (SELECT MAX(feed.created_date) FROM feed)',
-						function(err, results, fields) {
-							console.log(results);
-							client.query('DELETE FROM feed WHERE feed.id = ' + results[0].id,
-								function(err, results, fields) {
+									
+				// Find the beer count to update the rating_count
+				client.query(
+					'SELECT COUNT(feed.beer_id) AS count FROM feed WHERE feed.user_id = ' + req.query.user_id + ' AND feed.beer_id = ' + req.query.beer_id,
+					function(err, results, fields) {
+						console.log(results);
+						console.log(results[0].count);
+						rating_count += results[0].count; // getting current number
+						
+						client.query(
+							'UPDATE beers SET beers.' + req.query.rate + ' = beers.' + req.query.rate + ' + 1' + unrate + ', last_mod = "' + current + '" WHERE id = ' + req.query.beer_id + ';',
+							function(err, results, fields) {
+								if (err) throw err;
+								if (results != undefined) {
 									console.log(results);
-									// Find the beer count to update the rating_count
-									client.query(
-										'SELECT COUNT(feed.beer_id) AS count FROM feed WHERE feed.user_id = ' + req.query.user_id + ' AND feed.beer_id = ' + req.query.beer_id,
-										function(err, results, fields) {
-											console.log(results);
-											console.log(results[0].count);
-											rating_count += results[0].count; // getting current number
-											
-											client.query(
-												'UPDATE beers SET beers.' + req.query.rate + ' = beers.' + req.query.rate + ' + 1' + unrate + ', last_mod = "' + current + '" WHERE id = ' + req.query.beer_id + ';',
-												function(err, results, fields) {
-													if (err) throw err;
-													if (results != undefined) {
-														console.log(results);
-														var rate = '';
-														switch(req.query.rate) {
-															case 'love':
-																rate = 1;
-																break;
-															case 'like':
-																rate = 2;
-																break;
-															case 'meh':
-																rate = 3;
-																break;
-															case 'dislike':
-																rate = 4;
-																break;
-														}
-														client.query(
-															'INSERT INTO feed ' +
-															'SET user_id = ?, user_name = ?, beer_id = ?, type = ?, rating = ?, rating_count = ?, latitude = ?, longitude = ?, created_date = ? ',
-															[req.query.user_id, req.query.user_name, req.query.beer_id, "RATE", rate, rating_count, req.query.latitude, req.query.longitude, current],
-															function(err, results, fields) {
-																if (err) throw err;
-																console.log(results);
-																res.json({"status": "success", "feed_id": results.insertId, "beer_id": req.query.beer_id, "rate": rate });
-																// Add notification if rating someone elses beer
-																if (req.query.partner_id != req.query.user_id) { // makes sure owner and current user aren't the same
-																	client.query(
-																		'INSERT INTO notifications ' +
-																		'SET owner_id = ?, partner_id = ?, type = ?, feed_id = ?, created_date = ?',
-																		[req.query.partner_id, req.query.user_id, "RATE", results.insertId, current],
-																		function(err, sql_results, fields) {
-																			if (err) throw err;
-																	});
-																	client.query(
-																		'SELECT xid FROM users WHERE user_id = ' + req.query.user_id,
-																		function(err, results, fields) {
-																			if (err) throw err;
-																			console.log(results);
-																			console.log('attempting to create push notification');																			
-																			sendNotification({ 
-																						"apiKey": apiKey, 
-																						"appKey": appKey,
-																						"xids" : [
-																							results[0].xid
-																						],
-																						"sendAll": false,
-																					    "content": {
-																					        "message": "Someone else enjoyed your beer!",
-																							"badge": "+1"
-																						 }
-																					});
-																	});
-																}
-															}
-														);
-													} else {
-														res.json({"status":"failure"});
-													}
-												});
-									});
-							});
-					});
-				} else {
-					// Find the beer count to update the rating_count
-					client.query(
-						'SELECT COUNT(feed.beer_id) AS count FROM feed WHERE feed.user_id = ' + req.query.user_id + ' AND feed.beer_id = ' + req.query.beer_id,
-						function(err, results, fields) {
-							console.log('Figuring out beer count 1');
-							console.log(results);
-							console.log(results[0].count);
-							rating_count += results[0].count; // getting current number + 1
-							
-							client.query(
-								'UPDATE beers SET beers.' + req.query.rate + ' = beers.' + req.query.rate + ' + 1' + unrate + ', last_mod = "' + current + '" WHERE id = ' + req.query.beer_id + ';',
-								function(err, results, fields) {
-									if (err) throw err;
-									if (results != undefined) {
-										console.log(results);
-										var rate = '';
-										switch(req.query.rate) {
-											case 'love':
-												rate = 1;
-												break;
-											case 'like':
-												rate = 2;
-												break;
-											case 'meh':
-												rate = 3;
-												break;
-											case 'dislike':
-												rate = 4;
-												break;
-										}
-										client.query(
-											'INSERT INTO feed ' +
-											'SET user_id = ?, user_name = ?, beer_id = ?, type = ?, rating = ?, rating_count = ?, latitude = ?, longitude = ?, created_date = ? ',
-											[req.query.user_id, req.query.user_name, req.query.beer_id, "RATE", rate, rating_count, req.query.latitude, req.query.longitude, current],
-											function(err, results, fields) {
-												if (err) throw err;
-												console.log(results);
-												res.json({"status": "success", "feed_id": results.insertId, "beer_id": req.query.beer_id, "rate": rate });
-												// Add notification
-												if (req.query.partner_id != req.query.user_id && req.query.partner_id != undefined) { // makes sure owner and current user aren't the same
-													client.query(
-														'INSERT INTO notifications ' +
-														'SET owner_id = ?, partner_id = ?, type = ?, feed_id = ?, created_date = ?',
-														[req.query.partner_id, req.query.user_id, "RATE", results.insertId, current],
-														function(err, sql_results, fields) {
-															if (err) throw err;
-													});
-													
-													client.query(
-														'SELECT xid FROM users WHERE user_id = ' + req.query.partner_id,
-														function(err, results, fields) {
-															if (err) throw err;
-															console.log(results);
-															console.log('attempting to create push notification');
-															
-															sendNotification({ 
-																		"apiKey": apiKey, 
-																		"appKey": appKey,
-																		"xids" : [
-																			results[0].xid
-																		],
-																		"sendAll": false,
-																	    "content": {
-																	        "message": "Someone else enjoyed your beer!",
-																			"badge": "+1"
-																		 }
-																	});
-													});
-													
-												}
-											}
-										);
-									} else {
-										res.json({"status":"failure"});
+									var rate = '';
+									switch(req.query.rate) {
+										case 'love':
+											rate = 1;
+											break;
+										case 'like':
+											rate = 2;
+											break;
+										case 'meh':
+											rate = 3;
+											break;
+										case 'dislike':
+											rate = 4;
+											break;
 									}
-								});
-					});
-				}
+									client.query(
+										'INSERT INTO feed ' +
+										'SET user_id = ?, user_name = ?, beer_id = ?, type = ?, rating = ?, rating_count = ?, latitude = ?, longitude = ?, created_date = ? ',
+										[req.query.user_id, req.query.user_name, req.query.beer_id, "RATE", rate, rating_count, req.query.latitude, req.query.longitude, current],
+										function(err, results, fields) {
+											if (err) throw err;
+											console.log(results);
+											res.json({"status": "success", "feed_id": results.insertId, "beer_id": req.query.beer_id, "rate": rate });
+											// Add notification if rating someone elses beer
+											if (req.query.partner_id != req.query.user_id) { // makes sure owner and current user aren't the same
+												client.query(
+													'INSERT INTO notifications ' +
+													'SET owner_id = ?, partner_id = ?, type = ?, feed_id = ?, created_date = ?',
+													[req.query.partner_id, req.query.user_id, "RATE", results.insertId, current],
+													function(err, sql_results, fields) {
+														if (err) throw err;
+												});
+												client.query(
+													'SELECT xid FROM users WHERE user_id = ' + req.query.user_id,
+													function(err, results, fields) {
+														if (err) throw err;
+														console.log(results);
+														console.log('attempting to create push notification');																			
+														sendNotification({ 
+																	"apiKey": apiKey, 
+																	"appKey": appKey,
+																	"xids" : [
+																		results[0].xid
+																	],
+																	"sendAll": false,
+																    "content": {
+																        "message": "Someone else enjoyed your beer!",
+																		"badge": "+1"
+																	 }
+																});
+												});
+											}
+										});
+								} else {
+									res.json({"status":"failure"});
+								}
+						});
+				});
 		});
+	
 	} else {
+		
 		// Find the beer count to update the rating_count
 		client.query(
 			'SELECT COUNT(feed.beer_id) AS count FROM feed WHERE feed.user_id = ' + req.query.user_id + ' AND feed.beer_id = ' + req.query.beer_id,
 			function(err, results, fields) {
-				console.log('Figuring out beer count 2');
+				console.log('Figuring out beer count 1');
 				console.log(results);
 				console.log(results[0].count);
 				rating_count += results[0].count; // getting current number + 1
-				
+		
 				client.query(
 					'UPDATE beers SET beers.' + req.query.rate + ' = beers.' + req.query.rate + ' + 1' + unrate + ', last_mod = "' + current + '" WHERE id = ' + req.query.beer_id + ';',
 					function(err, results, fields) {
@@ -835,6 +1019,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 									if (err) throw err;
 									console.log(results);
 									res.json({"status": "success", "feed_id": results.insertId, "beer_id": req.query.beer_id, "rate": rate });
+									
 									// Add notification
 									if (req.query.partner_id != req.query.user_id && req.query.partner_id != undefined) { // makes sure owner and current user aren't the same
 										client.query(
@@ -844,14 +1029,14 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 											function(err, sql_results, fields) {
 												if (err) throw err;
 										});
-										
+								
 										client.query(
 											'SELECT xid FROM users WHERE user_id = ' + req.query.partner_id,
 											function(err, results, fields) {
 												if (err) throw err;
 												console.log(results);
 												console.log('attempting to create push notification');
-												
+										
 												sendNotification({ 
 															"apiKey": apiKey, 
 															"appKey": appKey,
@@ -865,7 +1050,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 															 }
 														});
 										});
-										
+								
 									}
 								}
 							);
@@ -873,8 +1058,12 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 							res.json({"status":"failure"});
 						}
 					});
+				});
+			}
 		});
-	}
+		
+	} // end ifelse
+	
 });
 
 
