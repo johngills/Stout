@@ -1000,7 +1000,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 					'UPDATE beers SET beers.' + req.query.rate + ' = beers.' + req.query.rate + ' + 1' + unrate + ', last_mod = "' + current + '" WHERE id = ' + req.query.beer_id + ';',
 					function(err, results, fields) {
 						if (err) throw err;
-						if (results != undefined) {
+						// if (results != undefined) {
 							console.log(results);
 							var rate = '';
 							switch(req.query.rate) {
