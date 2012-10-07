@@ -688,7 +688,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 																			if (err) throw err;
 																	});
 																	client.query(
-																		'SELECT xid FROM users WHERE user_id = ' + req.query.partner_id,
+																		'SELECT xid FROM users WHERE user_id = ' + req.query.user_id,
 																		function(err, results, fields) {
 																			if (err) throw err;
 																			console.log(results);
