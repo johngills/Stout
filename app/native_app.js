@@ -917,7 +917,9 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 							'UPDATE beers SET beers.' + req.query.rate + ' = beers.' + req.query.rate + ' + 1' + unrate + ', last_mod = "' + current + '" WHERE id = ' + req.query.beer_id + ';',
 							function(err, results, fields) {
 								if (err) throw err;
-								if (results != undefined) {
+								
+								// I think this if statement is unnecessary, lets see.
+								// if (results != undefined) {
 									console.log(results);
 									var rate = '';
 									switch(req.query.rate) {
@@ -968,16 +970,20 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 																        "message": "Someone else enjoyed your beer!",
 																		"badge": "+1"
 																	 }
-																});
-												});
-											}
-										});
-								} else {
-									res.json({"status":"failure"});
-								}
-						});
-				});
-		});
+																}); // close push notification
+												}); // close grab xid query
+											} // end ifelse
+										}); // close insert checkin query
+										
+								// } else {
+								// 	res.json({"status":"failure"});
+								// }
+								
+						}); // closes beer UPDATE
+						
+				}); // closes grabbing beer COUNT
+				
+		}); // closes running the DELETE query
 	
 	} else {
 		
@@ -1048,20 +1054,22 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 														        "message": "Someone else enjoyed your beer!",
 																"badge": "+1"
 															 }
-														});
-										});
+														}); // close push notification
+														
+										}); // closes xid check
 								
-									}
-								}
-							);
-						} else {
-							res.json({"status":"failure"});
-						}
-					});
-				});
-			}
-		});
-		
+									} // ends ifelse
+									
+								}); // closes INSERT
+								
+						// } else {
+						// 	res.json({"status":"failure"});
+						// }
+						
+				}); // closes UPDATE
+					
+			}); // closes COUNT
+
 	} // end ifelse
 	
 });
