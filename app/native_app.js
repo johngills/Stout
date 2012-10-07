@@ -620,7 +620,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 	var unrate = '';
 	var rating_count = 1;
 	
-	console.log('beerid: ' + req.query.beer_id);
+	console.log('beer_id: ' + req.query.beer_id + ', feed_id: ' + req.query.feed_id + ', user_id: ' + req.query.user_id);
 	console.log(req.query.unrate);
 	
 	// Check if user is re-rating a beer
