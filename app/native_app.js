@@ -572,8 +572,11 @@ app.get('/new-beer', checkAuth, function(req, res) {
 	var style = req.query.style;
 	var abv = req.query.abv;
 	var time = new Date();
-	var current = dateToString(time);
+	var current = dateToString(time),
+		user_id = req.query.user_id,
+		user_name = req.query.user_name;
 	
+	// TODO: Some brewery names do have numbers, figure out a better way
 	if (!hasNumbers(req.query.brewery)) { // Checks if new brewery
 		console.log(req.query.brewery);
 		client.query( // If new brewery, add it to database
@@ -587,7 +590,7 @@ app.get('/new-beer', checkAuth, function(req, res) {
 				client.query( // add new brewery with id to new beer
 					'INSERT INTO beers ' +
 					'SET name = ?, brewery_id = ?, description = ?, cat_id = ?, style_id = ?, abv = ?, last_mod = ?, creator_id = ?, creator_name = ?',
-					[name, brewery, description, category, style, abv, current, req.query.user_id, req.query.user_name],
+					[name, brewery, description, category, style, abv, current, user_id, user_name],
 					function(err, results, fields) {
 						if (err) throw err;
 						console.log(results.insertId);
@@ -887,6 +890,8 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 		rating_count = 1;
 	
 	if (req.query.feed_id == undefined) {
+		// I don't believe this is working, test later
+		// TODO: DELETE feed item in a 24 hour window and then re-rate
 		query = 'DELETE FROM feed WHERE feed.created_date = (SELECT MAX(feed.created_date) FROM feed WHERE feed.beer_id = ' + req.query.beer_id + ') AND feed.beer_id = ' + req.query.beer_id + ' AND feed.user_id = ' + req.query.user_id;
 	} else {
 		query = 'DELETE FROM feed WHERE feed.id = ' + req.query.feed_id + ' AND feed.user_id = ' + req.query.user_id;
