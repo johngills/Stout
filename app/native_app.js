@@ -122,6 +122,7 @@ function sendNotification(results) {
 	
 	function nextGo() {
 		var resultObject = JSON.parse(responseString);
+		console.log('resultObject: ' + resultObject);
 	}
 	
 	req.on('error', function(e) {
