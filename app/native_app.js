@@ -960,7 +960,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 													if (err) throw err;
 											});
 											client.query(
-												'SELECT xid FROM users WHERE user_id = ' + req.query.user_id,
+												'SELECT xid, full_name FROM users WHERE user_id = ' + req.query.user_id,
 												function(err, results, fields) {
 													if (err) throw err;
 													console.log(results);
@@ -973,7 +973,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 																],
 																"sendAll": false,
 															    "content": {
-															        "message": "Someone else enjoyed your beer!",
+															        "message": results[0].full_name + " enjoyed your beer!",
 																	"badge": "+1"
 																 }
 															}); // close push notification
@@ -1042,7 +1042,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 									});
 							
 									client.query(
-										'SELECT xid FROM users WHERE user_id = ' + req.query.partner_id,
+										'SELECT xid, full_name FROM users WHERE user_id = ' + req.query.partner_id,
 										function(err, results, fields) {
 											if (err) throw err;
 											console.log(results);
@@ -1056,7 +1056,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 														],
 														"sendAll": false,
 													    "content": {
-													        "message": "Someone else enjoyed your beer!",
+													        "message": results[0].full_name + " enjoyed your beer!",
 															"badge": "+1"
 														 }
 													}); // close push notification
@@ -1131,7 +1131,7 @@ app.get('/add-to-drink-list', checkAuth, function(req, res) {
 									if (err) throw err;
 							});
 							client.query(
-								'SELECT xid FROM users WHERE user_id = ' + req.query.partner_id,
+								'SELECT xid, full_name FROM users WHERE user_id = ' + req.query.partner_id,
 								function(err, results, fields) {
 									if (err) throw err;
 									console.log(results);
@@ -1145,7 +1145,7 @@ app.get('/add-to-drink-list', checkAuth, function(req, res) {
 												],
 												"sendAll": false,
 											    "content": {
-											        "message": "Someone added your beer to drink later!",
+											        "message": "You just introduced " + results[0].full_name + " to a new beer!",
 													"badge": "+1"
 												 }
 											});
@@ -1260,7 +1260,7 @@ app.get('/add-comment', checkAuth, function(req, res) {
 								if (err) throw err;
 						});
 						client.query(
-							'SELECT xid FROM users WHERE user_id = ' + req.query.owner_id,
+							'SELECT xid, partner.full_name FROM users, (SELECT full_name FROM users WHERE user_id = ' + req.query.user_id + ') AS partner WHERE user_id = ' + req.query.owner_id,
 							function(err, results, fields) {
 								if (err) throw err;
 								console.log(results);
@@ -1274,7 +1274,7 @@ app.get('/add-comment', checkAuth, function(req, res) {
 											],
 											"sendAll": false,
 										    "content": {
-										        "message": "Someone left you a comment!",
+										        "message": results[0].full_name + " left you a comment!",
 												"badge": "+1"
 											 }
 										});
