@@ -1631,6 +1631,7 @@ app.get('/test-message', function() {
 					"badge": "+1"
 				 }
 			});
+	res.send('Message sent!');
 });
 
 app.get('/follow', checkAuth, function(req, res) {
