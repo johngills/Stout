@@ -1625,7 +1625,8 @@ app.get('/test-message', function(req, res) {
 			        "message": "Stout is now following you!",
 					"action": {
 					            "type": "URL",
-								"data": "stout://dashboard.html?view_profile?474616790",
+								// "data": "stout://dashboard.html?view_profile?474616790",
+								"data": "http://www.google.com/",
 					            "label": "View"
 					        },
 					"badge": "+1"
