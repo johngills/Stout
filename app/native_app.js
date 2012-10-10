@@ -1613,7 +1613,7 @@ app.get('/get-notifications-list', checkAuth, function(req, res) {
 	});
 });
 
-app.get('/test-message', function() {
+app.get('/test-message', function(req, res) {
 	sendNotification({ 
 				"apiKey": apiKey, 
 				"appKey": appKey,
