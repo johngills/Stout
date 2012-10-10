@@ -1626,7 +1626,7 @@ app.get('/test-message', function(req, res) {
 					"action": {
 					            //"type": "CUSTOM",
 								// "data": { "acme1" : "bar", "acme2" : 42 },
-								"type": "{URL}",
+								"type": "URL",
 								"data": "stout://dashboard.html?view_profile?474616790",
 					            "label": "View"
 					        },
