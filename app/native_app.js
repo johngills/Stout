@@ -1647,7 +1647,7 @@ app.get('/follow', checkAuth, function(req, res) {
 									],
 									"sendAll": false,
 								    "content": {
-								        "message": results[0].full_name " is now following you!",
+								        "message": results[0].full_name + " is now following you!",
 										"badge": "+1"
 									 }
 								});
