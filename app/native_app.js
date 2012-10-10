@@ -93,7 +93,8 @@ function sendNotification(results) {
 	console.log('got into postCode');
 	
 	var data = results,
-		dataString = JSON.stringify(data);
+		dataString = JSON.stringify(data),
+		responseString = '';
 		
 	var headers = {
 			        'Content-Type': 'application/json',
@@ -111,8 +112,6 @@ function sendNotification(results) {
 	
 	var req = http.request(options, function(res) {
 		res.setEncoding('utf-8');
-
-		var responseString = '';
 
 		res.on('data', function(data) {
 			responseString += data;
