@@ -121,8 +121,9 @@ function sendNotification(results) {
 	});
 	
 	function nextGo() {
-		var resultObject = JSON.parse(responseString);
-		console.log('resultObject: ' + resultObject);
+		console.log('Success!');
+		// var resultObject = JSON.parse(responseString);
+		// console.log('resultObject: ' + resultObject + ', responseString: ' + responseString);
 	}
 	
 	req.on('error', function(e) {
@@ -962,7 +963,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 													if (err) throw err;
 											});
 											client.query(
-												'SELECT xid, full_name FROM users WHERE user_id = ' + req.query.user_id,
+												'SELECT xid, partner.full_name FROM users, (SELECT full_name FROM users WHERE user_id = ' + req.query.user_id + ') AS partner WHERE user_id = ' + req.query.user_id,
 												function(err, results, fields) {
 													if (err) throw err;
 													console.log(results);
@@ -1044,7 +1045,7 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 									});
 							
 									client.query(
-										'SELECT xid, full_name FROM users WHERE user_id = ' + req.query.partner_id,
+										'SELECT xid, partner.full_name FROM users, (SELECT full_name FROM users WHERE user_id = ' + req.query.user_id + ') AS partner WHERE user_id = ' + req.query.partner_id,
 										function(err, results, fields) {
 											if (err) throw err;
 											console.log(results);
@@ -1133,7 +1134,7 @@ app.get('/add-to-drink-list', checkAuth, function(req, res) {
 									if (err) throw err;
 							});
 							client.query(
-								'SELECT xid, full_name FROM users WHERE user_id = ' + req.query.partner_id,
+								'SELECT xid, partner.full_name FROM users, (SELECT full_name FROM users WHERE user_id = ' + req.query.user_id + ') AS partner WHERE user_id = ' + req.query.partner_id,
 								function(err, results, fields) {
 									if (err) throw err;
 									console.log(results);
@@ -1612,9 +1613,29 @@ app.get('/get-notifications-list', checkAuth, function(req, res) {
 	});
 });
 
+app.get('/test-message', function() {
+	sendNotification({ 
+				"apiKey": apiKey, 
+				"appKey": appKey,
+				"xids" : [
+					"5072527387242167c66a9381"
+				],
+				"sendAll": false,
+			    "content": {
+			        "message": "Stout is now following you!",
+					"action": {
+					            "type": "URL",
+								"data": "stout://dashboard.html?view_profile?474616790",
+					            "label": "label"
+					        },
+					"badge": "+1"
+				 }
+			});
+});
+
 app.get('/follow', checkAuth, function(req, res) {
-	var time = new Date();
-	var current = dateToString(time);
+	var time = new Date(),
+		current = dateToString(time);
 	
 	client.query(
 		'INSERT INTO followers ' +
@@ -1648,6 +1669,11 @@ app.get('/follow', checkAuth, function(req, res) {
 									"sendAll": false,
 								    "content": {
 								        "message": results[0].full_name + " is now following you!",
+										"action": {
+										            "type": "URL",
+										            "data": "stout://dashboard.html?view_profile?" + req.query.user_id,
+										            "label": "label"
+										        },
 										"badge": "+1"
 									 }
 								});
