@@ -1626,7 +1626,7 @@ app.get('/test-message', function(req, res) {
 					"action": {
 					            "type": "URL",
 								"data": "stout://dashboard.html?view_profile?474616790",
-					            "label": "label"
+					            "label": "View"
 					        },
 					"badge": "+1"
 				 }
@@ -1673,7 +1673,7 @@ app.get('/follow', checkAuth, function(req, res) {
 										"action": {
 										            "type": "URL",
 										            "data": "stout://dashboard.html?view_profile?" + req.query.user_id,
-										            "label": "label"
+										            "label": "View"
 										        },
 										"badge": "+1"
 									 }
