@@ -1633,7 +1633,7 @@ app.get('/follow', checkAuth, function(req, res) {
 						if (err) throw err;
 				});
 				client.query(
-					'SELECT xid FROM users WHERE user_id = ' + req.query.owner_id,
+					'SELECT xid, partner.full_name FROM users, (SELECT full_name FROM users WHERE user_id = ' + req.query.user_id + ') AS partner WHERE user_id = ' + req.query.owner_id,
 					function(err, results, fields) {
 						if (err) throw err;
 						console.log(results);
@@ -1647,7 +1647,7 @@ app.get('/follow', checkAuth, function(req, res) {
 									],
 									"sendAll": false,
 								    "content": {
-								        "message": "You have a new follower!",
+								        "message": results[0].full_name " is now following you!",
 										"badge": "+1"
 									 }
 								});
