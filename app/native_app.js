@@ -118,10 +118,12 @@ function sendNotification(results) {
 			responseString += data;
 		});
 
-		res.on('end', function() {
-			var resultObject = JSON.parse(responseString);
-		});
+		res.on('end', nextGo);
 	});
+	
+	function nextGo() {
+		var resultObject = JSON.parse(responseString);
+	}
 	
 	req.on('error', function(e) {
 		console.log(e);
