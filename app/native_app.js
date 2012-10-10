@@ -1674,7 +1674,7 @@ app.get('/follow', checkAuth, function(req, res) {
 								        "message": results[0].full_name + " is now following you!",
 										"action": {
 													"type": "CUSTOM",
-													"data": { "acme1" : "bar", "acme2" : 42 },
+													"data":  "{ \"acme1\" : \"bar\", \"acme2\" : 42 }",
 										            //"type": "URL",
 										            //"data": "stout://dashboard.html?view_profile?" + req.query.user_id,
 										            "label": "View"
