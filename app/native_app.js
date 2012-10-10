@@ -977,6 +977,11 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 																"sendAll": false,
 															    "content": {
 															        "message": results[0].full_name + " enjoyed your beer!",
+																	"action": {
+																				"type": "CUSTOM",
+																				"data":  "{ \"customKey\" : \"stout://dashboard.html?beer_detail?" + req.query.beer_id + "\" }",
+																	            "label": "View"
+																	        },
 																	"badge": "+1"
 																 }
 															}); // close push notification
@@ -1060,6 +1065,11 @@ app.get('/beer-checkin', checkAuth, function(req, res) {
 														"sendAll": false,
 													    "content": {
 													        "message": results[0].full_name + " enjoyed your beer!",
+															"action": {
+																		"type": "CUSTOM",
+																		"data":  "{ \"customKey\" : \"stout://dashboard.html?beer_detail?" + req.query.beer_id + "\" }",
+															            "label": "View"
+															        },
 															"badge": "+1"
 														 }
 													}); // close push notification
@@ -1149,6 +1159,11 @@ app.get('/add-to-drink-list', checkAuth, function(req, res) {
 												"sendAll": false,
 											    "content": {
 											        "message": "You just introduced " + results[0].full_name + " to a new beer!",
+													"action": {
+																"type": "CUSTOM",
+																"data":  "{ \"customKey\" : \"stout://dashboard.html?beer_detail?" + req.query.beer_id + "\" }",
+													            "label": "View"
+													        },
 													"badge": "+1"
 												 }
 											});
@@ -1278,6 +1293,11 @@ app.get('/add-comment', checkAuth, function(req, res) {
 											"sendAll": false,
 										    "content": {
 										        "message": results[0].full_name + " left you a comment!",
+												"action": {
+															"type": "CUSTOM",
+															"data":  "{ \"customKey\" : \"stout://dashboard.html?feed_detail?" + req.query.feed_id + "\" }",
+												            "label": "View"
+												        },
 												"badge": "+1"
 											 }
 										});
@@ -1675,8 +1695,6 @@ app.get('/follow', checkAuth, function(req, res) {
 										"action": {
 													"type": "CUSTOM",
 													"data":  "{ \"customKey\" : \"stout://dashboard.html?view_profile?" + req.query.user_id + "\" }",
-										            //"type": "URL",
-										            //"data": "stout://dashboard.html?view_profile?" + req.query.user_id,
 										            "label": "View"
 										        },
 										"badge": "+1"
