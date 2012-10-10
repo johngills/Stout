@@ -121,7 +121,7 @@ function sendNotification(results) {
 	});
 	
 	function nextGo() {
-		console.log('Success!');
+		console.log('Push notification sent successfully!');
 		// var resultObject = JSON.parse(responseString);
 		// console.log('resultObject: ' + resultObject + ', responseString: ' + responseString);
 	}
@@ -1624,7 +1624,8 @@ app.get('/test-message', function(req, res) {
 			    "content": {
 			        "message": "Stout is now following you!",
 					"action": {
-					            "type": "{ URL }",
+					            "type": { "URL" },
+								//"data": { "acme1" : "bar", "acme2" : 42 },
 								"data": "stout://dashboard.html?view_profile?474616790",
 					            "label": "View"
 					        },
