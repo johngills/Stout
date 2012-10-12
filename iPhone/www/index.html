@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+      
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no;" />
+        <meta charset="utf-8">
+
+
+        <!-- iPad/iPhone specific css below, add after your main css >
+        <link rel="stylesheet" media="only screen and (max-device-width: 1024px)" href="ipad.css" type="text/css" />		
+        <link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="iphone.css" type="text/css" />		
+        -->
+        <!-- If your application is targeting iOS BEFORE 4.0 you MUST put json2.js from http://www.JSON.org/json2.js into your www directory and include it here -->
+        <script type="text/javascript" charset="utf-8" src="cordova-1.9.0.js"></script>
+		<script type="text/javascript" charset="utf-8" src="js/constants.js"></script>
+		<script type="text/javascript" charset="utf-8" src="js/PushNotification.js"></script>
+        <script type="text/javascript" charset="utf-8" src="js/jquery-1.7.2.min.js"></script>
+        <script src="http://debug.phonegap.com/target/target-script-min.js#stoutapp"></script>
+        <!-- <script type="text/javascript" charset="utf-8" src="js/app.js"></script> -->
+        <script type="text/javascript">
+		
+		// Database
+		// var db = window.openDatabase("stout", "1.0", "Stout DB", 1000000);
+
+        // If you want to prevent dragging, uncomment this section
+        /*
+        function preventBehavior(e) 
+        { 
+          e.preventDefault(); 
+        };
+        document.addEventListener("touchmove", preventBehavior, false);
+        */
+        
+        /* If you are supporting your own protocol, the var invokeString will contain any arguments to the app launch.
+        see http://iphonedevelopertips.com/cocoa/launching-your-own-application-via-a-custom-url-scheme.html
+        for more details -jm */
+
+		// error callback
+		function errorCB(tx, err) {
+		    console.log("Error processing SQL: " + err.code);
+		}
+
+		// success callback
+		function successCB() {
+		    console.log("Success!");
+		}
+		
+		function dateToString(date) {
+			//check that date is a date object
+			if (date && date.getFullYear()){ 
+				return date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate() + ' ' + date.getHours() + '-' + date.getMinutes() + '-' + date.getSeconds();
+			} 
+			return "";
+		}
+            
+        function load(message,status) {
+            $('#load_overlay').remove();
+            if (message != undefined) {
+                $('body').append('<section id="load_overlay" style="display:block;"><section class="dialogue">' + message + '</section></section>');
+            }
+            if (status != undefined) {
+                setTimeout("$('#load_overlay').remove();",1000);
+            }
+        }
+        
+		function handleOpenURL(address) {
+		    console.log(address);
+		
+			var results = address.split('?'),
+				url = results[0],
+				username = results[1],
+				user_id = results[2];
+			
+			console.log(url);
+			console.log(username);
+			console.log(user_id);
+
+			// Create/Access Database on Start
+			db.transaction(function(tx) {
+			
+				// input data
+				tx.executeSql('SELECT * FROM user', [],
+					function(tx, results) {
+
+						var time = new Date();
+						var current = dateToString(time);
+
+						console.log("Returned rows = " + results.rows.length);
+
+						// New user, store in database and go to dashboard
+						if (results.rows.length == 0) {
+							tx.executeSql('INSERT INTO user (user_id, username) VALUES (' + user_id + ',"' + username + '");', [], successCB, errorCB);
+							if (url == 'stout://registration.html') {
+								getXidFromNative(user_id,'registration');
+							} else {
+								getXidFromNative(user_id,'dashboard');
+							}
+						}
+					}, errorCB);
+
+			}, errorCB, successCB);
+		}
+        
+        function onBodyLoad()
+        {		
+            document.addEventListener("deviceready", onDeviceReady, false);
+        }
+        
+        /* When this function is called, Cordova has been initialized and is ready to roll */
+        /* If you are supporting your own protocol, the var invokeString will contain any arguments to the app launch.
+        see http://iphonedevelopertips.com/cocoa/launching-your-own-application-via-a-custom-url-scheme.html
+        for more details -jm */
+		
+        function onDeviceReady()
+        {
+            // Create/Access Database on Start
+			db.transaction(function(tx) {
+				
+				// resets database
+				// tx.executeSql('DROP TABLE IF EXISTS user', [], successCB, errorCB);
+
+				// setup database
+				tx.executeSql('CREATE TABLE IF NOT EXISTS user (id INT(20), user_id INT(20), username varchar(255), xid varchar(255), created_date DATETIME);', [], successCB, errorCB);
+
+				// input data
+				tx.executeSql('SELECT * FROM user', [],
+					function(tx, results) {
+
+						console.log("Returned rows = " + results.rows.length);
+
+						// A user is already logged in
+						if (results.rows.length != 0) {
+							window.location='dashboard.html#_index';
+						} else {
+							$('#loader_splash').addClass('active');
+							setTimeout(function() {
+								$('#loader_splash').addClass('hide');
+							}, 1500);
+						}
+					}, function() {
+						// If there is an error, remove the splash anyway
+						$('#loader_splash').addClass('active');
+						setTimeout(function() {
+							$('#loader_splash').addClass('hide');
+						}, 1500);
+					});
+					
+			}, errorCB, successCB);
+        }
+		
+		function launchTwitter() {
+			$('#loader_splash').removeClass('active').removeClass('hide');
+			window.location='http://stoutapp.com:8989/auth/twitter?source=app';
+		}
+
+        </script>
+            
+        <link rel="apple-touch-icon-precomposed" href="img/stout-app-icon-hd.png">
+        <link rel="apple-touch-startup-image" href="img/app-startup.png">
+        <link rel="apple-touch-startup-image" sizes="640x920" href="img/app-startup.hd.png">
+        <link rel="stylesheet" type="text/css" href="css/iui.css" />
+        <link rel="stylesheet" type="text/css" href="css/style.css" />
+    </head>
+    <body onload="onBodyLoad();">
+        
+        <input type="hidden" id="user_name" value=""/>
+        <input type="hidden" id="user_id" value=""/>
+        <input id="latitude" type="hidden"/>
+        <input id="longitude" type="hidden"/>
+
+		<section id="loader_splash"></section>
+		
+        <section id="index" title="Stout" selected="true" class="ac home">
+            
+        	<section id="index_beer"></section>
+            
+            <h1>Stout Beta</h1>
+            <p>
+            Rate and track the greatest beverage in the world!
+            </p>
+            <!-- <a href="http://localhost:8989/auth/twitter?source=app" target="_webapp" class="btn twitter">
+                Sign in with Twitter
+                <span class="left"></span>
+            </a> -->
+            <a href="javascript:void(0);" ontouchstart="launchTwitter();" class="btn twitter">
+                Sign in with Twitter
+                <span class="left"></span>
+            </a>
+			
+			<br />
+			<!-- <a href="javascript:void(0);" onclick="getXidFromNative();">Get Xid</a> -->
+		
+        </section>
+    </body>
+</html>

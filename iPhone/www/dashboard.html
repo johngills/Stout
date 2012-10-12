@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+      
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no;" />
+        <meta charset="utf-8">
+
+        <!-- iPad/iPhone specific css below, add after your main css >
+        <link rel="stylesheet" media="only screen and (max-device-width: 1024px)" href="ipad.css" type="text/css" />		
+        <link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="iphone.css" type="text/css" />		
+        -->
+
+        <!-- If your application is targeting iOS BEFORE 4.0 you MUST put json2.js from http://www.JSON.org/json2.js into your www directory and include it here -->
+        <script type="text/javascript" charset="utf-8" src="cordova-1.9.0.js"></script>
+		<script type="text/javascript" charset="utf-8" src="js/constants.js"></script>
+		<script type="text/javascript" charset="utf-8" src="js/PushNotification.js"></script>
+        <script type="text/javascript" charset="utf-8" src="js/jquery-1.7.2.min.js"></script>
+		<script type="text/javascript" charset="utf-8" src="js/iscroll.js"></script>
+		<script type="text/javascript" charset="utf-8" src="js/jquery.fastLiveFilter.js"></script>
+		
+		<script type="text/javascript" charset="utf-8" src="js/iui.js"></script>
+        <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+        
+		<script type="text/javascript" charset="utf-8">
+		document.addEventListener("resume", getCustomDataForLastPush, false);
+		
+		</script>
+	
+		<link rel="apple-touch-icon-precomposed" href="img/stout-app-icon-hd.png">
+		<link rel="apple-touch-startup-image" href="img/app-startup.png">
+		<link rel="apple-touch-startup-image" sizes="640x920" href="img/app-startup.hd.png">
+		<link rel="stylesheet" type="text/css" href="css/iui.css" />
+		<link rel="stylesheet" type="text/css" href="css/style.css" />
+	
+	</head>
+    <body onload="onBodyLoad();">
+	
+		<input type="hidden" id="user_name" value="#{user_name}" />
+		<input type="hidden" id="user_id" value="#{user_id}" />
+		<input id="latitude" type="hidden" />
+		<input id="longitude" type="hidden" />
+
+		<section class="toolbar">
+			<a id="addFriend" class="right" href="javascript:void(0);" ontouchstart="loadFindFriend();"></a>
+			<h1 id="pageTitle"></h1>
+			<a id="backButton" class="button" href="javascript:void(0);">back</a>
+		</section>
+		
+		<!-- Bottom Elements -->
+		<section id="footer" class="active">
+			<section id="notifier"></section>
+			<ul>
+				<li class="the_tab active" ontouchstart="loadTab(0);">
+					<a href="#index">
+						<span></span>
+						<!-- The Tab -->
+					</a>
+				</li>
+				<li class="find_beer" ontouchstart="loadFindBeer();">
+					<a href="#find_beer">
+						<!-- <span></span> -->
+						<!-- Beer Me -->
+					</a>
+				</li>
+				<li class="profile">
+					<a href="#profile" ontouchstart="loadProfile(0);">
+						<span></span>
+						<!-- Profile -->
+					</a>
+				</li>
+			</ul>
+		</section>
+
+		<form id="add_comment" action="#" method="#">
+			<textarea id="add_comment_text" placeholder="Add Comment"></textarea>
+		</form>
+		
+		<!-- SLIDE UP VIEW -->
+		<section id="slide-up">
+			<section class="header">
+				<a id="close" class="right close-button" href="javascript:void(0);" ontouchstart="closeSlide();">Close</a>
+				<h1>Testing</h1>
+			</section>
+			<section class="input-text drop_shadow">
+				<form id="brewery_search" role="search" action="javascript:void(0);" autocorrect="off">
+					<input id="brewery_name" class="search" type="text" title="search" placeholder="Find brewery" />
+				</form>
+			</section>
+			<span id="scroller" class="results">
+			</span>
+		</section>
+		
+		<!-- Views -->
+		<ul id="index" title="Stout" selected="true">
+			<li class="tab_heading">
+				<ul>
+					<li id="following" class="active">Following</li>
+					<li id="public">Public</li>
+				</ul>
+			</li>
+			
+			<span class="results">
+			</span>
+		</ul>
+		
+		
+		<!-- FEED DETAIL -->
+		<ul id="feed_detail" title="Details">
+			<input id="feed-item-id" type="hidden" />
+			<input id="feed-item-beer_id" type="hidden" />
+			<input id="feed-item-rating" type="hidden" />
+			<span class="results"></span>
+		</ul>
+		
+		
+		<!-- FIND BEER -->
+		<ul id="find_beer" title="Find Beer">
+			<li class="input-text drop_shadow">
+				<form id="beer_search" role="search" action="javascript:void(0);" autocorrect="off">
+					<input id="beer_name" class="search" type="text" title="search" placeholder="Find beer" />
+				</form>
+			</li>
+			<span class="results"></span>
+		</ul>
+		
+		<!-- BEER DETAIL -->
+		<ul id="beer_detail" title="Beer"></ul>
+
+		<ul id="add_beer" title="Add Beer">
+			<form id="add_beer_form" action="javascript:void(0);">
+				<input type="hidden" id="breweries" />
+				<input type="hidden" id="styles" />
+				<input type="hidden" id="categories" />
+				<li>
+					<input id="add_beer_name" class="text" type="text" name="add_beer_name" placeholder="Name" title="Name">
+				</li>
+				<li id="add_beer_brewery" class="text" style="position:relative; z-index:999;" onclick="loadBreweries();">
+					Tap to add Brewery Name...
+					<!-- <input id="add_beer_brewery" class="text" type="text" name="add_beer_brewery" placeholder="Brewery" title="Brewery" autocorrect="off" onfocus="$('html, body').animate({scrollTop: '82px'}, 0);" /> -->
+					<!-- <input id="add_beer_brewery" class="text" type="text" name="add_beer_brewery" placeholder="Brewery" title="Brewery" autocorrect="off" ontouchstart="getBreweries();" readonly="readonly" /> -->
+				</li>
+				<li class="textarea">
+					<textarea id="add_beer_description" class="text" placeholder="Description (Optional)" title="Description (Optional)"></textarea>
+				</li>
+				<li class="abv_attribute hide">
+					<input id="add_beer_abv" type="number" class="text" name="add_beer_abv" placeholder="Alcohol by volume (%)" title="Alcohol by volume (%)" />
+				</li>
+				<li id="add_beer_category" class="text hide" onclick="loadCategories();">
+					<!-- Categories -->
+				</li>
+				<li id="add_beer_style" class="text hide" onclick="loadStyles();">
+					Tap to add Style...
+				</li>
+<!--
+				<li class="cat_attribute hide" ontouchstart="$('select#beer_categories').focus();">
+					<input id="add_beer_category" class="text" type="text" name="add_beer_category" placeholder="Add Category" disabled="disabled" />
+					<select id="beer_categories"></select>
+				</li>
+				<li class="style_attribute hide" ontouchstart="$('select#beer_styles').focus();">
+					<input id="add_beer_style" class="text" type="text" name="add_beer_style" placeholder="Add Style (Optional)" disabled="disabled">
+					<select id="beer_styles">
+						<option selected="selected" value="132">Out of Category</option>
+					</select>
+				</li>
+-->
+				<li class="drop_shadow">
+					<ul class="add_attributes">
+						<li class="abv_select ac" onclick="showAttribute('abv');">
+							<b>+ Alcohol (%)</b>
+						</li>
+						<li class="cat_select ac" onclick="getAddBeer('categories');">
+							<b>+ Category</b>
+						</li>
+					</ul>
+					<section class="push"></section>
+				</li>
+				<li class="no_bg">
+					<a class="btn orange" href="javascript:void(0);" ontouchstart="addNewBeer();">Add Beer</a>
+					<br /><br />
+				</li>
+			</form>
+		</ul>
+
+		<ul id="profile" title="Profile"></ul>
+
+		<ul id="profile_detail" title="Profile"></ul>
+
+		<ul id="profile_settings" title="Settings">
+			<li class="no_bg">
+				<!-- if user_name == 'sterlingrules' a.btn.orange(href="/admin", target="_webapp") Admin -->
+				<a class="btn orange" href="javascript:void(0);" ontouchstart="launchFeedback();">Feedback</a>
+				<a class="btn blue" href="javascript:void(0);" ontouchstart="logout();">Logout</a>
+			</li>
+		</ul>
+		
+		<ul id="find_friend" title="Find Friends">
+			<li class="input-text drop_shadow">
+				<form id="friend_search" role="search" action="javascript:void(0);" autocorrect="off">
+					<input id="search_user" class="search" type="text" title="search" placeholder="Find drinking buddies" />
+				</form>
+			</li>
+			<span class="results"></span>
+		</ul>
+
+		<ul id="share" title="Share Beer">
+			<li class="textarea">
+				<textarea class="comment" placeholder="Comment"></textarea>
+			</li>
+			<li class="push drop_shadow">
+				<ul class="rate_controls">
+					<li class="twitter active" ontouchstart="twitterToggle();">
+						<span></span>
+					</li>
+				</ul>
+			</li>
+			<li class="share_button no_bg">
+				<a class="btn orange" href="#index" ontouchstart="load('Something went wrong!','error');">Bottom's Up</a>
+			</li>
+		</ul>
+
+    </body>
+</html>
