@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+      
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no;" />
+        <meta charset="utf-8">
+
+        <!-- iPad/iPhone specific css below, add after your main css >
+        <link rel="stylesheet" media="only screen and (max-device-width: 1024px)" href="ipad.css" type="text/css" />		
+        <link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="iphone.css" type="text/css" />		
+        -->
+
+        <!-- If your application is targeting iOS BEFORE 4.0 you MUST put json2.js from http://www.JSON.org/json2.js into your www directory and include it here -->
+        <script type="text/javascript" charset="utf-8" src="cordova-1.9.0.js"></script>
+		<script type="text/javascript" charset="utf-8" src="js/constants.js"></script>
+		<script type="text/javascript" charset="utf-8" src="js/PushNotification.js"></script>
+        <script type="text/javascript" charset="utf-8" src="js/jquery-1.7.2.min.js"></script>
+		<script type="text/javascript" charset="utf-8" src="js/jquery.autoSuggest.packed.js"></script>
+		<script type="text/javascript" charset="utf-8" src="js/iui.js"></script>
+        <!-- <script type="text/javascript" charset="utf-8" src="js/app.js"></script> -->
+		<script type="text/javascript">
+		
+		// Database
+		// var db = window.openDatabase("stout", "1.0", "Stout DB", 1000000),
+			// url = 'http://localhost:8989';
+			// url = 'http://stoutapp.com:8989';
+		
+		// error callback
+		function errorCB(tx, err) {
+		    console.log("Error processing SQL: " + err.code);
+		}
+
+		// success callback
+		function successCB() {
+		    console.log("Success!");
+		}
+		
+		function dateToString(date) {
+			//check that date is a date object
+			if (date && date.getFullYear()){ 
+				return date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate() + ' ' + date.getHours() + '-' + date.getMinutes() + '-' + date.getSeconds();
+			} 
+			return "";
+		}
+		
+		// function getUserInfo() {
+		// 	
+		// 	var url = 'http://localhost:8989';
+		// 	//var url = 'http://stoutapp.com:8989';
+		// 	
+		// 	// Get user id and user name
+		// 	db.transaction(function(tx) {
+		// 	
+		// 		// input data
+		// 		tx.executeSql('SELECT * FROM user', [],
+		// 			function(tx, results) {
+		// 				var time = new Date(),
+		// 					current = dateToString(time),
+		// 					user_id = results.rows.item(0).user_id,
+		// 					user_name = results.rows.item(0).user_name;
+		// 			}, errorCB);
+		// 
+		// 	}, errorCB, successCB);
+		// 	
+		// 	$.ajax({
+		// 		cache: false,
+		// 		url: url + '/get-user-info',
+		// 		data: { user_id: user_id, user_name: user_name },
+		// 		success: function(results) {
+		// 					console.log('got here');
+		// 					alert(results);
+		// 					console.log(results);
+		// 					console.log(results[0].user_name);
+		// 				},
+		// 		error: function(results) {
+		// 					console.log(results[0]);
+		// 					return false;
+		// 				}
+		// 	});
+		// 	
+		// }
+		
+		function load(message,status) {
+			$('#load_overlay').remove();
+			if (message != undefined) {
+				$('body').append('<section id="load_overlay" style="display:block;"><section class="dialogue">' + message + '</section></section>');
+			}
+			if (status != undefined) {
+				setTimeout("$('#load_overlay').remove();",1000);
+			}
+		}
+		
+		function onBodyLoad()
+        {		
+            document.addEventListener("deviceready", onDeviceReady, false);			
+        }
+        
+        /* When this function is called, Cordova has been initialized and is ready to roll */
+        /* If you are supporting your own protocol, the var invokeString will contain any arguments to the app launch.
+        see http://iphonedevelopertips.com/cocoa/launching-your-own-application-via-a-custom-url-scheme.html
+        for more details -jm */
+		
+        function onDeviceReady()
+        {			
+			// Get user id and user name
+			db.transaction(function(tx) {
+			
+				// input data
+				tx.executeSql('SELECT * FROM user', [],
+					function(tx, results) {
+						var time = new Date(),
+							current = dateToString(time),
+							username = results.rows.item(0).username,
+							user_id = results.rows.item(0).user_id,
+							xid = results.rows.item(0).xid;
+						
+						console.log('got to registration');
+						console.log('user_name: ' + username);
+						console.log('user_id: ' + user_id);
+						console.log('xid: ' + xid);
+						
+						$.ajax({
+							cache: false,
+							url: url + '/get-user-info',
+							data: { user_id: user_id, user_name: username },
+							success: function(data) {
+										console.log('got here');
+										console.log(data[0].user_name);
+										
+										$('#first_name').val(data[0].first_name);
+										$('#last_name').val(data[0].last_name);
+										$('#user_name').val(username);
+										$('#user_id').val(user_id);
+										$('#location').val(data[0].location);
+										$('#avatar').prepend('<img src="' + data[0].avatar + '" class="avatar" />');
+										$('b.first_name').empty().append(data[0].first_name);
+										
+										// getLocationFromNative(user_id,xid);
+										
+									},
+							error: function(results) {
+										console.log(results[0]);
+										return false;
+									}
+						});
+						
+					}, errorCB);
+
+			}, errorCB, successCB);
+        }
+
+		function finishRegistration() {
+			load('Brewing...');
+			var first_name = ($('input#first_name').val() == '') ? null : $('input#first_name').val(),
+				last_name = ($('input#last_name').val() == '') ? null : $('input#last_name').val(),
+				user_name = $('input#user_name').val(),
+				user_id = $('input#user_id').val(),
+				email = ($('input#email').val() == '') ? null : $('input#email').val(),
+				location = ($('input#location').val() == '') ? null : $('input#location').val();
+
+			$.ajax({
+				cache: false,
+				url: url + '/update-user',
+				data: { user_id: user_id, first_name: first_name, last_name: last_name, email: email, location: location },
+				success: function(results) {
+							if (results.status == 'success') {
+								window.location='dashboard.html#_index';
+							} else {
+								load('Something went wrong!','error');
+								return false;
+							}
+						},
+				error: function() {
+							load('Something went wrong!','error');
+							return false;
+						}
+			});
+		}
+		
+		function followStout() {
+			var user_name = $('input#user_name').val(),
+				user_id = $('input#user_id').val();
+				
+			load('Brewing...');
+			
+			$.ajax({
+				cache: false,
+				url: url + '/follow-stoutapp',
+				data: { user_id: user_id, user_name: user_name },
+				success: function(results) {
+						if (results.status == 'success') {
+							$('#follow_stout a').replaceWith('<a href="javascript:void(0);" class="btn light right">Followed!</a>');
+							load();
+						}
+					},
+				error: function(results) {
+						load('Something went wrong!','error');
+						return false;
+					}
+			});
+		}
+		
+		</script>
+	
+		<link rel="apple-touch-icon-precomposed" href="img/stout-app-icon-hd.png">
+		<link rel="apple-touch-startup-image" href="img/app-startup.png">
+		<link rel="apple-touch-startup-image" sizes="640x920" href="img/app-startup.hd.png">
+		<link rel="stylesheet" type="text/css" href="css/iui.css" />
+		<link rel="stylesheet" type="text/css" href="css/style.css" />
+	
+	</head>
+    <body onload="onBodyLoad();">
+	
+		<input type="hidden" id="user_name" value="" />
+		<input type="hidden" id="user_id" value="" />
+	
+		<section class="toolbar">
+			<a href="javascript:void(0);" class="btn blue right" ontouchstart="finishRegistration();">Finish</a>
+			<h1 id="pageTitle"></h1>
+		</section>
+
+		<div id="registration" title="Registration" selected="true">
+			<form>
+				<fieldset id="avatar">
+					<p>
+						Thanks for joining <br />
+						<b class="first_name"></b>! <br />
+						Please confirm your info
+					</p>
+				</fieldset>
+
+				<fieldset class="full_name">
+					<section class="col">
+						<input id="first_name" type="text" value="" placeholder="First name" />
+					</section>
+					<section class="col">
+						<input id="last_name" type="text" value="" placeholder="Last name" />
+					</section>
+				</fieldset>
+			
+				<fieldset>
+					<section class="col_full">
+						<input id="email" type="email" value="" placeholder="Email Address (Optional)" />
+					</section>
+				</fieldset>
+
+				<fieldset>
+					<section class="col_full">
+						<input id="location" type="text" value="" placeholder="Location" />
+					</section>
+				</fieldset>
+			</form>
+
+			<section id="follow_stout" class="drop_shadow">
+				<a class="btn blue right" href="javascript:void(0);" onclick="followStout();">Follow</a>
+				<img src="img/stout-app-icon-hd.png" class="left" />
+				<span class="left" style="padding: 5px 0 5px 10px;">
+					Follow us<br />
+					on Twitter!
+				</span>
+				<section class="push"></section>
+			</section>
+		</div>
+	</body>
+</html>

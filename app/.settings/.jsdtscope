@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry excluding="node_modules/forever/node_modules/broadway/node_modules/optimist/test/_/|node_modules/forever/test/service/|node_modules/request/|node_modules/querystring/|node_modules/forever/node_modules/winston/lib/winston/transports/|node_modules/forever/node_modules/broadway/node_modules/eventemitter2/test/perf/|node_modules/jquery/node_modules/___jsdom.npm/package/test/|node_modules/jsdom/lib/jsdom/|node_modules/hashish/test/|node_modules/forever/node_modules/node-fork/test/basic/|node_modules/forever/node_modules/ps-tree/|node_modules/forever/node_modules/nconf/test/|node_modules/node-oauth/|node_modules/express/node_modules/connect/node_modules/formidable/test/unit/|node_modules/express/node_modules/mkdirp/test/|node_modules/forever/node_modules/node-fork/example/visible/|node_modules/forever/node_modules/broadway/test/fixtures/sample-app/app/|node_modules/now/lib/|node_modules/connect-auth/spec/lib/|node_modules/node-proxy/examples/autoload-namespace/|views/js/cubiq-add-to-homescreen-7cddc55/src/|node_modules/forever/node_modules/daemon/examples/|node_modules/uglify-js/test/unit/compress/expected/|node_modules/ini/test/|node_modules/uglify-js/|node_modules/forever/node_modules/flatiron/examples/cli-sample/|node_modules/forever/node_modules/winston/test/transports/|node_modules/cssom/lib/|node_modules/express/node_modules/connect/lib/middleware/session/|node_modules/jsdom/test/sizzle/support/|node_modules/mysql/test/|node_modules/express/node_modules/connect/node_modules/formidable/test/legacy/simple/|node_modules/request/tests/|node_modules/jsdom/example/ender/|node_modules/jade/lib/nodes/|node_modules/socket.io/lib/stores/|node_modules/forever/node_modules/broadway/node_modules/optimist/examples/|node_modules/now/dist/|node_modules/jsdom/lib/|node_modules/jquery/node_modules/___jsdom.npm/package/example/browser/|node_modules/socket.io/support/node-websocket-client/examples/|node_modules/crypto/|node_modules/express/node_modules/connect/|node_modules/forever/node_modules/nssocket/examples/|node_modules/jsdom/lib/jsdom/level2/languages/|node_modules/forever/node_modules/flatiron/test/fixtures/sample-app/app/new-york/|node_modules/node-oauth/sample/|views/js/|node_modules/connect-auth/test/|node_modules/forever/node_modules/winston/lib/winston/config/|node_modules/jquery/node_modules/___jsdom.npm/package/example/pure/|node_modules/forever/node_modules/optimist/|node_modules/express/node_modules/connect/node_modules/formidable/test/fixture/js/|node_modules/forever/node_modules/flatiron/lib/flatiron/plugins/|node_modules/forever/node_modules/minimatch/test/|node_modules/htmlparser/|node_modules/forever/node_modules/nconf/lib/nconf/|node_modules/jquery/node_modules/htmlparser/lib/|node_modules/forever/node_modules/nconf/test/fixtures/scripts/|node_modules/uglify-js/test/unit/|node_modules/querystring/tests/|node_modules/prowler/|node_modules/forever/node_modules/optimist/test/|node_modules/jsdom/lib/jsdom/level1/|node_modules/jade/examples/|node_modules/forever/node_modules/broadway/lib/|node_modules/mysql/test/integration/Client/connection/|node_modules/now/examples/multiroomchat_example/|node_modules/forever/node_modules/broadway/test/helpers/|node_modules/node-static/lib/|node_modules/uglify-js/lib/|node_modules/jquery/node_modules/___jsdom.npm/package/example/ender/|node_modules/hashish/node_modules/traverse/test/lib/|node_modules/jsdom/lib/jsdom/level2/|node_modules/forever/lib/forever/|node_modules/express/testing/foo/|node_modules/jsdom/lib/jsdom/level3/|node_modules/forever/node_modules/pkginfo/test/|node_modules/mysql/test/integration/Query/errors/|node_modules/forever/node_modules/optimist/test/_/|node_modules/forever/node_modules/nconf/test/stores/|node_modules/forever/node_modules/utile/lib/|node_modules/now/lib/nodeclient/|node_modules/express/node_modules/mkdirp/examples/|node_modules/jsdom/example/jquery/|node_modules/jsdom/example/node-xml/|node_modules/express/node_modules/connect/node_modules/formidable/lib/|node_modules/forever/node_modules/winston/test/fixtures/scripts/|node_modules/forever/node_modules/node-fork/example/invisible/|node_modules/jsdom/lib/jsdom/selectors/|node_modules/socket.io/examples/chat/|node_modules/jquery/node_modules/___jsdom.npm/package/example/jquery/|node_modules/express/node_modules/connect/node_modules/formidable/test/legacy/integration/|node_modules/jsdom/test/level2/events/files/|node_modules/node-proxy/examples/autoload-namespace/org/w3c/DOM/Document/String/|node_modules/forever/node_modules/cliff/test/|node_modules/node-proxy/test/|node_modules/express/lib/view/|node_modules/socket.io-client/test/|node_modules/jsdom/test/jsdom/|node_modules/jsdom/test/level1/html/files/|node_modules/express/|node_modules/express/node_modules/connect/lib/middleware/|node_modules/forever/test/helpers/mocks/|node_modules/mysql/lib/|node_modules/mysql/|node_modules/jsdom/test/window/files/|node_modules/forever/node_modules/microtime/|node_modules/jquery/node_modules/___jsdom.npm/package/lib/jsdom/level1/|node_modules/mysql/benchmark/node-mysql/|node_modules/jade/lib/|node_modules/now/examples/nodeclient_example/|node_modules/forever/node_modules/winston/lib/|node_modules/forever/node_modules/watch/|node_modules/jquery/node_modules/___jsdom.npm/package/example/node-xml/|node_modules/oauth/tests/|node_modules/hashish/node_modules/traverse/examples/|node_modules/forever/node_modules/broadway/node_modules/eventemitter2/test/simple/|node_modules/socket.io/lib/|node_modules/forever/node_modules/broadway/node_modules/eventemitter2/lib/|node_modules/htmlparser/lib/|node_modules/express/testing/|node_modules/socket.io/test/leaks/|node_modules/forever/node_modules/broadway/node_modules/eventemitter2/test/|node_modules/jquery/node_modules/htmlparser/tests/|node_modules/jsdom/test/browser/|node_modules/forever/node_modules/flatiron/examples/|node_modules/forever/node_modules/node-fork/test/fixtures/basic-visible/|node_modules/crypto/test/|node_modules/jquery/node_modules/htmlparser/pulls/node-htmlparser/lib/|node_modules/jquery/node_modules/___jsdom.npm/package/benchmark/|node_modules/forever/node_modules/timespan/lib/|node_modules/forever/node_modules/broadway/examples/nodejs/plugins/|node_modules/jsdom/test/|node_modules/jsdom/test/level3/core/files/|node_modules/forever/node_modules/watch/test/|node_modules/forever/node_modules/node-fork/test/fixtures/basic-invisible/|node_modules/jsdom/test/level2/core/files/orig/|node_modules/express/node_modules/connect/node_modules/formidable/tool/|node_modules/jquery/node_modules/___jsdom.npm/package/lib/jsdom/level3/|node_modules/prowler/lib/|node_modules/mysql/test/integration/Client/commands/|node_modules/forever/node_modules/broadway/lib/broadway/common/|node_modules/jquery/node_modules/___jsdom.npm/package/lib/jsdom/level2/|node_modules/jsdom/example/sizzle/|node_modules/socket.io/examples/irc-output/|node_modules/forever/test/helpers/|node_modules/forever/node_modules/broadway/lib/broadway/features/|node_modules/ini/|node_modules/jquery/node_modules/htmlparser/pulls/node-htmlparser/|node_modules/jsdom/test/jsonp/|node_modules/contextify/test/|node_modules/forever/node_modules/portfinder/lib/|node_modules/jsdom/benchmark/|node_modules/hashish/node_modules/traverse/|node_modules/connect-auth/lib/auth.strategies/|node_modules/hashish/node_modules/traverse/test/|node_modules/forever/lib/forever/service/adapters/initd/|node_modules/node-static/lib/node-static/|node_modules/forever/lib/forever/service/|node_modules/forever/node_modules/optimist/examples/|node_modules/jquery/|node_modules/forever/node_modules/nconf/|node_modules/jsdom/test/level2/core/files/|node_modules/express/node_modules/connect/node_modules/formidable/example/|node_modules/jquery/node_modules/___jsdom.npm/package/lib/jsdom/|node_modules/forever/test/monitor/|node_modules/jquery/node_modules/___jsdom.npm/package/lib/jsdom/selectors/|node_modules/forever/lib/forever/service/adapters/systemv/|node_modules/forever/node_modules/timespan/test/|node_modules/connect-auth/lib/auth.strategies/oauth/|node_modules/forever/test/fixtures/|node_modules/express/node_modules/connect/node_modules/formidable/benchmark/|node_modules/forever/node_modules/flatiron/lib/|node_modules/now/lib/client/|node_modules/forever/node_modules/utile/test/fixtures/require-directory/|node_modules/forever/node_modules/broadway/test/plugins/|node_modules/forever/node_modules/winston/lib/winston/|node_modules/forever/node_modules/minimatch/node_modules/lru-cache/lib/|node_modules/less/test/|node_modules/connect-auth/examples/mac/|node_modules/mysql/test/integration/Query/misc/|node_modules/now/node_modules/node-proxy/examples/autoload-namespace/org/w3c/DOM/Document/String/|node_modules/express/node_modules/connect/node_modules/formidable/test/|node_modules/socket.io/support/node-websocket-client/test/|node_modules/socket.io/test/|node_modules/forever/node_modules/utile/test/|node_modules/express/testing/foo/routes/|node_modules/socket.io-client/lib/transports/|node_modules/forever/node_modules/daemon/lib/|node_modules/jquery/node_modules/htmlparser/pulls/node-htmlparser/tests/|node_modules/forever/examples/|node_modules/forever/node_modules/broadway/node_modules/eventemitter2/test/wildcardEvents/|node_modules/hashish/examples/|node_modules/express/node_modules/qs/|node_modules/express/node_modules/mime/|node_modules/socket.io-client/support/test-runner/|node_modules/forever/test/worker/|node_modules/express/node_modules/connect/node_modules/formidable/|node_modules/forever/lib/forever/plugins/|node_modules/forever/node_modules/nconf/test/fixtures/|node_modules/connect-auth/lib/auth.strategies/http/|node_modules/socket.io-client/lib/|node_modules/jquery/node_modules/___jsdom.npm/package/lib/|node_modules/forever/node_modules/timespan/browser/|node_modules/oauth/examples/express-gdata/|node_modules/forever/node_modules/broadway/node_modules/optimist/|node_modules/express/node_modules/connect/node_modules/formidable/test/legacy/|node_modules/forever/node_modules/flatiron/bin/commands/|node_modules/express/node_modules/mkdirp/|node_modules/socket.io/|node_modules/forever/node_modules/minimatch/|node_modules/less/lib/less/|node_modules/oauth/lib/|node_modules/now/examples/helloworld_example/|node_modules/connect-auth/examples/mac/files/|node_modules/forever/lib/forever/service/adapters/|node_modules/forever/node_modules/winston/examples/|node_modules/forever/node_modules/nssocket/test/|node_modules/hashish/|node_modules/cssom/|node_modules/jsdom/test/level1/|node_modules/express/lib/router/|node_modules/forever/node_modules/pkginfo/examples/|node_modules/jsdom/test/level1/core/files/|node_modules/forever/node_modules/winston/test/|node_modules/forever/node_modules/broadway/test/common/|node_modules/jsdom/test/browser/files/js/|node_modules/forever/node_modules/portfinder/test/|node_modules/express/lib/|node_modules/express/node_modules/qs/lib/|node_modules/jsdom/test/level2/|node_modules/forever/node_modules/flatiron/test/|node_modules/node-static/examples/|node_modules/jsdom/example/browser/|node_modules/socket.io/benchmarks/|node_modules/jsdom/test/level3/|node_modules/forever/node_modules/flatiron/lib/flatiron/util/|node_modules/now/bin/|node_modules/forever/test/core/|node_modules/now/node_modules/node-proxy/examples/autoload-namespace/org/w3c/DOM/|node_modules/forever/node_modules/flatiron/lib/flatiron/|node_modules/mysql/tool/|node_modules/now/examples/express_example/|node_modules/socket.io-client/support/test-runner/public/javascript/|node_modules/now/node_modules/node-proxy/test/|node_modules/forever/test/fixtures/watch/|node_modules/jquery/node_modules/htmlparser/|node_modules/express/node_modules/connect/lib/|node_modules/jsdom/test/level1/svg/files/|node_modules/forever/node_modules/broadway/examples/nodejs/|node_modules/forever/node_modules/broadway/lib/broadway/plugins/|node_modules/mysql/test/unit/|node_modules/forever/test/plugins/|node_modules/oauth/|node_modules/socket.io-client/bin/|node_modules/jsdom/test/level2/html/files/js/|node_modules/uglify-js/tmp/|node_modules/forever/lib/|node_modules/jsdom/test/window/|node_modules/socket.io-client/lib/vendor/web-socket-js/|node_modules/forever/node_modules/pkginfo/lib/|node_modules/forever/node_modules/daemon/test/|node_modules/jsdom/test/sizzle/|node_modules/socket.io-client/dist/|node_modules/forever/node_modules/broadway/node_modules/optimist/test/|node_modules/socket.io/lib/transports/|node_modules/forever/node_modules/minimatch/node_modules/lru-cache/test/|node_modules/less/benchmark/|node_modules/base64/test/|node_modules/forever/node_modules/broadway/node_modules/eventemitter2/|node_modules/socket.io-client/test/node/|node_modules/connect-auth/|node_modules/node-oauth/lib/|node_modules/forever/node_modules/cliff/examples/|node_modules/socket.io/lib/transports/websocket/|node_modules/jade/test/|node_modules/jsdom/example/pure/|node_modules/jquery/node_modules/___jsdom.npm/package/example/sizzle/|node_modules/jade/|node_modules/express/node_modules/connect/node_modules/formidable/test/fixture/|node_modules/forever/node_modules/nssocket/lib/|node_modules/forever/node_modules/utile/test/fixtures/require-directory/directory/|node_modules/contextify/lib/|node_modules/forever/node_modules/node-fork/test/|node_modules/forever/node_modules/broadway/examples/browser/plugins/|node_modules/socket.io/support/node-websocket-client/lib/|node_modules/mysql/test/unit/legacy/|node_modules/socket.io-client/support/|node_modules/jsdom/test/level3/core/files/orig/|node_modules/forever/node_modules/nconf/lib/|node_modules/express/node_modules/connect/node_modules/formidable/test/legacy/system/|node_modules/htmlparser/tests/|node_modules/less/dist/|node_modules/jade/support/|node_modules/express/node_modules/connect/node_modules/formidable/test/integration/|node_modules/forever/node_modules/broadway/examples/browser/|node_modules/uglify-js/test/|node_modules/less/lib/less/tree/|node_modules/jquery/node_modules/___jsdom.npm/package/lib/jsdom/browser/|node_modules/uglify-js/test/unit/compress/test/|node_modules/oauth/examples/|node_modules/jquery/node_modules/___jsdom.npm/package/lib/jsdom/level2/languages/|node_modules/forever/node_modules/broadway/test/core/|node_modules/mysql/test/integration/Query/results/|node_modules/connect-auth/examples/|node_modules/express/node_modules/qs/test/|node_modules/forever/node_modules/broadway/lib/broadway/|node_modules/forever/node_modules/node-fork/lib/|node_modules/forever/node_modules/nconf/lib/nconf/stores/|node_modules/connect-auth/lib/|node_modules/connect-auth/spec/|node_modules/forever/node_modules/utile/test/helpers/|node_modules/jsdom/test/jsdom/files/|node_modules/localStorage/|node_modules/now/node_modules/node-proxy/examples/autoload-namespace/|node_modules/request/vendor/cookie/|node_modules/node-proxy/examples/autoload-namespace/org/w3c/DOM/|node_modules/jsdom/lib/jsdom/browser/|node_modules/forever/node_modules/cliff/lib/" kind="src" path=""/>
+	<classpathentry kind="src" path="node_modules/base64/test"/>
+	<classpathentry excluding="spec/lib/|test/|lib/auth.strategies/|lib/auth.strategies/oauth/|examples/mac/|lib/auth.strategies/http/|examples/mac/files/|examples/|lib/|spec/" kind="src" path="node_modules/connect-auth"/>
+	<classpathentry excluding="mac/|mac/files/" kind="src" path="node_modules/connect-auth/examples"/>
+	<classpathentry excluding="files/" kind="src" path="node_modules/connect-auth/examples/mac"/>
+	<classpathentry kind="src" path="node_modules/connect-auth/examples/mac/files"/>
+	<classpathentry excluding="auth.strategies/|auth.strategies/oauth/|auth.strategies/http/" kind="src" path="node_modules/connect-auth/lib"/>
+	<classpathentry excluding="oauth/|http/" kind="src" path="node_modules/connect-auth/lib/auth.strategies"/>
+	<classpathentry kind="src" path="node_modules/connect-auth/lib/auth.strategies/http"/>
+	<classpathentry kind="src" path="node_modules/connect-auth/lib/auth.strategies/oauth"/>
+	<classpathentry excluding="lib/" kind="src" path="node_modules/connect-auth/spec"/>
+	<classpathentry kind="src" path="node_modules/connect-auth/spec/lib"/>
+	<classpathentry kind="src" path="node_modules/connect-auth/test"/>
+	<classpathentry kind="src" path="node_modules/contextify/lib"/>
+	<classpathentry kind="src" path="node_modules/contextify/test"/>
+	<classpathentry excluding="test/" kind="src" path="node_modules/crypto"/>
+	<classpathentry kind="src" path="node_modules/crypto/test"/>
+	<classpathentry excluding="lib/" kind="src" path="node_modules/cssom"/>
+	<classpathentry kind="src" path="node_modules/cssom/lib"/>
+	<classpathentry excluding="node_modules/connect/node_modules/formidable/test/unit/|node_modules/mkdirp/test/|node_modules/connect/lib/middleware/session/|node_modules/connect/node_modules/formidable/test/legacy/simple/|node_modules/connect/|node_modules/connect/node_modules/formidable/test/fixture/js/|testing/foo/|node_modules/mkdirp/examples/|node_modules/connect/node_modules/formidable/lib/|node_modules/connect/node_modules/formidable/test/legacy/integration/|lib/view/|node_modules/connect/lib/middleware/|testing/|node_modules/connect/node_modules/formidable/tool/|node_modules/connect/node_modules/formidable/example/|node_modules/connect/node_modules/formidable/benchmark/|node_modules/connect/node_modules/formidable/test/|testing/foo/routes/|node_modules/qs/|node_modules/mime/|node_modules/connect/node_modules/formidable/|node_modules/connect/node_modules/formidable/test/legacy/|node_modules/mkdirp/|lib/router/|lib/|node_modules/qs/lib/|node_modules/connect/lib/|node_modules/connect/node_modules/formidable/test/fixture/|node_modules/connect/node_modules/formidable/test/legacy/system/|node_modules/connect/node_modules/formidable/test/integration/|node_modules/qs/test/" kind="src" path="node_modules/express"/>
+	<classpathentry excluding="view/|router/" kind="src" path="node_modules/express/lib"/>
+	<classpathentry kind="src" path="node_modules/express/lib/router"/>
+	<classpathentry kind="src" path="node_modules/express/lib/view"/>
+	<classpathentry excluding="node_modules/formidable/test/unit/|lib/middleware/session/|node_modules/formidable/test/legacy/simple/|node_modules/formidable/test/fixture/js/|node_modules/formidable/lib/|node_modules/formidable/test/legacy/integration/|lib/middleware/|node_modules/formidable/tool/|node_modules/formidable/example/|node_modules/formidable/benchmark/|node_modules/formidable/test/|node_modules/formidable/|node_modules/formidable/test/legacy/|lib/|node_modules/formidable/test/fixture/|node_modules/formidable/test/legacy/system/|node_modules/formidable/test/integration/" kind="src" path="node_modules/express/node_modules/connect"/>
+	<classpathentry excluding="middleware/session/|middleware/" kind="src" path="node_modules/express/node_modules/connect/lib"/>
+	<classpathentry excluding="session/" kind="src" path="node_modules/express/node_modules/connect/lib/middleware"/>
+	<classpathentry kind="src" path="node_modules/express/node_modules/connect/lib/middleware/session"/>
+	<classpathentry excluding="test/unit/|test/legacy/simple/|test/fixture/js/|lib/|test/legacy/integration/|tool/|example/|benchmark/|test/|test/legacy/|test/fixture/|test/legacy/system/|test/integration/" kind="src" path="node_modules/express/node_modules/connect/node_modules/formidable"/>
+	<classpathentry kind="src" path="node_modules/express/node_modules/connect/node_modules/formidable/benchmark"/>
+	<classpathentry kind="src" path="node_modules/express/node_modules/connect/node_modules/formidable/example"/>
+	<classpathentry kind="src" path="node_modules/express/node_modules/connect/node_modules/formidable/lib"/>
+	<classpathentry excluding="unit/|legacy/simple/|fixture/js/|legacy/integration/|legacy/|fixture/|legacy/system/|integration/" kind="src" path="node_modules/express/node_modules/connect/node_modules/formidable/test"/>
+	<classpathentry excluding="js/" kind="src" path="node_modules/express/node_modules/connect/node_modules/formidable/test/fixture"/>
+	<classpathentry kind="src" path="node_modules/express/node_modules/connect/node_modules/formidable/test/fixture/js"/>
+	<classpathentry kind="src" path="node_modules/express/node_modules/connect/node_modules/formidable/test/integration"/>
+	<classpathentry excluding="simple/|integration/|system/" kind="src" path="node_modules/express/node_modules/connect/node_modules/formidable/test/legacy"/>
+	<classpathentry kind="src" path="node_modules/express/node_modules/connect/node_modules/formidable/test/legacy/integration"/>
+	<classpathentry kind="src" path="node_modules/express/node_modules/connect/node_modules/formidable/test/legacy/simple"/>
+	<classpathentry kind="src" path="node_modules/express/node_modules/connect/node_modules/formidable/test/legacy/system"/>
+	<classpathentry kind="src" path="node_modules/express/node_modules/connect/node_modules/formidable/test/unit"/>
+	<classpathentry kind="src" path="node_modules/express/node_modules/connect/node_modules/formidable/tool"/>
+	<classpathentry kind="src" path="node_modules/express/node_modules/mime"/>
+	<classpathentry excluding="test/|examples/" kind="src" path="node_modules/express/node_modules/mkdirp"/>
+	<classpathentry kind="src" path="node_modules/express/node_modules/mkdirp/examples"/>
+	<classpathentry kind="src" path="node_modules/express/node_modules/mkdirp/test"/>
+	<classpathentry excluding="lib/|test/" kind="src" path="node_modules/express/node_modules/qs"/>
+	<classpathentry kind="src" path="node_modules/express/node_modules/qs/lib"/>
+	<classpathentry kind="src" path="node_modules/express/node_modules/qs/test"/>
+	<classpathentry excluding="foo/|foo/routes/" kind="src" path="node_modules/express/testing"/>
+	<classpathentry excluding="routes/" kind="src" path="node_modules/express/testing/foo"/>
+	<classpathentry kind="src" path="node_modules/express/testing/foo/routes"/>
+	<classpathentry kind="src" path="node_modules/forever/examples"/>
+	<classpathentry excluding="forever/|forever/service/adapters/initd/|forever/service/|forever/service/adapters/systemv/|forever/plugins/|forever/service/adapters/" kind="src" path="node_modules/forever/lib"/>
+	<classpathentry excluding="service/adapters/initd/|service/|service/adapters/systemv/|plugins/|service/adapters/" kind="src" path="node_modules/forever/lib/forever"/>
+	<classpathentry kind="src" path="node_modules/forever/lib/forever/plugins"/>
+	<classpathentry excluding="adapters/initd/|adapters/systemv/|adapters/" kind="src" path="node_modules/forever/lib/forever/service"/>
+	<classpathentry excluding="initd/|systemv/" kind="src" path="node_modules/forever/lib/forever/service/adapters"/>
+	<classpathentry kind="src" path="node_modules/forever/lib/forever/service/adapters/initd"/>
+	<classpathentry kind="src" path="node_modules/forever/lib/forever/service/adapters/systemv"/>
+	<classpathentry excluding="plugins/" kind="src" path="node_modules/forever/node_modules/broadway/examples/browser"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/broadway/examples/browser/plugins"/>
+	<classpathentry excluding="plugins/" kind="src" path="node_modules/forever/node_modules/broadway/examples/nodejs"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/broadway/examples/nodejs/plugins"/>
+	<classpathentry excluding="broadway/common/|broadway/features/|broadway/plugins/|broadway/" kind="src" path="node_modules/forever/node_modules/broadway/lib"/>
+	<classpathentry excluding="common/|features/|plugins/" kind="src" path="node_modules/forever/node_modules/broadway/lib/broadway"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/broadway/lib/broadway/common"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/broadway/lib/broadway/features"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/broadway/lib/broadway/plugins"/>
+	<classpathentry excluding="test/perf/|test/simple/|lib/|test/|test/wildcardEvents/" kind="src" path="node_modules/forever/node_modules/broadway/node_modules/eventemitter2"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/broadway/node_modules/eventemitter2/lib"/>
+	<classpathentry excluding="perf/|simple/|wildcardEvents/" kind="src" path="node_modules/forever/node_modules/broadway/node_modules/eventemitter2/test"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/broadway/node_modules/eventemitter2/test/perf"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/broadway/node_modules/eventemitter2/test/simple"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/broadway/node_modules/eventemitter2/test/wildcardEvents"/>
+	<classpathentry excluding="test/_/|examples/|test/" kind="src" path="node_modules/forever/node_modules/broadway/node_modules/optimist"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/broadway/node_modules/optimist/examples"/>
+	<classpathentry excluding="_/" kind="src" path="node_modules/forever/node_modules/broadway/node_modules/optimist/test"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/broadway/node_modules/optimist/test/_"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/broadway/test/common"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/broadway/test/core"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/broadway/test/fixtures/sample-app/app"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/broadway/test/helpers"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/broadway/test/plugins"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/cliff/examples"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/cliff/lib"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/cliff/test"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/daemon/examples"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/daemon/lib"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/daemon/test"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/flatiron/bin/commands"/>
+	<classpathentry excluding="cli-sample/" kind="src" path="node_modules/forever/node_modules/flatiron/examples"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/flatiron/examples/cli-sample"/>
+	<classpathentry excluding="flatiron/plugins/|flatiron/util/|flatiron/" kind="src" path="node_modules/forever/node_modules/flatiron/lib"/>
+	<classpathentry excluding="plugins/|util/" kind="src" path="node_modules/forever/node_modules/flatiron/lib/flatiron"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/flatiron/lib/flatiron/plugins"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/flatiron/lib/flatiron/util"/>
+	<classpathentry excluding="fixtures/sample-app/app/new-york/" kind="src" path="node_modules/forever/node_modules/flatiron/test"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/flatiron/test/fixtures/sample-app/app/new-york"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/microtime"/>
+	<classpathentry excluding="test/|node_modules/lru-cache/lib/|node_modules/lru-cache/test/" kind="src" path="node_modules/forever/node_modules/minimatch"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/minimatch/node_modules/lru-cache/lib"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/minimatch/node_modules/lru-cache/test"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/minimatch/test"/>
+	<classpathentry excluding="test/|lib/nconf/|test/fixtures/scripts/|test/stores/|test/fixtures/|lib/|lib/nconf/stores/" kind="src" path="node_modules/forever/node_modules/nconf"/>
+	<classpathentry excluding="nconf/|nconf/stores/" kind="src" path="node_modules/forever/node_modules/nconf/lib"/>
+	<classpathentry excluding="stores/" kind="src" path="node_modules/forever/node_modules/nconf/lib/nconf"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/nconf/lib/nconf/stores"/>
+	<classpathentry excluding="fixtures/scripts/|stores/|fixtures/" kind="src" path="node_modules/forever/node_modules/nconf/test"/>
+	<classpathentry excluding="scripts/" kind="src" path="node_modules/forever/node_modules/nconf/test/fixtures"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/nconf/test/fixtures/scripts"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/nconf/test/stores"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/node-fork/example/invisible"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/node-fork/example/visible"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/node-fork/lib"/>
+	<classpathentry excluding="basic/|fixtures/basic-visible/|fixtures/basic-invisible/" kind="src" path="node_modules/forever/node_modules/node-fork/test"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/node-fork/test/basic"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/node-fork/test/fixtures/basic-invisible"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/node-fork/test/fixtures/basic-visible"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/nssocket/examples"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/nssocket/lib"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/nssocket/test"/>
+	<classpathentry excluding="test/|test/_/|examples/" kind="src" path="node_modules/forever/node_modules/optimist"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/optimist/examples"/>
+	<classpathentry excluding="_/" kind="src" path="node_modules/forever/node_modules/optimist/test"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/optimist/test/_"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/pkginfo/examples"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/pkginfo/lib"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/pkginfo/test"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/portfinder/lib"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/portfinder/test"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/ps-tree"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/timespan/browser"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/timespan/lib"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/timespan/test"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/utile/lib"/>
+	<classpathentry excluding="fixtures/require-directory/|fixtures/require-directory/directory/|helpers/" kind="src" path="node_modules/forever/node_modules/utile/test"/>
+	<classpathentry excluding="directory/" kind="src" path="node_modules/forever/node_modules/utile/test/fixtures/require-directory"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/utile/test/fixtures/require-directory/directory"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/utile/test/helpers"/>
+	<classpathentry excluding="test/" kind="src" path="node_modules/forever/node_modules/watch"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/watch/test"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/winston/examples"/>
+	<classpathentry excluding="winston/transports/|winston/config/|winston/" kind="src" path="node_modules/forever/node_modules/winston/lib"/>
+	<classpathentry excluding="transports/|config/" kind="src" path="node_modules/forever/node_modules/winston/lib/winston"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/winston/lib/winston/config"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/winston/lib/winston/transports"/>
+	<classpathentry excluding="transports/|fixtures/scripts/" kind="src" path="node_modules/forever/node_modules/winston/test"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/winston/test/fixtures/scripts"/>
+	<classpathentry kind="src" path="node_modules/forever/node_modules/winston/test/transports"/>
+	<classpathentry kind="src" path="node_modules/forever/test/core"/>
+	<classpathentry excluding="watch/" kind="src" path="node_modules/forever/test/fixtures"/>
+	<classpathentry kind="src" path="node_modules/forever/test/fixtures/watch"/>
+	<classpathentry excluding="mocks/" kind="src" path="node_modules/forever/test/helpers"/>
+	<classpathentry kind="src" path="node_modules/forever/test/helpers/mocks"/>
+	<classpathentry kind="src" path="node_modules/forever/test/monitor"/>
+	<classpathentry kind="src" path="node_modules/forever/test/plugins"/>
+	<classpathentry kind="src" path="node_modules/forever/test/service"/>
+	<classpathentry kind="src" path="node_modules/forever/test/worker"/>
+	<classpathentry excluding="test/|node_modules/traverse/test/lib/|node_modules/traverse/examples/|node_modules/traverse/|node_modules/traverse/test/|examples/" kind="src" path="node_modules/hashish"/>
+	<classpathentry kind="src" path="node_modules/hashish/examples"/>
+	<classpathentry excluding="test/lib/|examples/|test/" kind="src" path="node_modules/hashish/node_modules/traverse"/>
+	<classpathentry kind="src" path="node_modules/hashish/node_modules/traverse/examples"/>
+	<classpathentry excluding="lib/" kind="src" path="node_modules/hashish/node_modules/traverse/test"/>
+	<classpathentry kind="src" path="node_modules/hashish/node_modules/traverse/test/lib"/>
+	<classpathentry kind="src" path="node_modules/hashish/test"/>
+	<classpathentry excluding="lib/|tests/" kind="src" path="node_modules/htmlparser"/>
+	<classpathentry kind="src" path="node_modules/htmlparser/lib"/>
+	<classpathentry kind="src" path="node_modules/htmlparser/tests"/>
+	<classpathentry excluding="test/" kind="src" path="node_modules/ini"/>
+	<classpathentry kind="src" path="node_modules/ini/test"/>
+	<classpathentry excluding="lib/nodes/|examples/|lib/|test/|support/" kind="src" path="node_modules/jade"/>
+	<classpathentry kind="src" path="node_modules/jade/examples"/>
+	<classpathentry excluding="nodes/" kind="src" path="node_modules/jade/lib"/>
+	<classpathentry kind="src" path="node_modules/jade/lib/nodes"/>
+	<classpathentry kind="src" path="node_modules/jade/support"/>
+	<classpathentry kind="src" path="node_modules/jade/test"/>
+	<classpathentry excluding="node_modules/___jsdom.npm/package/test/|node_modules/___jsdom.npm/package/example/browser/|node_modules/___jsdom.npm/package/example/pure/|node_modules/htmlparser/lib/|node_modules/___jsdom.npm/package/example/ender/|node_modules/___jsdom.npm/package/example/jquery/|node_modules/___jsdom.npm/package/lib/jsdom/level1/|node_modules/___jsdom.npm/package/example/node-xml/|node_modules/htmlparser/tests/|node_modules/htmlparser/pulls/node-htmlparser/lib/|node_modules/___jsdom.npm/package/benchmark/|node_modules/___jsdom.npm/package/lib/jsdom/level3/|node_modules/___jsdom.npm/package/lib/jsdom/level2/|node_modules/htmlparser/pulls/node-htmlparser/|node_modules/___jsdom.npm/package/lib/jsdom/|node_modules/___jsdom.npm/package/lib/jsdom/selectors/|node_modules/htmlparser/pulls/node-htmlparser/tests/|node_modules/___jsdom.npm/package/lib/|node_modules/htmlparser/|node_modules/___jsdom.npm/package/example/sizzle/|node_modules/___jsdom.npm/package/lib/jsdom/browser/|node_modules/___jsdom.npm/package/lib/jsdom/level2/languages/" kind="src" path="node_modules/jquery"/>
+	<classpathentry kind="src" path="node_modules/jquery/node_modules/___jsdom.npm/package/benchmark"/>
+	<classpathentry kind="src" path="node_modules/jquery/node_modules/___jsdom.npm/package/example/browser"/>
+	<classpathentry kind="src" path="node_modules/jquery/node_modules/___jsdom.npm/package/example/ender"/>
+	<classpathentry kind="src" path="node_modules/jquery/node_modules/___jsdom.npm/package/example/jquery"/>
+	<classpathentry kind="src" path="node_modules/jquery/node_modules/___jsdom.npm/package/example/node-xml"/>
+	<classpathentry kind="src" path="node_modules/jquery/node_modules/___jsdom.npm/package/example/pure"/>
+	<classpathentry kind="src" path="node_modules/jquery/node_modules/___jsdom.npm/package/example/sizzle"/>
+	<classpathentry excluding="jsdom/level1/|jsdom/level3/|jsdom/level2/|jsdom/|jsdom/selectors/|jsdom/browser/|jsdom/level2/languages/" kind="src" path="node_modules/jquery/node_modules/___jsdom.npm/package/lib"/>
+	<classpathentry excluding="level1/|level3/|level2/|selectors/|browser/|level2/languages/" kind="src" path="node_modules/jquery/node_modules/___jsdom.npm/package/lib/jsdom"/>
+	<classpathentry kind="src" path="node_modules/jquery/node_modules/___jsdom.npm/package/lib/jsdom/browser"/>
+	<classpathentry kind="src" path="node_modules/jquery/node_modules/___jsdom.npm/package/lib/jsdom/level1"/>
+	<classpathentry excluding="languages/" kind="src" path="node_modules/jquery/node_modules/___jsdom.npm/package/lib/jsdom/level2"/>
+	<classpathentry kind="src" path="node_modules/jquery/node_modules/___jsdom.npm/package/lib/jsdom/level2/languages"/>
+	<classpathentry kind="src" path="node_modules/jquery/node_modules/___jsdom.npm/package/lib/jsdom/level3"/>
+	<classpathentry kind="src" path="node_modules/jquery/node_modules/___jsdom.npm/package/lib/jsdom/selectors"/>
+	<classpathentry kind="src" path="node_modules/jquery/node_modules/___jsdom.npm/package/test"/>
+	<classpathentry excluding="lib/|tests/|pulls/node-htmlparser/lib/|pulls/node-htmlparser/|pulls/node-htmlparser/tests/" kind="src" path="node_modules/jquery/node_modules/htmlparser"/>
+	<classpathentry kind="src" path="node_modules/jquery/node_modules/htmlparser/lib"/>
+	<classpathentry excluding="lib/|tests/" kind="src" path="node_modules/jquery/node_modules/htmlparser/pulls/node-htmlparser"/>
+	<classpathentry kind="src" path="node_modules/jquery/node_modules/htmlparser/pulls/node-htmlparser/lib"/>
+	<classpathentry kind="src" path="node_modules/jquery/node_modules/htmlparser/pulls/node-htmlparser/tests"/>
+	<classpathentry kind="src" path="node_modules/jquery/node_modules/htmlparser/tests"/>
+	<classpathentry kind="src" path="node_modules/jsdom/benchmark"/>
+	<classpathentry kind="src" path="node_modules/jsdom/example/browser"/>
+	<classpathentry kind="src" path="node_modules/jsdom/example/ender"/>
+	<classpathentry kind="src" path="node_modules/jsdom/example/jquery"/>
+	<classpathentry kind="src" path="node_modules/jsdom/example/node-xml"/>
+	<classpathentry kind="src" path="node_modules/jsdom/example/pure"/>
+	<classpathentry kind="src" path="node_modules/jsdom/example/sizzle"/>
+	<classpathentry excluding="jsdom/|jsdom/level2/languages/|jsdom/level1/|jsdom/level2/|jsdom/level3/|jsdom/selectors/|jsdom/browser/" kind="src" path="node_modules/jsdom/lib"/>
+	<classpathentry excluding="level2/languages/|level1/|level2/|level3/|selectors/|browser/" kind="src" path="node_modules/jsdom/lib/jsdom"/>
+	<classpathentry kind="src" path="node_modules/jsdom/lib/jsdom/browser"/>
+	<classpathentry kind="src" path="node_modules/jsdom/lib/jsdom/level1"/>
+	<classpathentry excluding="languages/" kind="src" path="node_modules/jsdom/lib/jsdom/level2"/>
+	<classpathentry kind="src" path="node_modules/jsdom/lib/jsdom/level2/languages"/>
+	<classpathentry kind="src" path="node_modules/jsdom/lib/jsdom/level3"/>
+	<classpathentry kind="src" path="node_modules/jsdom/lib/jsdom/selectors"/>
+	<classpathentry excluding="sizzle/support/|level2/events/files/|jsdom/|level1/html/files/|window/files/|browser/|level3/core/files/|level2/core/files/orig/|jsonp/|level2/core/files/|level1/|level1/core/files/|browser/files/js/|level2/|level3/|level1/svg/files/|level2/html/files/js/|window/|sizzle/|level3/core/files/orig/|jsdom/files/" kind="src" path="node_modules/jsdom/test"/>
+	<classpathentry excluding="files/js/" kind="src" path="node_modules/jsdom/test/browser"/>
+	<classpathentry kind="src" path="node_modules/jsdom/test/browser/files/js"/>
+	<classpathentry excluding="files/" kind="src" path="node_modules/jsdom/test/jsdom"/>
+	<classpathentry kind="src" path="node_modules/jsdom/test/jsdom/files"/>
+	<classpathentry kind="src" path="node_modules/jsdom/test/jsonp"/>
+	<classpathentry excluding="html/files/|core/files/|svg/files/" kind="src" path="node_modules/jsdom/test/level1"/>
+	<classpathentry kind="src" path="node_modules/jsdom/test/level1/core/files"/>
+	<classpathentry kind="src" path="node_modules/jsdom/test/level1/html/files"/>
+	<classpathentry kind="src" path="node_modules/jsdom/test/level1/svg/files"/>
+	<classpathentry excluding="events/files/|core/files/orig/|core/files/|html/files/js/" kind="src" path="node_modules/jsdom/test/level2"/>
+	<classpathentry excluding="orig/" kind="src" path="node_modules/jsdom/test/level2/core/files"/>
+	<classpathentry kind="src" path="node_modules/jsdom/test/level2/core/files/orig"/>
+	<classpathentry kind="src" path="node_modules/jsdom/test/level2/events/files"/>
+	<classpathentry kind="src" path="node_modules/jsdom/test/level2/html/files/js"/>
+	<classpathentry excluding="core/files/|core/files/orig/" kind="src" path="node_modules/jsdom/test/level3"/>
+	<classpathentry excluding="orig/" kind="src" path="node_modules/jsdom/test/level3/core/files"/>
+	<classpathentry kind="src" path="node_modules/jsdom/test/level3/core/files/orig"/>
+	<classpathentry excluding="support/" kind="src" path="node_modules/jsdom/test/sizzle"/>
+	<classpathentry kind="src" path="node_modules/jsdom/test/sizzle/support"/>
+	<classpathentry excluding="files/" kind="src" path="node_modules/jsdom/test/window"/>
+	<classpathentry kind="src" path="node_modules/jsdom/test/window/files"/>
+	<classpathentry kind="src" path="node_modules/less/benchmark"/>
+	<classpathentry kind="src" path="node_modules/less/dist"/>
+	<classpathentry excluding="tree/" kind="src" path="node_modules/less/lib/less"/>
+	<classpathentry kind="src" path="node_modules/less/lib/less/tree"/>
+	<classpathentry kind="src" path="node_modules/less/test"/>
+	<classpathentry kind="src" path="node_modules/localStorage"/>
+	<classpathentry excluding="test/|test/integration/Client/connection/|test/integration/Query/errors/|lib/|benchmark/node-mysql/|test/integration/Client/commands/|test/integration/Query/misc/|tool/|test/unit/|test/unit/legacy/|test/integration/Query/results/" kind="src" path="node_modules/mysql"/>
+	<classpathentry kind="src" path="node_modules/mysql/benchmark/node-mysql"/>
+	<classpathentry kind="src" path="node_modules/mysql/lib"/>
+	<classpathentry excluding="integration/Client/connection/|integration/Query/errors/|integration/Client/commands/|integration/Query/misc/|unit/|unit/legacy/|integration/Query/results/" kind="src" path="node_modules/mysql/test"/>
+	<classpathentry kind="src" path="node_modules/mysql/test/integration/Client/commands"/>
+	<classpathentry kind="src" path="node_modules/mysql/test/integration/Client/connection"/>
+	<classpathentry kind="src" path="node_modules/mysql/test/integration/Query/errors"/>
+	<classpathentry kind="src" path="node_modules/mysql/test/integration/Query/misc"/>
+	<classpathentry kind="src" path="node_modules/mysql/test/integration/Query/results"/>
+	<classpathentry excluding="legacy/" kind="src" path="node_modules/mysql/test/unit"/>
+	<classpathentry kind="src" path="node_modules/mysql/test/unit/legacy"/>
+	<classpathentry kind="src" path="node_modules/mysql/tool"/>
+	<classpathentry excluding="sample/|lib/" kind="src" path="node_modules/node-oauth"/>
+	<classpathentry kind="src" path="node_modules/node-oauth/lib"/>
+	<classpathentry kind="src" path="node_modules/node-oauth/sample"/>
+	<classpathentry excluding="org/w3c/DOM/Document/String/|org/w3c/DOM/" kind="src" path="node_modules/node-proxy/examples/autoload-namespace"/>
+	<classpathentry excluding="Document/String/" kind="src" path="node_modules/node-proxy/examples/autoload-namespace/org/w3c/DOM"/>
+	<classpathentry kind="src" path="node_modules/node-proxy/examples/autoload-namespace/org/w3c/DOM/Document/String"/>
+	<classpathentry kind="src" path="node_modules/node-proxy/test"/>
+	<classpathentry kind="src" path="node_modules/node-static/examples"/>
+	<classpathentry excluding="node-static/" kind="src" path="node_modules/node-static/lib"/>
+	<classpathentry kind="src" path="node_modules/node-static/lib/node-static"/>
+	<classpathentry kind="src" path="node_modules/now/bin"/>
+	<classpathentry kind="src" path="node_modules/now/dist"/>
+	<classpathentry kind="src" path="node_modules/now/examples/express_example"/>
+	<classpathentry kind="src" path="node_modules/now/examples/helloworld_example"/>
+	<classpathentry kind="src" path="node_modules/now/examples/multiroomchat_example"/>
+	<classpathentry kind="src" path="node_modules/now/examples/nodeclient_example"/>
+	<classpathentry excluding="nodeclient/|client/" kind="src" path="node_modules/now/lib"/>
+	<classpathentry kind="src" path="node_modules/now/lib/client"/>
+	<classpathentry kind="src" path="node_modules/now/lib/nodeclient"/>
+	<classpathentry excluding="org/w3c/DOM/Document/String/|org/w3c/DOM/" kind="src" path="node_modules/now/node_modules/node-proxy/examples/autoload-namespace"/>
+	<classpathentry excluding="Document/String/" kind="src" path="node_modules/now/node_modules/node-proxy/examples/autoload-namespace/org/w3c/DOM"/>
+	<classpathentry kind="src" path="node_modules/now/node_modules/node-proxy/examples/autoload-namespace/org/w3c/DOM/Document/String"/>
+	<classpathentry kind="src" path="node_modules/now/node_modules/node-proxy/test"/>
+	<classpathentry excluding="tests/|examples/express-gdata/|lib/|examples/" kind="src" path="node_modules/oauth"/>
+	<classpathentry excluding="express-gdata/" kind="src" path="node_modules/oauth/examples"/>
+	<classpathentry kind="src" path="node_modules/oauth/examples/express-gdata"/>
+	<classpathentry kind="src" path="node_modules/oauth/lib"/>
+	<classpathentry kind="src" path="node_modules/oauth/tests"/>
+	<classpathentry excluding="lib/" kind="src" path="node_modules/prowler"/>
+	<classpathentry kind="src" path="node_modules/prowler/lib"/>
+	<classpathentry excluding="tests/" kind="src" path="node_modules/querystring"/>
+	<classpathentry kind="src" path="node_modules/querystring/tests"/>
+	<classpathentry excluding="tests/|vendor/cookie/" kind="src" path="node_modules/request"/>
+	<classpathentry kind="src" path="node_modules/request/tests"/>
+	<classpathentry kind="src" path="node_modules/request/vendor/cookie"/>
+	<classpathentry excluding="lib/stores/|support/node-websocket-client/examples/|examples/chat/|lib/|test/leaks/|examples/irc-output/|support/node-websocket-client/test/|test/|benchmarks/|lib/transports/|lib/transports/websocket/|support/node-websocket-client/lib/" kind="src" path="node_modules/socket.io"/>
+	<classpathentry kind="src" path="node_modules/socket.io-client/bin"/>
+	<classpathentry kind="src" path="node_modules/socket.io-client/dist"/>
+	<classpathentry excluding="transports/|vendor/web-socket-js/" kind="src" path="node_modules/socket.io-client/lib"/>
+	<classpathentry kind="src" path="node_modules/socket.io-client/lib/transports"/>
+	<classpathentry kind="src" path="node_modules/socket.io-client/lib/vendor/web-socket-js"/>
+	<classpathentry excluding="test-runner/|test-runner/public/javascript/" kind="src" path="node_modules/socket.io-client/support"/>
+	<classpathentry excluding="public/javascript/" kind="src" path="node_modules/socket.io-client/support/test-runner"/>
+	<classpathentry kind="src" path="node_modules/socket.io-client/support/test-runner/public/javascript"/>
+	<classpathentry excluding="node/" kind="src" path="node_modules/socket.io-client/test"/>
+	<classpathentry kind="src" path="node_modules/socket.io-client/test/node"/>
+	<classpathentry kind="src" path="node_modules/socket.io/benchmarks"/>
+	<classpathentry kind="src" path="node_modules/socket.io/examples/chat"/>
+	<classpathentry kind="src" path="node_modules/socket.io/examples/irc-output"/>
+	<classpathentry excluding="stores/|transports/|transports/websocket/" kind="src" path="node_modules/socket.io/lib"/>
+	<classpathentry kind="src" path="node_modules/socket.io/lib/stores"/>
+	<classpathentry excluding="websocket/" kind="src" path="node_modules/socket.io/lib/transports"/>
+	<classpathentry kind="src" path="node_modules/socket.io/lib/transports/websocket"/>
+	<classpathentry kind="src" path="node_modules/socket.io/support/node-websocket-client/examples"/>
+	<classpathentry kind="src" path="node_modules/socket.io/support/node-websocket-client/lib"/>
+	<classpathentry kind="src" path="node_modules/socket.io/support/node-websocket-client/test"/>
+	<classpathentry excluding="leaks/" kind="src" path="node_modules/socket.io/test"/>
+	<classpathentry kind="src" path="node_modules/socket.io/test/leaks"/>
+	<classpathentry excluding="test/unit/compress/expected/|test/unit/|lib/|tmp/|test/|test/unit/compress/test/" kind="src" path="node_modules/uglify-js"/>
+	<classpathentry kind="src" path="node_modules/uglify-js/lib"/>
+	<classpathentry excluding="unit/compress/expected/|unit/|unit/compress/test/" kind="src" path="node_modules/uglify-js/test"/>
+	<classpathentry excluding="compress/expected/|compress/test/" kind="src" path="node_modules/uglify-js/test/unit"/>
+	<classpathentry kind="src" path="node_modules/uglify-js/test/unit/compress/expected"/>
+	<classpathentry kind="src" path="node_modules/uglify-js/test/unit/compress/test"/>
+	<classpathentry kind="src" path="node_modules/uglify-js/tmp"/>
+	<classpathentry excluding="cubiq-add-to-homescreen-7cddc55/src/" kind="src" path="views/js"/>
+	<classpathentry kind="src" path="views/js/cubiq-add-to-homescreen-7cddc55/src"/>
+	<classpathentry kind="con" path="org.eclipse.wst.jsdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path=""/>
+</classpath>

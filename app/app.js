@@ -34,8 +34,8 @@ var app = express.createServer(
 				express.cookieParser(),
 				express.session({secret: 'FlurbleGurgleBurgle',
 				                store: new express.session.MemoryStore({ reapInterval: -1 }) }));
-//app.listen(1337);
-app.listen(80);
+app.listen(1337);
+//app.listen(80);
 
 process.on('uncaughtException', function(err) {
 	console.log('Caught exception: ' + err.stack);
@@ -54,7 +54,7 @@ app.enable('jsonp callback');
 var mysql = require('mysql'),
 	database = 'stout',
 	user_table = 'users',
-	client = mysql.createClient({ user: 'sterlingrules', password: '@y&7~s45', host: 'mysql.mynameissterling.com', port: 3306 });
+	client = mysql.createClient({ user: 'root', password: '', host: 'localhost', port: 3306 });
 	client.query('USE ' + database);
 	client.database = 'stout';
 
@@ -68,17 +68,27 @@ var mysql = require('mysql'),
 // --------------------------------------------------------------------------------------
 // OAUTH SETUP
 // --------------------------------------------------------------------------------------
-
+/*
 var oa = new OAuth(
 	"https://api.twitter.com/oauth/request_token",
 	"https://api.twitter.com/oauth/access_token",
 	"Nmqm7UthsfdjaDQ4HcxPw",
 	"PIFvIPSXlTIbqnnnjBIqoWs0VIxpQivNrIJuWxtkLI",
 	"1.0",
-	//"http://localhost:1337/auth/twitter/callback",
 	"http://stoutapp.com/auth/twitter/callback",
 	"HMAC-SHA1"
 );
+*/
+var oa = new OAuth(
+		"https://api.twitter.com/oauth/request_token",
+		"https://api.twitter.com/oauth/access_token",
+		"r7iH7FJk4d99PojcwMoMA",
+		"TNXC3Tgd2Ycxexw1bVg2hkpEPpsYbYBdMsTyCwzek",
+		"1.0",
+		"http://192.168.0.200:1337/auth/twitter/callback",
+		"HMAC-SHA1"
+	);
+// 
 
 // --------------------------------------------------------------------------------------
 // COMMON FUNCTIONS

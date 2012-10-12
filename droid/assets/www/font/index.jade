@@ -1,0 +1,13 @@
+body(onload="storeCheck();")
+
+	section#index(title="Stout", selected="true").ac.home
+		section#index_beer
+		b STOUT
+		p.
+			Rate and track the greatest beverage in the world!
+		a(href="/auth/twitter", target="_webapp").btn.twitter Sign in with Twitter
+			span.left
+
+	script(type='text/javascript')
+		if (!window.navigator.standalone)
+			addToHome.show(true);
