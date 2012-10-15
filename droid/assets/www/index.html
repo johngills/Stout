@@ -12,7 +12,9 @@
         <link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="iphone.css" type="text/css" />		
         -->
         <!-- If your application is targeting iOS BEFORE 4.0 you MUST put json2.js from http://www.JSON.org/json2.js into your www directory and include it here -->
-        <script type="text/javascript" charset="utf-8" src="cordova-1.9.0.js"></script>
+
+        <script type="text/javascript" charset="utf-8" src="cordova-2.1.0.js"></script>
+        <script type="text/javascript" charset="utf-8" src="droidjs/webintent.js"></script>
 		<script type="text/javascript" charset="utf-8" src="js/constants.js"></script>
 		<script type="text/javascript" charset="utf-8" src="js/PushNotification.js"></script>
         <script type="text/javascript" charset="utf-8" src="js/jquery-1.7.2.min.js"></script>
@@ -52,7 +54,7 @@
 				return date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate() + ' ' + date.getHours() + '-' + date.getMinutes() + '-' + date.getSeconds();
 			} 
 			return "";
-		}
+		} 
             
         function load(message,status) {
             $('#load_overlay').remove();
@@ -65,7 +67,7 @@
         }
         
 		function handleOpenURL(address) {
-		    console.log(address);
+		    // console.log('!!!!!!~!!   ' + address);
 		
 			var results = address.split('?'),
 				url = results[0],
@@ -117,6 +119,10 @@
             // Create/Access Database on Start
 			db.transaction(function(tx) {
 				
+				window.plugins.webintent.getExtra(WebIntent.EXTRA\_TEXT, function (url) {
+							console.log('!!!!!!!!!!!!!!! url was ' + url);
+						}
+					);
 				// resets database
 				// tx.executeSql('DROP TABLE IF EXISTS user', [], successCB, errorCB);
 
@@ -133,6 +139,7 @@
 						if (results.rows.length != 0) {
 							window.location='dashboard.html#_index';
 						} else {
+							
 							$('#loader_splash').addClass('active');
 							setTimeout(function() {
 								$('#loader_splash').addClass('hide');
