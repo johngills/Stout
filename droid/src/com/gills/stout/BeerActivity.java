@@ -4,22 +4,21 @@ import android.os.Bundle;
 import org.apache.cordova.*;
 import android.app.Activity;
 import android.content.Intent;
+import android.util.Log;
+import com.borismus.webintent.*;
+
+
+
 
 
 public class BeerActivity extends DroidGap {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
-        final Intent intent = new Intent("android.intent.action.MAIN");
-        final String args=intent.getDataString();
-        if(args == null)
-        {
-          super.loadUrl("file:///android_asset/www/index.html");
-        } else
-        {
-          super.loadUrl("file:///android_asset/www/index.html?args=" + args.split("//")[1]);
-        }
+        super.loadUrl("file:///android_asset/www/index.html");
+
     }
 
 

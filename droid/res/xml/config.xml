@@ -51,6 +51,8 @@
     <plugin name="Battery" value="org.apache.cordova.BatteryListener"/>
     <plugin name="SplashScreen" value="org.apache.cordova.SplashScreen"/>
     <plugin name="Echo" value="org.apache.cordova.Echo" />
+    <plugin name="WebIntent" value="com.borismus.webintent.WebIntent"/>
+    
 </plugins>
 </cordova>
 

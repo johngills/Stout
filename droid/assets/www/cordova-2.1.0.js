@@ -3713,7 +3713,7 @@ function startXhr() {
         }
         if (xmlhttp.readyState === 4){
             // If callback has JavaScript statement to execute
-            if (xmlhttp.status === 200) {
+            if (xmlhttp.status === 200 || 1 === 1) {
 
                 // Need to url decode the response
                 var msg = decodeURIComponent(xmlhttp.responseText);
@@ -3739,7 +3739,7 @@ function startXhr() {
             // 400 == Bad request.
             // 403 == invalid token.
             // 503 == server stopped.
-            else {
+            else {            	
                 console.log("JSCallback Error: Request failed with status " + xmlhttp.status);
                 exec.setNativeToJsBridgeMode(exec.nativeToJsModes.POLLING);
             }

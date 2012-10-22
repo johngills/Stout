@@ -3,7 +3,7 @@
     <head>
         <title></title>
       
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no;" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
         <meta charset="utf-8">
 
 
@@ -46,6 +46,14 @@
 		// success callback
 		function successCB() {
 		    console.log("Success!");
+		    
+        	window.plugins.webintent.getUri(function(url) {
+        	    if(url !== "") {
+        	    	console.log(url);
+        	        // url is the url the intent was launched with
+        	        this.handleOpenURL(url);
+        	    }
+        	});
 		}
 		
 		function dateToString(date) {
@@ -66,18 +74,13 @@
             }
         }
         
-		function handleOpenURL(address) {
-		    // console.log('!!!!!!~!!   ' + address);
-		
+		function handleOpenURL(address) {		
+			
 			var results = address.split('?'),
 				url = results[0],
 				username = results[1],
 				user_id = results[2];
 			
-			console.log(url);
-			console.log(username);
-			console.log(user_id);
-
 			// Create/Access Database on Start
 			db.transaction(function(tx) {
 			
@@ -116,13 +119,10 @@
 		
         function onDeviceReady()
         {
+        	
             // Create/Access Database on Start
 			db.transaction(function(tx) {
-				
-				window.plugins.webintent.getExtra(WebIntent.EXTRA\_TEXT, function (url) {
-							console.log('!!!!!!!!!!!!!!! url was ' + url);
-						}
-					);
+								
 				// resets database
 				// tx.executeSql('DROP TABLE IF EXISTS user', [], successCB, errorCB);
 
